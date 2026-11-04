@@ -1,0 +1,1 @@
+-- colocar varios insert into TABELAS values... pelo menos 10 para cada tabela, pode usar ia pra fazer
