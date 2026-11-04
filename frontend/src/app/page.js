@@ -1,40 +1,94 @@
-import styles from "./page.module.css";
+'use client';
+
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+const DeliveryMap = dynamic(() => import('../../components/DeliveryMap'), {
+  ssr: false,
+  loading: () => <p style={{ textAlign: 'center', padding: '20px' }}>A carregar o mapa...</p>,
+});
 
 export default function Home() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+  const [rotas, setRotas] = useState([]);
+  const [rotaSelecionada, setRotaSelecionada] = useState(null);
+  const [erro, setErro] = useState(null);
+
+  // Busca as rotas na API do backend assim que a página carrega
+  useEffect(() => {
+    fetch('http://localhost:8080/api/rotas')
+      .then((res) => {
+        if (!res.ok) throw new Error('Erro ao carregar rotas da API');
+        return res.json();
+      })
+      .then((data) => {
+        setRotas(data);
+        if (data.length > 0) {
+          setRotaSelecionada(data[0]); // Seleciona a primeira rota por padrão
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErro('Não foi possível conectar ao backend ou carregar as rotas.');
+      });
+  }, []);
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <section className={styles.hero}>
-          <p className={styles.kicker}>LogiTrack</p>
-          <h1>Next.js, Express e MySQL</h1>
-          <p>
-            Base limpa para fork dos alunos, preparada para desenvolvimento
-            local e deploy com Docker no Coolify.
-          </p>
-        </section>
+    <div style={{ padding: '40px', width: '100%', minHeight: '100vh', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
+      <h1 style={{ marginBottom: '5px' }}>LogiTrack - Rotas</h1>
+      <p style={{ color: '#666', marginBottom: '30px' }}>
+        Selecione uma rota para visualizar o trajeto no mapa (dados vindos do Banco de Dados/API).
+      </p>
 
-        <section className={styles.grid} aria-label="Stack do projeto">
-          <article>
-            <span>Frontend</span>
-            <strong>Next.js</strong>
-            <p>Sem Tailwind ou Bootstrap por padrao.</p>
-          </article>
-          <article>
-            <span>Backend</span>
-            <strong>Express</strong>
-            <p>API em JavaScript com dotenv, cors, helmet e mysql2.</p>
-          </article>
-          <article>
-            <span>Banco</span>
-            <strong>MySQL</strong>
-            <p>Container com script inicial em SQL.</p>
-          </article>
-        </section>
+      {erro && <p style={{ color: 'red', marginBottom: '20px' }}>{erro}</p>}
 
-        <p className={styles.api}>API configurada: {apiUrl}</p>
-      </main>
+      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start', width: '100%' }}>
+        
+        {/* Coluna da Esquerda: Lista dinâmica de Rotas */}
+        <div style={{ width: '400px', flexShrink: 0 }}>
+          <h3>Rotas em destaque</h3>
+          {rotas.length === 0 && !erro && <p>A carregar rotas...</p>}
+          
+          {rotas.map((rota) => {
+            const estaSelecionada = rotaSelecionada?.id === rota.id;
+            return (
+              <div 
+                key={rota.id}
+                onClick={() => setRotaSelecionada(rota)}
+                style={{
+                  padding: '18px',
+                  margin: '15px 0',
+                  borderRadius: '8px',
+                  background: estaSelecionada ? '#1e293b' : '#0f172a',
+                  border: estaSelecionada ? '2px solid #f97316' : '1px solid #334155',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  transition: '0.2s'
+                }}
+              >
+                <strong style={{ fontSize: '15px' }}>{rota.titulo}</strong>
+                <p style={{ fontSize: '13px', color: '#94a3b8', margin: '6px 0' }}>{rota.motorista}</p>
+                <span style={{ fontSize: '12px', color: '#4ade80' }}>● {rota.status}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Coluna da Direita: O Mapa atualizado com base na rota seleccionada */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h3>Mapa de rotas</h3>
+          <div style={{ marginTop: '15px', width: '100%', height: '500px' }}>
+            {rotaSelecionada ? (
+              <DeliveryMap 
+                origin={[Number(rotaSelecionada.origem_lat), Number(rotaSelecionada.origem_lng)]} 
+                destination={[Number(rotaSelecionada.destino_lat), Number(rotaSelecionada.destino_lng)]} 
+              />
+            ) : (
+              <p>Selecione uma rota para ver o mapa.</p>
+            )}
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }

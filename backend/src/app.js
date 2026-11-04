@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import deliveryRoutes from "./routes/deliveryRoutes.js";
 
 import { errorHandler } from "./middlewares/errorHandler.js";
 import healthRoutes from "./routes/healthRoutes.js";
@@ -22,6 +23,7 @@ app.get("/", (request, response) => {
 });
 
 app.use("/api/health", healthRoutes);
+app.use("/api/rotas", deliveryRoutes);
 
 app.use(errorHandler);
 
