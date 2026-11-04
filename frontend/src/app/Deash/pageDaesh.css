@@ -1,0 +1,49 @@
+.container{
+    background-color: #071424;
+}
+
+aside{
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    flex-direction: column;
+    height: 48vw;
+    width: 280px;
+    background-color: #0a1829;
+    border: 3px solid #112437
+}
+
+.botao{
+    height: 50px;
+    width: 100%;
+    background-color: #fe7f3c;
+    border:none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    font-size: 20px; 
+}
+
+.img_logo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    width: 100%;
+    /* background-color: aliceblue; */
+}
+
+.logo{
+    height: 150px;
+    /* width: 100px; */
+
+}
+
+.area_botoes{
+    height: 500px;
+    width: 250px;
+    flex-direction: column;
+    display: flex;
+    gap: 10px;
+    /* background-color: aqua; */
+}
