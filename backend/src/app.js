@@ -4,6 +4,7 @@ import helmet from "helmet";
 
 import { errorHandler } from "./middlewares/errorHandler.js";
 import healthRoutes from "./routes/healthRoutes.js";
+import deliveryRoutes from "./routes/deliveryRoutes.js"; // 1. Importe a nova rota de entregas
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get("/", (request, response) => {
 });
 
 app.use("/api/health", healthRoutes);
+app.use("/api", deliveryRoutes); // 2. Registre as rotas de entregas (o endpoint será /api/deliveries)
 
 app.use(errorHandler);
 

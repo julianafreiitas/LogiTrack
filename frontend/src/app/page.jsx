@@ -1,3 +1,5 @@
+
+import DeliveryForm from "./components/DeliveryForm";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -32,6 +34,11 @@ export default function Home() {
             <p>Container com script inicial em SQL.</p>
           </article>
         </section>
+
+        {/* Formulário de Nova Entrega com Geocodificação */}
+        <div style={{ width: '100%', maxWidth: '400px', margin: '2rem 0' }}>
+          <DeliveryForm />
+        </div>
 
         <p className={styles.api}>API configurada: {apiUrl}</p>
       </main>
