@@ -2,6 +2,7 @@
 
 import styles from "./pageDash.css";
 import { useState } from "react";
+import { Omega } from "lucide-react";
 
 
 export default function Dash() {
@@ -10,7 +11,7 @@ export default function Dash() {
     return (
         <body className="container">
 
-            <main>
+            <main className="dash">
                 <aside>
                     <div className="img_logo">
                         <img className="logo" src="/imagens/logo.png" alt="" />
@@ -30,8 +31,24 @@ export default function Dash() {
 
                 </aside>
 
-            </main>
+                <div className="espaco">
+                    <input className="buscar" type="text" placeholder="Buscar entrega ou destino..." />
+                    <div className="box">
+                        <div className="identifica">
+                            <p>Equipe de operações</p>
+                            <p className="infor">Visão geral</p>
 
+                        </div>
+                        <div className="perfil">
+                            JF
+                        </div>
+                    </div>
+
+            
+
+                </div>
+
+            </main>
 
         </body>
     )

@@ -10,7 +10,7 @@ aside {
     height: 49vw;
     width: 280px;
     background-color: #0a1829;
-    border: 3px solid #112437
+    border: 3px solid #112437;   
 }
 
 .botao {
@@ -60,4 +60,57 @@ button.selecionado {
     display: flex;
     gap: 10px;
     /* background-color: aqua; */
+}
+
+/* ---- main ----- */
+
+.dash{
+    display: flex;
+}
+
+.espaco{
+    height: 100px;
+    width: 80%;
+    /* background-color: #c94e00; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 25px;
+    color: white;
+    border-bottom: 3px solid #132b3f;
+}
+
+.buscar{
+    height: 50px;
+    width: 290px;
+    border: none;
+    border-radius: 7px;
+    background-color: #10263b;
+    color: white;
+    padding: 10px;
+    font-size: 15px;
+}
+
+.box{
+    display: flex;
+    gap: 20px;
+}
+
+.perfil{
+    height: 60px;
+    width: 60px;
+    background-color: #4e5268;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+}
+
+.infor{
+    margin-left: 70px;
+}
+
+.identifica{
+    margin-top: 10px;
 }
