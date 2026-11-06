@@ -1,5 +1,9 @@
 .container {
     background-color: #071424;
+    display: flex;
+    /* flex-direction: column; */
+    
+    
 }
 
 aside {
@@ -64,20 +68,26 @@ button.selecionado {
 
 /* ---- main ----- */
 
-.dash{
+/* .dash{ */
+    /* height: 100%; */
+    /* width: 100%;
+    background-color: #c94e00;
     display: flex;
-}
+    
+   
+} */
 
 .espaco{
     height: 100px;
-    width: 80%;
-    /* background-color: #c94e00; */
+    width: 290%;
+    /* background-color: #000dc9; */
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-left: 25px;
     color: white;
     border-bottom: 3px solid #132b3f;
+    margin-bottom: 30px;
 }
 
 .buscar{
@@ -113,4 +123,11 @@ button.selecionado {
 
 .identifica{
     margin-top: 10px;
+}
+
+.conteudo{
+    height: 250px;
+    width: 100px;
+    background-color: aqua;
+    margin-left: 30px;
 }
