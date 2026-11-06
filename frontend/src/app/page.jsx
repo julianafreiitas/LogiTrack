@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import DeliveryForm from './components/DeliveryForm';
+import styles from './page.module.css';
 
-const DeliveryMap = dynamic(() => import('../../components/DeliveryMap'), {
+// Importação dinâmica do mapa para evitar erros de SSR com Leaflet
+const DeliveryMap = dynamic(() => import('../components/DeliveryMap'), {
   ssr: false,
-  loading: () => <p style={{ textAlign: 'center', padding: '20px' }}>A carregar o mapa...</p>,
+  loading: () => <p style={{ textAlign: 'center', padding: '20px' }}>A carregar o mapa...</p>
 });
 
 export default function Home() {
@@ -22,7 +25,7 @@ export default function Home() {
       })
       .then((data) => {
         setRotas(data);
-        if (data.length > 0) {
+        if (data.length > 0) {""
           setRotaSelecionada(data[0]); // Seleciona a primeira rota por padrão
         }
       })
@@ -34,24 +37,30 @@ export default function Home() {
 
   return (
     <div style={{ padding: '40px', width: '100%', minHeight: '100vh', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
-      <h1 style={{ marginBottom: '5px' }}>LogiTrack - Rotas</h1>
+      <h1 style={{ marginBottom: '5px' }}>LogiTrack - Gestão de Entregas</h1>
       <p style={{ color: '#666', marginBottom: '30px' }}>
-        Selecione uma rota para visualizar o trajeto no mapa (dados vindos do Banco de Dados/API).
+        Sistema unificado com formulário de geocodificação e visualização de rotas no mapa.
       </p>
 
       {erro && <p style={{ color: 'red', marginBottom: '20px' }}>{erro}</p>}
 
+      {/* Secção superior: Formulário de nova entrega com geocodificação */}
+      <div style={{ marginBottom: '40px', background: '#f9f9f9', padding: '20px', borderRadius: '8px', border: '1px solid #ddd' }}>
+        <h3 style={{ marginBottom: '15px' }}>Registar Nova Entrega</h3>
+        <DeliveryForm />
+      </div>
+
+      {/* Secção inferior: Listagem de rotas e Mapa interativo */}
       <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start', width: '100%' }}>
-        
         {/* Coluna da Esquerda: Lista dinâmica de Rotas */}
         <div style={{ width: '400px', flexShrink: 0 }}>
           <h3>Rotas em destaque</h3>
           {rotas.length === 0 && !erro && <p>A carregar rotas...</p>}
-          
+
           {rotas.map((rota) => {
             const estaSelecionada = rotaSelecionada?.id === rota.id;
             return (
-              <div 
+              <div
                 key={rota.id}
                 onClick={() => setRotaSelecionada(rota)}
                 style={{
@@ -67,27 +76,26 @@ export default function Home() {
               >
                 <strong style={{ fontSize: '15px' }}>{rota.titulo}</strong>
                 <p style={{ fontSize: '13px', color: '#94a3b8', margin: '6px 0' }}>{rota.motorista}</p>
-                <span style={{ fontSize: '12px', color: '#4ade80' }}>● {rota.status}</span>
+                <span style={{ fontSize: '12px', color: '#4ade80' }}>{rota.status}</span>
               </div>
             );
           })}
         </div>
 
-        {/* Coluna da Direita: O Mapa atualizado com base na rota seleccionada */}
+        {/* Coluna da Direita: O Mapa atualizado com base na rota selecionada */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3>Mapa de rotas</h3>
           <div style={{ marginTop: '15px', width: '100%', height: '500px' }}>
             {rotaSelecionada ? (
-              <DeliveryMap 
-                origin={[Number(rotaSelecionada.origem_lat), Number(rotaSelecionada.origem_lng)]} 
-                destination={[Number(rotaSelecionada.destino_lat), Number(rotaSelecionada.destino_lng)]} 
+              <DeliveryMap
+                origin={[Number(rotaSelecionada.origem_lat), Number(rotaSelecionada.origem_lng)]}
+                destination={[Number(rotaSelecionada.destino_lat), Number(rotaSelecionada.destino_lng)]}
               />
             ) : (
               <p>Selecione uma rota para ver o mapa.</p>
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
