@@ -1,41 +1,43 @@
 import { getCoordinates } from '../services/geocodeService.js';
-import db from '../config/database.js'; // Certifica-te de que o caminho para a tua conexão db está correto
+import db from '../config/database.js';
 
 export async function createDelivery(req, res, next) {
-  try {
-    const { clientName, address } = req.body;
+    try {
+        const { clientName, address } = req.body;
 
-    if (!clientName || !address) {
-      return res.status(400).json({ error: 'Nome do cliente e endereço são obrigatórios.' });
+        if (!clientName || !address) {
+            return res.status(400).json({ error: 'Nome do cliente e endereço são obrigatórios.' });
+        }
+
+        // 1. Converte o endereço em latitude e longitude usando o Nominatim
+        const { latitude, longitude } = await getCoordinates(address);
+
+        // 2. Gera um código de rastreio único (ex: ENT-timestamp)
+        const codigoRastreio = `ENT-${Date.now().toString().slice(-6)}`;
+
+        // 3. Inserção ajustada para as colunas reais do banco de dados (usando POINT para geolocalização)
+        // Nota: No MySQL POINT, a ordem padrão é (Longitude, Latitude)
+        const query = `
+            INSERT INTO entregas (codigo_rastreio, id_cliente, endereco_destino, coordenadas_destino, status)
+            VALUES (?, 1, ?, ST_GeomFromText(?), 'Pendente')
+        `;
+        
+        const pointWKT = `POINT(${longitude} ${latitude})`;
+        const [result] = await db.execute(query, [codigoRastreio, address, pointWKT]);
+
+        return res.status(201).json({
+            message: 'Entrega criada e geocodificada com sucesso!',
+            data: {
+                id: result.insertId,
+                codigoRastreio,
+                clientName,
+                address,
+                latitude,
+                longitude
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao criar entrega:', error);
+        next(error);
     }
-
-    // Converte o endereço em latitude e longitude usando o serviço de geocodificação
-    const { latitude, longitude } = await getCoordinates(address);
-
-    // Gera um código de rastreio único simples (ex: ENT-TIMESTAMP)
-    const codigoRastreio = `ENT-${Date.now().toString().slice(-6)}`;
-
-    // Inserção real na base de dados MySQL
-    const query = `
-      INSERT INTO entregas (codigo_rastreio, cliente, endereco, latitude, longitude, status) 
-      VALUES (?, ?, ?, ?, ?, 'Pendente')
-    `;
-    
-    const [result] = await db.execute(query, [codigoRastreio, clientName, address, latitude, longitude]);
-
-    return res.status(201).json({
-      message: 'Entrega criada e geocodificada com sucesso!',
-      data: {
-        id: result.insertId,
-        codigoRastreio,
-        clientName,
-        address,
-        latitude,
-        longitude
-      }
-    });
-  } catch (error) {
-    console.error('Erro ao criar entrega:', error);
-    next(error);
-  }
 }

@@ -3,14 +3,15 @@ import express from "express";
 import helmet from "helmet";
 import deliveryRoutes from "./routes/deliveryRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-import healthRoutes from "./healthRoutes.js"; // ou o caminho correto do healthRoutes
+import healthRoutes from "./routes/healthRoutes.js";
+app.use("/api", healthRoutes);
 
 const app = express();
 
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:3001"],
   })
 );
 app.use(express.json());

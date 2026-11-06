@@ -5,8 +5,7 @@ import dynamic from 'next/dynamic';
 import DeliveryForm from './components/DeliveryForm';
 import styles from './page.module.css';
 
-// Importação dinâmica do mapa para evitar erros de SSR com Leaflet
-const DeliveryMap = dynamic(() => import('../components/DeliveryMap'), {
+const DeliveryMap = dynamic(() => import('./components/DeliveryMap'), {
   ssr: false,
   loading: () => <p style={{ textAlign: 'center', padding: '20px' }}>A carregar o mapa...</p>
 });
@@ -18,16 +17,13 @@ export default function Home() {
 
   // Busca as rotas na API do backend assim que a página carrega
   useEffect(() => {
-    fetch('http://localhost:8080/api/rotas')
+    fetch('http://localhost:8080/api/')
       .then((res) => {
         if (!res.ok) throw new Error('Erro ao carregar rotas da API');
         return res.json();
       })
       .then((data) => {
         setRotas(data);
-        if (data.length > 0) {""
-          setRotaSelecionada(data[0]); // Seleciona a primeira rota por padrão
-        }
       })
       .catch((err) => {
         console.error(err);
