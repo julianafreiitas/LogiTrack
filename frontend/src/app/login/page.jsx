@@ -1,19 +1,45 @@
 
 "use client";
 
-import { createIcons, CircleUserRound, SquareUserRound } from 'lucide-react';
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./page.css";
 
 export default function Login() {
 
+  const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  function entrar(e) {
+  async function entrar(e) {
     e.preventDefault();
+    setErro("");
+    setCarregando(true);
 
-    alert("Login será conectado ao backend!");
+    try {
+      const res = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha }),
+      });
+      const dados = await res.json();
+
+      if (!res.ok) {
+        setErro(dados.erro || "Não foi possível entrar.");
+        return;
+      }
+
+      localStorage.setItem("token", dados.token);
+      router.push("/Dash");
+    } catch {
+      setErro("Não foi possível conectar ao servidor.");
+    } finally {
+      setCarregando(false);
+    }
   }
 
   return (
@@ -62,8 +88,10 @@ export default function Login() {
               <a href="">Esqueceu a senha?</a>
             </div>
 
-            <button type="submit">
-              Entrar
+            {erro && <p className="erro">{erro}</p>}
+
+            <button type="submit" disabled={carregando}>
+              {carregando ? "Entrando..." : "Entrar"}
             </button>
 
             <div className="cadastro">
