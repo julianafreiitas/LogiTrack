@@ -6,12 +6,12 @@ import { Omega } from "lucide-react";
 
 
 export default function Dash() {
-   
+
 
     return (
         <div className="container">
 
-           <Aside/>
+            <Aside />
 
             <main className="dash">
                 <div className="espaco">
@@ -30,6 +30,11 @@ export default function Dash() {
 
                 </div>
                 <div className="conteudo">
+                    <div className="">
+                        <p>VISÃO GERAL / OPERAÇÕES</p>
+                        <h1>Dashboard</h1>
+                        <p>Acompanhe sua operação em tempo real.</p>
+                    </div>
 
                 </div>
             </main>
