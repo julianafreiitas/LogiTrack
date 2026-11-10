@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Boxes,
-  Check,
-  Clock3,
-  Truck,
-} from "lucide-react";
+import { Boxes, Check, Clock3, Truck } from "lucide-react";
 import Aside from "../components/aside";
 import "./pageDash.css";
 
@@ -25,6 +20,7 @@ const updates = [
 
 function DeliveriesChart() {
   const points = "28,119 78,97 128,108 178,78 228,91 278,68 328,80";
+
   return (
     <svg className="line-chart" viewBox="0 0 360 170" role="img" aria-label="Entregas por dia: crescimento ao longo da semana">
       {[30, 52, 74, 96, 118, 140].map((y, i) => (
