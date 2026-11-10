@@ -39,5 +39,15 @@ export async function createDelivery(req, res, next) {
     } catch (error) {
         console.error('Erro ao criar entrega:', error);
         next(error);
+    }   
+}
+// Função para listar todas as entregas e retornar um array puro para o frontend
+export async function getDeliveries(req, res, next) {
+    try {
+        const [rows] = await db.query("SELECT * FROM entregas");
+        return res.status(200).json(rows); // Retorna os registos como array JSON
+    } catch (error) {
+        console.error('Erro ao buscar entregas:', error);
+        next(error);
     }
 }

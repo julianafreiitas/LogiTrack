@@ -16,20 +16,23 @@ export default function Home() {
   const [erro, setErro] = useState(null);
 
   // Busca as rotas na API do backend assim que a página carrega
-  useEffect(() => {
-    fetch('http://localhost:8080/api/')
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao carregar rotas da API');
-        return res.json();
-      })
-      .then((data) => {
-        setRotas(data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setErro('Não foi possível conectar ao backend ou carregar as rotas.');
-      });
-  }, []);
+ // Busca as rotas na API do backend assim que a página carrega
+useEffect(() => {
+    fetch('http://localhost:8080/api/deliveries')
+        .then((res) => {
+            if (!res.ok) throw new Error('Erro ao carregar rotas da API');
+            return res.json();
+        })
+        .then((data) => {
+            // Garante que só guarda um array no estado (evita o erro do .map)
+            setRotas(Array.isArray(data) ? data : []);
+        })
+        .catch((err) => {
+            console.error(err);
+            setErro('Não foi possível conectar ao backend ou carregar as rotas.');
+            setRotas([]); // Garante array vazio em caso de erro
+        });
+}, []);
 
   return (
     <div style={{ padding: '40px', width: '100%', minHeight: '100vh', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
@@ -53,7 +56,7 @@ export default function Home() {
           <h3>Rotas em destaque</h3>
           {rotas.length === 0 && !erro && <p>A carregar rotas...</p>}
 
-          {rotas.map((rota) => {
+          {Array.isArray(rotas) && rotas.map((rota) => {
             const estaSelecionada = rotaSelecionada?.id === rota.id;
             return (
               <div

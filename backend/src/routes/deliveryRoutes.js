@@ -8,16 +8,16 @@ const router = Router();
 router.get('/', async (req, res, next) => {
     try {
         const [rows] = await db.query(`
-            id_entregas AS id,
-            codigo_rastreio AS titulo,
-            'Motorista Atribuído' AS motorista,
-            'Ativa' AS status,
-            endereco_destino,
-            ST_X(coordenadas_destino) AS destino_lng,
-            ST_Y(coordenadas_destino) AS destino_lat,
-            -- Definimos uma origem padrão (ex: Centro de SP) para desenhar a linha no mapa
-            -23.550520 AS origem_lat,
-            -46.633308 AS origem_lng
+            SELECT 
+                id_entregas AS id,
+                codigo_rastreio AS titulo,
+                'Motorista Atribuído' AS motorista,
+                status,
+                endereco_destino,
+                ST_X(coordenadas_destino) AS destino_lng,
+                ST_Y(coordenadas_destino) AS destino_lat,
+                -23.550520 AS origem_lat,
+                -46.633308 AS origem_lng
             FROM entregas
         `);
         res.json(rows);
@@ -26,7 +26,5 @@ router.get('/', async (req, res, next) => {
         next(error);
     }
 });
-
-router.post('/', createDelivery);
 
 export default router;
