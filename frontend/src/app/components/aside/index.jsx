@@ -1,6 +1,6 @@
 "use client";
 
-import "../../Dash/pageDash.css";
+import "./aside.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, ChartNoAxesColumnIncreasing, LayoutDashboard, Map, Package, Users } from "lucide-react";

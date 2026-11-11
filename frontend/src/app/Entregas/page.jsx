@@ -1,8 +1,10 @@
+
 "use client";
 
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import Aside from "../components/aside";
+import Header from "../components/header";
 import "../Dash/pageDash.css";
 import "./pageEntregas.css";
 
@@ -29,16 +31,7 @@ export default function Entregas() {
     <div className="dash-container">
       <Aside />
       <main className="dash">
-        <header className="topbar">
-          <label className="search-box">
-            <Search size={13} aria-hidden="true" />
-            <input type="search" placeholder="Buscar entrega ou destino..." aria-label="Buscar entrega ou destino" />
-          </label>
-          <div className="account">
-            <div><strong>Equipe de operações</strong><span>Visão geral</span></div>
-            <div className="avatar" aria-label="Perfil LT">LT</div>
-          </div>
-        </header>
+       <Header/>
 
         <section className="delivery-content" aria-label="Pedidos e entregas">
           <div className="delivery-title-row">

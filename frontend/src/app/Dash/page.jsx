@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Boxes, Check, Clock3, Truck } from "lucide-react";
 import Aside from "../components/aside";
+import Header from "../components/header";
 import "./pageDash.css";
 
 const metrics = [
@@ -69,16 +70,7 @@ export default function Dash() {
     <div className="dash-container">
       <Aside />
       <main className="dash">
-        <header className="topbar">
-          <label className="search-box">
-            <span className="search-icon" aria-hidden="true">⌕</span>
-            <input type="search" placeholder="Buscar entrega ou destino..." aria-label="Buscar entrega ou destino" />
-          </label>
-          <div className="account">
-            <div><strong>Equipe de operações</strong><span>Visão geral</span></div>
-            <div className="avatar" aria-label="Perfil LT">LT</div>
-          </div>
-        </header>
+        <Header/>
 
         <section className="dashboard-content" aria-label="Visão geral das operações">
           <div className="dashboard-heading">
