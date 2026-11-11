@@ -1,7 +1,4 @@
 POST http://localhost:8080/api/deliveries
 Content-Type: application/json
 
-{
-  "clientName": "Empresa Teste",
-  "address": "Avenida Paulista, 1000, São Paulo, SP"
-}
+{ "clientName": "Teste", "address": "Avenida Paulista, 1578, São Paulo" }
