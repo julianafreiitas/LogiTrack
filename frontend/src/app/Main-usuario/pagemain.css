@@ -1,0 +1,84 @@
+.dash-container {
+  --page: #ffffff;
+  --sidebar: #091a2b;
+  --panel: #0e2337;
+  --panel-border: #142e45;
+  --muted: #8195aa;
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  color: #edf4fc;
+  background: var(--page);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =================
+   SIDE-BAR CLIENTE
+   ================= */
+
+.sidebar-users {
+  position: sticky;
+  top: 0;
+  display: flex;
+  width: 138px;
+  height: 100vh;
+  min-height: 480px;
+  flex: 0 0 138px;
+  flex-direction: column;
+  border-right: 1px solid #142e45;
+  background: var(--sidebar);
+  padding: 14px 9px 12px;
+}
+
+.brand {
+  display: flex;
+  height: 28px;
+  align-items: center;
+  gap: 3px;
+  padding-left: 4px;
+  color: #ff751f;
+  font-size: 12px;
+  font-weight: 800;
+}
+.brand span { color: #f3f7fb; }
+.brand strong { color: #ff751f; }
+.nav-label { margin: 24px 0 8px; padding-left: 7px; color: #71869c; font-size: 7px; font-weight: 700; letter-spacing: 1px; }
+.area_botoes { display: flex; flex-direction: column; gap: 3px; }
+.botao {
+  display: flex;
+  min-height: 26px;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #d1dce8;
+  padding: 0 8px;
+  cursor: pointer;
+  font-size: 9px;
+  text-align: left;
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+.botao:hover { background: #142b40; color: #fff; }
+.botao:active { transform: scale(0.97); }
+.botao.selecionado, .botao.selecionado:hover { background: #ff751f; color: #fff; }
+.sidebar-footer { margin-top: auto; padding: 0 5px; color: #72879d; font-size: 7px; white-space: nowrap; }
+
+/* =================
+        BANNER
+   ================= */
+
+.banner {
+    background: #f4f0e8;
+    border: 1px solid #e5dac6;
+    background-image: url('/img/FundoBanner.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.banner h1 {
+    color: #fa8212;
+    font-family: Georgia, serif;
+}
+
