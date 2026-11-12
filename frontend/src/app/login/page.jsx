@@ -1,9 +1,8 @@
 
 "use client";
 
-import { createIcons, CircleUserRound, SquareUserRound } from 'lucide-react';
 import { useState } from "react";
-import styles from "./page.css";
+import "./page.css";
 
 export default function Login() {
 
@@ -17,7 +16,7 @@ export default function Login() {
   }
 
   return (
-    <main className="container">
+    <main className="login-page">
 
       <div className="marca">
 

@@ -1,63 +1,721 @@
-.container {
-    background-color: #071424;
-}
-
-aside {
+.dash-container {
+    --page: #071424;
+    --sidebar: #091a2b;
+    --panel: #0e2337;
+    --panel-border: #142e45;
+    --muted: #8195aa;
     display: flex;
-    /* justify-content: center;*/
-    align-items: center;
-    flex-direction: column;
-    height: 49vw;
-    width: 280px;
-    background-color: #0a1829;
-    border: 3px solid #112437
+    min-height: 100vh;
+    width: 100%;
+    color: #edf4fc;
+    background: var(--page);
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-.botao {
-    height: 50px;
+
+.dash {
+    min-width: 0;
+    flex: 1;
+    padding: 0 21px 22px;
+}
+
+
+.dashboard-content {
     width: 100%;
-    border: none;
-    background-color: #0a1829;
-    border-radius: 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 16px;
+}
+
+.dashboard-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 11px;
+}
+
+.eyebrow {
+    margin-bottom: 5px;
+    color: #7e93a9;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+.dashboard-heading h1 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.2;
+}
+
+.subtitle {
+    margin-top: 5px;
+    color: #dce7f2;
+    font-size: 8px;
+}
+
+.period-switch {
+    display: flex;
+    gap: 3px;
+    border: 1px solid #1b354b;
+    border-radius: 6px;
+    background: #10263b;
+    padding: 3px;
+}
+
+.period-switch button {
+    min-height: 18px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: #93a5b7;
+    padding: 0 8px;
     cursor: pointer;
-    color: white;
-    font-size: 20px;
-    transition: 0.3s ease;
+    font-size: 7px;
+    transition: 0.2s ease;
 }
 
-button:hover {
-    background-color: #4e526873;
+.period-switch button:hover {
+    color: #fff;
 }
 
-button:active {
-    background-color: #c94e00;
-    transform: scale(0.95);
+.period-switch button.active {
+    border: 1px solid #a94f1b;
+    background: #193047;
+    color: #fff;
 }
 
-button.selecionado {
-    background-color: #ff751f;
-    color: white;
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-bottom: 7px;
 }
 
-.img_logo {
-    display: flex;
-    justify-content: center;
+.metric-card,
+.panel {
+    min-width: 0;
+    border: 1px solid var(--panel-border);
+    border-radius: 7px;
+    background: var(--panel);
+}
+
+.metric-card {
+    position: relative;
+    display: grid;
+    min-height: 96px;
+    grid-template-columns: 19px 1fr;
+    grid-template-rows: 21px 25px auto;
+    align-content: start;
     align-items: center;
-    height: 150px;
-    width: 100%;
-    /* background-color: aliceblue; */
+    column-gap: 7px;
+    padding: 10px;
 }
 
-.logo {
-    height: 150px;
-    /* width: 100px; */
+.metric-icon {
+    display: grid;
+    width: 18px;
+    height: 18px;
+    grid-row: 1;
+    place-items: center;
+    border-radius: 5px;
 }
 
-.area_botoes {
-    height: 500px;
-    width: 250px;
-    flex-direction: column;
+.metric-icon.orange {
+    background: #53341f;
+    color: #ff812e;
+}
+
+.metric-icon.green {
+    background: #104b43;
+    color: #28c49c;
+}
+
+.metric-icon.blue {
+    background: #183e5c;
+    color: #53b5f5;
+}
+
+.metric-icon.red {
+    background: #512b3a;
+    color: #ff687f;
+}
+
+.metric-label {
+    overflow: hidden;
+    color: #aab9c8;
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.metric-value {
+    grid-column: 1 / -1;
+    align-self: end;
+    margin-top: 2px;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+}
+
+.metric-note {
+    grid-column: 1 / -1;
+    align-self: end;
+    margin-top: 5px;
+    color: #8da1b5;
+    font-size: 7px;
+    line-height: 1.25;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 7px;
+    margin-bottom: 7px;
+}
+
+.panel {
+    padding: 10px;
+}
+
+.panel-heading {
     display: flex;
-    gap: 10px;
-    /* background-color: aqua; */
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.panel-heading h2 {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.panel-heading p {
+    margin-top: 4px;
+    color: #8da1b5;
+    font-size: 8px;
+}
+
+.delivery-panel,
+.status-panel {
+    min-height: 201px;
+}
+
+.chart-key {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #9aabbb;
+    font-size: 7px;
+}
+
+.chart-key i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ff751f;
+}
+
+.line-chart {
+    display: block;
+    width: 100%;
+    height: 142px;
+    margin-top: 3px;
+    overflow: visible;
+}
+
+.chart-grid {
+    stroke: #21394e;
+    stroke-width: 0.7;
+}
+
+.chart-label {
+    fill: #8295a8;
+    font-size: 6px;
+}
+
+.chart-area {
+    fill: rgba(255, 117, 31, 0.12);
+}
+
+.chart-line {
+    fill: none;
+    stroke: #ff751f;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.chart-dot {
+    fill: #ff751f;
+}
+
+.donut-wrap {
+    display: flex;
+    min-height: 145px;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 7px;
+}
+
+.donut-chart {
+    width: 126px;
+    height: 126px;
+    flex: 0 0 126px;
+    transform: rotate(-90deg);
+}
+
+.donut-track,
+.donut-segment {
+    fill: none;
+    stroke-width: 15;
+}
+
+.donut-track {
+    stroke: #163047;
+}
+
+.donut-segment {
+    stroke-linecap: butt;
+}
+
+.segment-complete {
+    stroke: #20c49a;
+    stroke-dasharray: 232 302;
+    stroke-dashoffset: 0;
+}
+
+.segment-transit {
+    stroke: #4aa7ef;
+    stroke-dasharray: 51 302;
+    stroke-dashoffset: -235;
+}
+
+.segment-pending {
+    stroke: #ffa43b;
+    stroke-dasharray: 14 302;
+    stroke-dashoffset: -289;
+}
+
+.segment-late {
+    stroke: #ef647e;
+    stroke-dasharray: 4 302;
+    stroke-dashoffset: -305;
+}
+
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    color: #a9b7c5;
+    list-style: none;
+    font-size: 7px;
+}
+
+.chart-legend li {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.chart-legend i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.legend-complete {
+    background: #20c49a;
+}
+
+.legend-transit {
+    background: #4aa7ef;
+}
+
+.legend-pending {
+    background: #ffa43b;
+}
+
+.legend-late {
+    background: #ef647e;
+}
+
+.updates-panel {
+    min-height: 92px;
+}
+
+.updates-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 9px;
+}
+
+.update-item {
+    display: flex;
+    min-width: 0;
+    min-height: 29px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    border-left: 2px solid;
+    padding-left: 7px;
+}
+
+.update-item strong {
+    overflow: hidden;
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.update-item span {
+    overflow: hidden;
+    color: #8da1b5;
+    font-size: 7px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.update-item.orange {
+    border-color: #ff751f;
+}
+
+.update-item.blue {
+    border-color: #4aa7ef;
+}
+
+.update-item.green {
+    border-color: #20c49a;
+}
+
+@media (min-width: 1100px) {
+    .sidebar {
+        width: 210px;
+        flex-basis: 210px;
+        padding: 22px 14px 16px;
+    }
+
+    .brand {
+        font-size: 15px;
+    }
+
+    .nav-label {
+        margin-top: 34px;
+        font-size: 10px;
+    }
+
+    .botao {
+        min-height: 38px;
+        font-size: 12px;
+    }
+
+    .botao svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .sidebar-footer {
+        font-size: 9px;
+    }
+
+    .dash {
+        padding: 0 30px 30px;
+    }
+
+    .topbar {
+        min-height: 66px;
+    }
+
+    .search-box {
+        width: min(100%, 240px);
+        height: 34px;
+    }
+
+    .search-box input {
+        font-size: 10px;
+    }
+
+    .account strong {
+        font-size: 10px;
+    }
+
+    .account span {
+        font-size: 8px;
+    }
+
+    .avatar {
+        width: 27px;
+        height: 27px;
+        font-size: 10px;
+    }
+
+    .dashboard-content {
+        padding-top: 23px;
+    }
+
+    .dashboard-heading h1 {
+        font-size: 24px;
+    }
+
+    .eyebrow {
+        font-size: 9px;
+    }
+
+    .subtitle {
+        font-size: 11px;
+    }
+
+    .metric-grid,
+    .charts-grid {
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .metric-card {
+        min-height: 120px;
+        padding: 14px;
+        grid-template-columns: 25px 1fr;
+        grid-template-rows: 27px 31px auto;
+    }
+
+    .metric-icon {
+        width: 23px;
+        height: 23px;
+    }
+
+    .metric-label {
+        font-size: 10px;
+    }
+
+    .metric-value {
+        font-size: 21px;
+    }
+
+    .metric-note {
+        font-size: 9px;
+    }
+
+    .panel {
+        padding: 14px;
+    }
+
+    .panel-heading h2 {
+        font-size: 16px;
+    }
+
+    .panel-heading p {
+        font-size: 10px;
+    }
+
+    .delivery-panel,
+    .status-panel {
+        min-height: 260px;
+    }
+
+    .line-chart {
+        height: 188px;
+    }
+
+    .chart-label {
+        font-size: 7px;
+    }
+
+    .donut-wrap {
+        min-height: 196px;
+        gap: 25px;
+    }
+
+    .donut-chart {
+        width: 160px;
+        height: 160px;
+        flex-basis: 160px;
+    }
+
+    .chart-legend {
+        font-size: 9px;
+    }
+
+    .updates-panel {
+        min-height: 116px;
+    }
+
+    .updates-grid {
+        gap: 18px;
+        margin-top: 12px;
+    }
+
+    .update-item {
+        min-height: 42px;
+        padding-left: 9px;
+    }
+
+    .update-item strong {
+        font-size: 10px;
+    }
+
+    .update-item span {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        border-right: 0;
+        border-bottom: 1px solid #142e45;
+        padding: 10px 12px;
+    }
+
+    .brand {
+        flex: 0 0 auto;
+    }
+
+    .nav-label {
+        margin: 0 0 0 0;
+        padding: 0;
+    }
+
+    .area_botoes {
+        width: 100%;
+        flex-direction: row;
+        gap: 4px;
+        overflow-x: auto;
+    }
+
+    .botao {
+        min-height: 34px;
+        flex: 1 0 auto;
+        justify-content: center;
+        gap: 5px;
+        padding: 0 8px;
+        font-size: 10px;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .dash-container {
+        flex-direction: column;
+    }
+
+    .dash {
+        padding: 0 14px 20px;
+    }
+
+    .topbar {
+        min-height: 56px;
+    }
+
+    .dashboard-content {
+        padding-top: 17px;
+    }
+
+    .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .delivery-panel,
+    .status-panel {
+        min-height: 220px;
+    }
+
+    .line-chart {
+        height: 160px;
+    }
+
+    .donut-wrap {
+        min-height: 160px;
+    }
+}
+
+@media (max-width: 420px) {
+    .dash {
+        padding: 0 10px 16px;
+    }
+
+    .topbar {
+        gap: 8px;
+    }
+
+    .search-box {
+        width: min(62%, 220px);
+    }
+
+    .search-box input {
+        font-size: 8px;
+    }
+
+    .account {
+        gap: 5px;
+    }
+
+    .account strong {
+        font-size: 7px;
+    }
+
+    .account span {
+        font-size: 6px;
+    }
+
+    .dashboard-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .period-switch {
+        align-self: flex-end;
+        margin-top: -4px;
+    }
+
+    .metric-card {
+        min-height: 102px;
+        padding: 8px;
+    }
+
+    .metric-note {
+        font-size: 6.5px;
+    }
+
+    .donut-wrap {
+        gap: 10px;
+    }
+
+    .donut-chart {
+        width: 112px;
+        height: 112px;
+        flex-basis: 112px;
+    }
+
+    .chart-legend {
+        gap: 7px;
+        font-size: 7px;
+    }
+
+    .updates-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .update-item {
+        min-height: 30px;
+    }
 }
