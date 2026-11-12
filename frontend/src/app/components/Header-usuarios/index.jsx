@@ -11,13 +11,15 @@ import {
   Truck,
   MapPinHouse,
   LogOut,
+  RotateCcwClock,
   ChevronDown
 } from "lucide-react";
 
 const navigation = [
   { name: "Início", href: "/Main-usuario", icon: Home },
+  { name: "Solicitar Entregas", href: "/Solicitar-Entregas", icon: Package},
   { name: "Acompanhar", href: "/AcompanharEntrega", icon: Truck },
-  { name: "Meus Pedidos", href: "/Meus-Pedidos", icon: Package},
+  { name: "Últimos Pedidos", href: "/Meus-Pedidos", icon: RotateCcwClock},
   { name: "Endereços", href: "/Enderecos", icon: MapPinHouse },
 ];
 
@@ -34,7 +36,7 @@ export default function Header() {
         href="/Main-usuario"
         aria-label="LogiTrack início"
       >
-        <ArrowUpRight size={22} strokeWidth={3} />
+        <img src="/imagens/logo2.png" className="logo" />
         <span>Logi<strong>Track</strong></span>
       </Link>
 

@@ -53,6 +53,10 @@
   color: #ff751f;
 }
 
+.logo{
+  height: 50px
+}
+
 /* NAVEGAÇÃO */
 
 .area_botoes {
@@ -151,7 +155,7 @@
 }
 
 .main-content {
-  width: min(1100px, 92%);
+  width: min(1800px, 92%);
   margin: 0 auto;
   padding: 30px 0 20px;
 }
@@ -166,7 +170,7 @@
   align-items: center;
   justify-content: space-between;
 
-  min-height: 195px;
+  min-height: 299px;
   padding: 32px 40px;
   margin-bottom: 22px;
 
@@ -185,7 +189,7 @@
 .banner-text {
   position: relative;
   z-index: 2;
-  max-width: 530px;
+  max-width: 550px;
 }
 
 .banner-label {
@@ -200,7 +204,7 @@
 .banner h1 {
   margin: 0 0 10px;
   color: #fff;
-  font-size: 30px;
+  font-size: 40px;
   font-weight: 700;
 }
 
@@ -208,7 +212,7 @@
   max-width: 430px;
   margin: 0;
   color: #d1dce9;
-  font-size: 14px;
+  font-size: 18px;
   line-height: 1.6;
 }
 
@@ -513,7 +517,9 @@
 
 .dashboard-footer {
   padding: 15px 0;
-  border-top: 1px solid #e2e9f2;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #d0d9e6;
   text-align: center;
 }
 
@@ -522,6 +528,18 @@
   color: #94a3b8;
   font-size: 11px;
 }
+
+
+.custom-icon1 {
+  width: 10px;
+  height: 10px;
+}
+
+.custom-icon2 {
+  width: 12px;
+  height: 12px;
+}
+
 
 /* =========================
    RESPONSIVIDADE

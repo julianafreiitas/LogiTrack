@@ -3,7 +3,9 @@
 
 import { useState } from "react";
 import Header from "../components/Header-usuarios";
+import Footer from "../components/Footer-usuarios";
 import "./pagemain.css";
+import {Truck, Package, Check, Clock4, Info } from "lucide-react";
 
 const pedidos = [
   {
@@ -82,7 +84,7 @@ export default function MainUsuario() {
                   Digite um código demonstrativo, como LT-2049.
                 </p>
               </div>
-              <span className="card-icon">📦</span>
+              <span className="card-icon"><Package/></span>
             </div>
 
             <form onSubmit={consultarEntrega}>
@@ -115,7 +117,7 @@ export default function MainUsuario() {
             </form>
 
             <div className="tracking-help">
-              <span>ⓘ</span>
+              <span><Info className="custom-icon2"/></span>
               Tenha seu código em mãos para consultar sua encomenda.
             </div>
           </div>
@@ -151,7 +153,7 @@ export default function MainUsuario() {
         <section className="stats-grid">
 
           <div className="stat-card">
-            <div className="stat-icon blue">🚚</div>
+            <div className="stat-icon blue"><Truck/></div>
             <div>
               <span>Em trânsito</span>
               <strong>12</strong>
@@ -159,7 +161,7 @@ export default function MainUsuario() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon green">✓</div>
+            <div className="stat-icon green"><Check/></div>
             <div>
               <span>Entregues</span>
               <strong>28</strong>
@@ -167,7 +169,7 @@ export default function MainUsuario() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon orange">◷</div>
+            <div className="stat-icon orange"><Clock4 /></div>
             <div>
               <span>Pendentes</span>
               <strong>03</strong>
@@ -176,9 +178,7 @@ export default function MainUsuario() {
 
         </section>
 
-        <footer className="dashboard-footer">
-          <p>© 2026 LogiTrack · Sistema de acompanhamento de entregas.</p>
-        </footer>
+        <Footer/>
 
       </main>
     </div>

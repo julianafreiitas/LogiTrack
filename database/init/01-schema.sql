@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email VARCHAR(150) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     telefone VARCHAR(40) NOT NULL,
+    imagem VARCHAR(100) NOT NULL,
     tipo ENUM('admin', 'operador') DEFAULT 'operador',
     status ENUM('ativo', 'inativo') DEFAULT 'ativo',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
