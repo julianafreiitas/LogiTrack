@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import DeliveryForm from './components/DeliveryForm';
 import { API_URL } from './lib/api';
 
-// Leaflet precisa do navegador: carrega o mapa só no cliente
 const DeliveryMap = dynamic(() => import('./components/DeliveryMap'), {
   ssr: false,
   loading: () => (
@@ -44,14 +43,12 @@ export default function Home() {
   const [erro, setErro] = useState(null);
   const [carregando, setCarregando] = useState(true);
 
-  // Busca as rotas na API. Se receber um id, seleciona essa rota (ex.: a recém-criada)
   const carregarRotas = useCallback(async (selecionarId) => {
     try {
       const res = await fetch(`${API_URL}/deliveries`);
       if (!res.ok) throw new Error('Erro ao carregar rotas da API');
 
       const data = await res.json();
-      // Garante que só guarda um array no estado (evita o erro do .map)
       const lista = Array.isArray(data) ? data : [];
 
       setRotas(lista);
@@ -107,9 +104,7 @@ export default function Home() {
           LogiTrack · Operações / Deslocamento
         </p>
         <h1 style={{ fontSize: '40px', margin: '6px 0 4px' }}>Rotas</h1>
-        <p style={{ color: '#94a3b8', margin: '0 0 28px' }}>
-          Registre uma entrega e explore o trajeto no mapa.
-        </p>
+     
 
         {erro && <p style={{ color: '#f87171', marginBottom: '20px' }}>{erro}</p>}
 
@@ -119,9 +114,7 @@ export default function Home() {
           {/* Coluna esquerda: lista de rotas */}
           <div style={{ flex: '0 0 420px', maxWidth: '100%' }}>
             <h3 style={{ margin: '0 0 4px', fontSize: '20px' }}>Rotas em destaque</h3>
-            <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#94a3b8' }}>
-              Selecione uma rota para visualizar seu trajeto
-            </p>
+            
 
             {carregando && <p style={{ color: '#94a3b8' }}>Carregando rotas...</p>}
 

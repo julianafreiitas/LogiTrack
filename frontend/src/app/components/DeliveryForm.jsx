@@ -74,9 +74,6 @@ export default function DeliveryForm({ onCreated }) {
       }}
     >
       <h3 style={{ margin: '0 0 4px', fontSize: '18px' }}>Registrar nova entrega</h3>
-      <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#94a3b8' }}>
-        O endereço é convertido em latitude e longitude e a rota aparece no mapa.
-      </p>
 
       <form
         onSubmit={handleSubmit}

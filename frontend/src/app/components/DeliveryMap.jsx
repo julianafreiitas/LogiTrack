@@ -54,7 +54,6 @@ export default function DeliveryMap({
 
   const [rotaViaria, setRotaViaria] = useState(null);
 
-  // Busca o trajeto por vias reais. Se falhar, a linha reta continua valendo.
   useEffect(() => {
     if (!temOrigem || !temDestino) return undefined;
 
