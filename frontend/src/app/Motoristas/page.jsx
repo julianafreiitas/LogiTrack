@@ -20,7 +20,6 @@ export default function Motoristas() {
                                 <p className="eyebrow">OPERAÇÕES / MOTORISTAS</p>
                                 <h1>Motoristas</h1>
                                 <p className="subtitle">Gerencie os motoristas cadastrados.</p>
-
                             </div>
 
                             <div className="total-motoristas">
@@ -33,14 +32,7 @@ export default function Motoristas() {
                         <input className="buscar" type="text" placeholder="Buscar motorista..." />
 
                         <div className="filtro">
-                            <div class="caixa">
-                                <div class="titulo" onclick="abrirCaixa()">
-                                    Informações do motorista
-                                    <span id="seta">⌄</span>
-                                </div>
-
-
-                            </div>
+                            <button className="btn_cadastro">Cadastrar</button>
 
                         </div>
 
