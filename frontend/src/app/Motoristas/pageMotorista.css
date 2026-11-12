@@ -1,5 +1,36 @@
 .motorista-title{
     height: 100%;
     width: 100%;
-    background-color: aqua;
+    /* background-color: rgb(3, 56, 56); */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.total-motoristas{
+    color: white;
+    font-size: 13px;
+    margin-right: 20px;
+    background-color: rgb(58, 72, 114);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.motorista-table{
+    height: 100px;
+    width: 100%;
+    /* background-color: brown; */
+}
+
+.buscar{
+    height: 55px;
+    width: 80%;
+    border-radius: 10px;
+    border: none;
+    background-color: #132b3f;
+    color: white;
+    padding: 15px;
+    border: solid 1px #1b3950;
 }
