@@ -6,6 +6,17 @@ import Header from "../components/header";
 import "./pageMotorista.css";
 
 
+const deliveries = [
+    { code: "LT-2048", destination: "São Paulo, SP", driver: "João Pereira", eta: "30 out · 10:30", status: "Entregue" },
+    { code: "LT-2049", destination: "Campinas, SP", driver: "Ana Costa", eta: "30 out · 15:00", status: "Em trânsito" },
+    { code: "LT-2050", destination: "Santos, SP", driver: "Pedro Alves", eta: "31 out · 11:00", status: "Pendente" },
+    { code: "LT-2051", destination: "São Bernardo, SP", driver: "Marina Lima", eta: "30 out · 09:00", status: "Entregue" },
+    { code: "LT-2052", destination: "Sorocaba, SP", driver: "Diego Ramos", eta: "29 out · 17:00", status: "Atrasada" },
+    { code: "LT-2053", destination: "Jundiaí, SP", driver: "Carla Nunes", eta: "30 out · 18:00", status: "Em trânsito" },
+];
+
+const filteredDeliveries = deliveries;
+
 export default function Motoristas() {
     return (
         <div className="dash-container">
@@ -29,27 +40,40 @@ export default function Motoristas() {
                     </div>
 
                     <div className="filtro_busca">
-                        <input className="buscar" type="text" placeholder="Buscar motorista..." />
+                        <div className="filtro_busca-row">
+                            <input className="buscar" type="text" placeholder="Buscar motorista ou cidade..." />
 
-                        <div className="filtro">
-                            <button className="btn_cadastro">Cadastrar</button>
+                            <div className="filtro">
+                                <button className="btn_cadastro">+</button>
+                                
+                                <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Filtrar por status">
+                                    {["Todos os status", "Entregue", "Em trânsito", "Pendente", "Atrasada"].map((option) => <option key={option}>{option}</option>)}
+                                </select>
+
+                            </div>
 
                         </div>
 
-                        <div className="motorista-table-wrap">
-                            <table className="motorista-table">
-                                <thead><tr><th>Nome</th><th>Veículo</th><th>Placa</th><th>Status</th></tr></thead>
+                        <div className="delivery-table-wrap">
+                            <table className="delivery-table">
+                                <thead><tr><th>Código</th><th>Destino</th><th>Motorista</th><th>Previsão</th><th>Status</th></tr></thead>
                                 <tbody>
-                                    {/* Aqui você pode mapear os motoristas cadastrados */}
-                                    <tr><td>João Pereira</td><td>Caminhão</td><td>ABC-1234</td><td>Ativo</td></tr>
-                                    <tr><td>Ana Costa</td><td>Van</td><td>XYZ-5678</td><td>Inativo</td></tr>
-                                    {/* Adicione mais motoristas conforme necessário */}
+                                    {filteredDeliveries.map((delivery) => (
+                                        <tr key={delivery.code}>
+                                            <td className="delivery-code">{delivery.code}</td>
+                                            <td>{delivery.destination}</td>
+                                            <td>{delivery.driver}</td>
+                                            <td>{delivery.eta}</td>
+                                            <td><span className={`status-badge ${delivery.status.toLowerCase().replace(" ", "-")}`}>{delivery.status}</span></td>
+                                        </tr>
+                                    ))}
+                                    {filteredDeliveries.length === 0 && <tr><td className="empty-state" colSpan="5">Nenhuma entrega encontrada.</td></tr>}
                                 </tbody>
                             </table>
                         </div>
-                        </div>
+                    </div>
 
-                    
+
                 </section>
             </main>
         </div>

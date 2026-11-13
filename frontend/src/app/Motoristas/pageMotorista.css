@@ -1,3 +1,8 @@
+::placeholder {
+    color: white;
+    opacity: 1; /* Firefox */
+}
+
 .motorista-title{
     height: 100%;
     width: 100%;
@@ -24,13 +29,49 @@
     /* background-color: brown; */
 }
 
+.filtro_busca-row{
+    display: flex;
+    gap: 15px;
+    /* justify-content: space-between; */
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btn_cadastro{
+    height: 50px;
+    width: 50px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;    
+    align-items: center;
+    border: none;
+    background-color: #132b3f00;
+    color: white;
+    padding: 15px;
+    border: solid 2px #1b3950;
+    cursor: pointer;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 16px;
+    font-size: 25px;
+}
+
+.btn_cadastro:hover{
+    background-color: #132b3f;
+    border: solid 2px #1b3950;
+}
+
 .buscar{
-    height: 55px;
-    width: 80%;
+    height: 50px;
+    width: 95%;
     border-radius: 10px;
     border: none;
     background-color: #132b3f;
     color: white;
     padding: 15px;
     border: solid 1px #1b3950;
+}
+
+.filtro{
+    display: flex;
+    justify-content: center;
 }

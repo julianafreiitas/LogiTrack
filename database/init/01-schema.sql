@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS motoristas (
     status ENUM('Disponível', 'Em rota', 'Indisponível') NOT NULL DEFAULT 'Disponível',
     localizacao_atual POINT NOT NULL, 
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_        TIMESTAMP,
     
     SPATIAL INDEX idx_localizacao_motorista (localizacao_atual)
 );
