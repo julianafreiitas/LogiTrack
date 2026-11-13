@@ -1,9 +1,8 @@
-
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./page.css";
+import "./page.css";
 
 export default function Login() {
 
@@ -43,7 +42,7 @@ export default function Login() {
   }
 
   return (
-    <main className="container">
+    <main className="login-page">
 
       <div className="marca">
 
@@ -85,7 +84,7 @@ export default function Login() {
 
 
             <div className="espaco">
-              <a href="">Esqueceu a senha?</a>
+              <a href="#">Esqueceu a senha?</a>
             </div>
 
             {erro && <p className="erro">{erro}</p>}
@@ -106,4 +105,4 @@ export default function Login() {
       </div>
     </main>
   );
-}   
+}

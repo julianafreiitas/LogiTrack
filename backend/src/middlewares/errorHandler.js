@@ -1,7 +1,7 @@
 export function errorHandler(error, request, response, next) {
   console.error(error);
 
-  response.status(500).json({
-    message: "Erro interno no servidor",
+  response.status(error.status || 500).json({
+    erro: error.status ? "Requisição inválida" : "Erro interno no servidor",
   });
 }
