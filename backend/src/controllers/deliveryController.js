@@ -63,13 +63,14 @@ export async function createDelivery(req, res, next) {
 export async function getDeliveries(req, res, next) {
   try {
     const [rows] = await db.query(`
-      SELECT DATE_FORMAT(e.previsao, '%Y-%m-%dT%H:%i:%s') AS previsao,
+      SELECT
         e.id_entregas AS id,
         e.codigo_rastreio AS titulo,
         COALESCE(m.nome, 'Sem motorista') AS motorista,
         COALESCE(e.nome_cliente, c.nome) AS cliente,
         e.status,
         e.endereco_destino,
+        DATE_FORMAT(e.previsao, '%Y-%m-%dT%H:%i:%s') AS previsao,
         ST_X(e.coordenadas_destino) AS destino_lng,
         ST_Y(e.coordenadas_destino) AS destino_lat,
         -23.550520 AS origem_lat,
