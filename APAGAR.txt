@@ -1,4 +1,0 @@
-Apague estes arquivos do projeto (nao sao mais usados):
-
-backend/src/db.js
-database/init/02-schema.sql
