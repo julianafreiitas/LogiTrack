@@ -3,13 +3,14 @@
 import "./aside.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, ChartNoAxesColumnIncreasing, LayoutDashboard, Map, Package, Users } from "lucide-react";
+import { ArrowUpRight, ChartNoAxesColumnIncreasing, LayoutDashboard, LogOut, Map, Package, Users } from "lucide-react";
 
 const navigation = [
-  { name: "Dashboard", icon: LayoutDashboard },
-  { name: "Entregas", icon: Package },
-  { name: "Motoristas", icon: Users },
-  { name: "Rotas", icon: Map , }, 
+  { name: "Dashboard", href: "/Dash", icon: LayoutDashboard },
+  { name: "Entregas", href: "/Entregas", icon: Package },
+  { name: "Motoristas", href: "/Motoristas", icon: Users },
+  { name: "Usuários", href: "/Usuarios", icon: Users },
+  { name: "Rotas", href: "/Rotas", icon: Map }, 
   // { name: "Relatórios", icon: ChartNoAxesColumnIncreasing },
 ];
 
@@ -27,8 +28,7 @@ export default function Aside() {
       </div>
       <p className="nav-label">MENU PRINCIPAL</p>
       <nav className="area_botoes" aria-label="Menu principal">
-        {navigation.map(({ name, icon: Icon }) => {
-          const href = name === "Dashboard" ? "/Dash" : `/${name}`;
+        {navigation.map(({ name, href, icon: Icon }) => {
           const selected = pathname === href;
           return (
             <Link key={name} href={href} className={`botao ${selected ? "selecionado" : ""}`} aria-current={selected ? "page" : undefined}>
@@ -38,7 +38,11 @@ export default function Aside() {
           );
         })}
       </nav>
-      <p className="sidebar-footer">LogiTrack · Painel demonstrativo</p>
+      <p className="sidebar-footer">LogiTrack &middot; Painel demonstrativo</p>
+      <a className="logout-button" href="/login">
+        <LogOut size={19} strokeWidth={2} />
+        <span>Sair</span>
+      </a>
     </aside>
   );
 }

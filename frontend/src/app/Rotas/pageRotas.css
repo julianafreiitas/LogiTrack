@@ -1,0 +1,256 @@
+.rotas-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 16px;
+}
+
+.rotas-heading {
+    margin-bottom: 14px;
+}
+
+.rotas-heading h1 {
+    margin: 3px 0 5px;
+    color: #edf4fc;
+    font-size: 17px;
+    line-height: 1.2;
+}
+
+.rotas-heading .subtitle {
+    color: #8da1b5;
+}
+
+.rotas-layout {
+    display: grid;
+    grid-template-columns: minmax(210px, 35%) minmax(0, 1fr);
+    gap: 8px;
+    min-height: 305px;
+}
+
+.rotas-panel,
+.map-panel {
+    min-width: 0;
+    border: 1px solid #18344a;
+    border-radius: 7px;
+    background: #0d2236;
+    padding: 10px;
+}
+
+.rotas-panel h2,
+.map-panel h2 {
+    margin: 0 0 4px;
+    color: #e7eff8;
+    font-size: 12px;
+}
+
+.rotas-panel-description {
+    margin: 0 0 9px;
+    color: #91a5b8;
+    font-size: 8px;
+}
+
+.rotas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.rota-card {
+    width: 100%;
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    border: 1px solid #1b3950;
+    border-radius: 5px;
+    background: #10283d;
+    color: #dce6ef;
+    padding: 7px 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .18s, background .18s;
+}
+
+.rota-card:hover {
+    border-color: #55758f;
+    background: #142f47;
+}
+
+.rota-card.is-active {
+    border: 2px solid #ff751f;
+    padding: 6px 7px;
+}
+
+.rota-card-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.rota-card-copy strong {
+    overflow: hidden;
+    color: #e7eff8;
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rota-card-copy small {
+    color: #8399ad;
+    font-size: 7px;
+}
+
+.rota-active-label {
+    flex: 0 0 auto;
+    color: #ff9a4d;
+    font-size: 7px;
+}
+
+.rotas-empty {
+    color: #91a5b8;
+    padding: 12px 4px;
+    font-size: 8px;
+}
+
+.map-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-map {
+    position: relative;
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #d9e6d1;
+}
+
+.route-map iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.route-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.route-overlay polyline {
+    fill: none;
+    stroke: #179de4;
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .55));
+}
+
+.route-overlay circle {
+    stroke: #fff;
+    stroke-width: 3;
+}
+
+.route-origin {
+    fill: #ff751f;
+}
+
+.route-destination {
+    fill: #189fe5;
+}
+
+.map-caption {
+    margin-top: 6px;
+    color: #8298ad;
+    font-size: 7px;
+}
+
+@media (min-width: 1100px) {
+    .rotas-content {
+        padding-top: 23px;
+    }
+
+    .rotas-heading {
+        margin-bottom: 18px;
+    }
+
+    .rotas-heading h1 {
+        font-size: 24px;
+    }
+
+    .rotas-heading .subtitle {
+        font-size: 11px;
+    }
+
+    .rotas-layout {
+        gap: 12px;
+        min-height: 430px;
+    }
+
+    .rotas-panel,
+    .map-panel {
+        padding: 14px;
+    }
+
+    .rotas-panel h2,
+    .map-panel h2 {
+        font-size: 16px;
+    }
+
+    .rotas-panel-description {
+        margin-bottom: 12px;
+        font-size: 10px;
+    }
+
+    .rotas-list {
+        gap: 7px;
+    }
+
+    .rota-card {
+        min-height: 56px;
+        padding: 9px 10px;
+    }
+
+    .rota-card.is-active {
+        padding: 8px 9px;
+    }
+
+    .rota-card-copy strong {
+        font-size: 10px;
+    }
+
+    .rota-card-copy small,
+    .rota-active-label {
+        font-size: 8px;
+    }
+
+    .map-caption {
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 650px) {
+    .rotas-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .rotas-panel {
+        order: 1;
+    }
+
+    .map-panel {
+        order: 2;
+        min-height: 280px;
+    }
+
+    .route-map {
+        min-height: 220px;
+    }
+}

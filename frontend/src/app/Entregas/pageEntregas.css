@@ -7,7 +7,15 @@
 .delivery-search { display: flex; min-width: 0; height: 26px; flex: 1; align-items: center; gap: 7px; border: 1px solid #1a354b; border-radius: 5px; background: #0d2236; color: #8095aa; padding: 0 8px; }
 .delivery-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #edf4fc; font-size: 8px; }
 .delivery-search input::placeholder { color: #8095aa; }
-.delivery-filters select { width: 116px; border: 1px solid #1a354b; border-radius: 5px; background: #0d2236; color: #e4edf6; padding: 0 7px; font-size: 8px; }
+.delivery-status-dropdown { position: relative; width: 116px; flex: 0 0 116px; }
+.delivery-status-button { width: 100%; height: 26px; display: flex; align-items: center; justify-content: space-between; gap: 5px; border: 1px solid #456078; border-radius: 5px; background: #10283c; color: #e4edf6; padding: 0 7px; font-size: 8px; cursor: pointer; }
+.delivery-status-button:hover { border-color: #ff751f; }
+.delivery-status-chevron { flex: 0 0 auto; transition: transform .3s; }
+.delivery-status-chevron.is-open { transform: rotate(180deg); }
+.delivery-status-options { position: absolute; top: 31px; left: 0; z-index: 100; width: 100%; padding: 5px; border: 1px solid #456078; border-radius: 7px; background: #10283c; box-shadow: 0 8px 20px rgba(0, 0, 0, .35); }
+.delivery-status-option { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 4px; border: 0; border-radius: 5px; background: transparent; color: #dce6ef; padding: 8px 6px; font-size: 8px; text-align: left; cursor: pointer; }
+.delivery-status-option:hover { background: #1c3b52; color: #ff751f; }
+.delivery-status-option.is-selected { background: rgba(255, 117, 31, .13); color: #ff751f; }
 .delivery-table-wrap { overflow-x: auto; border: 1px solid #18344a; border-radius: 7px; background: #0d2236; }
 .delivery-table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
 .delivery-table th { height: 27px; border-bottom: 1px solid #18344a; background: #10283d; color: #91a5b8; padding: 0 8px; font-size: 7px; font-weight: 600; }
@@ -31,7 +39,10 @@
   .delivery-filters { gap: 10px; margin-bottom: 9px; }
   .delivery-search { height: 34px; padding: 0 10px; }
   .delivery-search input { font-size: 10px; }
-  .delivery-filters select { width: 150px; font-size: 10px; }
+  .delivery-status-dropdown { width: 150px; flex-basis: 150px; }
+  .delivery-status-button { height: 34px; font-size: 10px; padding: 0 10px; }
+  .delivery-status-options { top: 39px; }
+  .delivery-status-option { font-size: 10px; padding: 10px 8px; }
   .delivery-table th { height: 34px; padding: 0 11px; font-size: 9px; }
   .delivery-table td { height: 40px; padding: 0 11px; font-size: 9px; }
   .status-badge { min-height: 18px; padding: 0 7px; font-size: 7px; }
@@ -49,5 +60,8 @@
   .delivery-filters { flex-direction: column; }
   .delivery-search { height: 34px; }
   .delivery-search input { font-size: 10px; }
-  .delivery-filters select { width: 100%; height: 34px; font-size: 10px; }
+  .delivery-status-dropdown { width: 100%; flex-basis: auto; }
+  .delivery-status-button { height: 34px; font-size: 10px; }
+  .delivery-status-options { top: 39px; }
+  .delivery-status-option { font-size: 10px; }
 }

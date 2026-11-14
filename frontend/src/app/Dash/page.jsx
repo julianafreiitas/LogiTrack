@@ -5,6 +5,7 @@ import { Boxes, Check, Clock3, Truck } from "lucide-react";
 import Aside from "../components/aside";
 import Header from "../components/header";
 import "./pageDash.css";
+import "../sharedDashboard.css";
 
 const metrics = [
   { label: "Total de entregas", value: "1.284", note: "↑ 12,8% em relação ao período anterior", icon: Boxes, tone: "orange" },
