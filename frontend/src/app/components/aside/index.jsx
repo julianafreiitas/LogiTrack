@@ -38,7 +38,7 @@ export default function Aside() {
           );
         })}
       </nav>
-      <p className="sidebar-footer">LogiTrack &middot; Painel demonstrativo</p>
+      <p className="sidebar-footer">LogiTrack &middot;</p>
       <a className="logout-button" href="/login">
         <LogOut size={19} strokeWidth={2} />
         <span>Sair</span>
