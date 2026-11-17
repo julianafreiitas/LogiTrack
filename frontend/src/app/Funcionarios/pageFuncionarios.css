@@ -1,0 +1,77 @@
+.sidebar{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 250px;
+    background-color: #09192a;
+    border-right: 3px solid #142d41;
+}
+
+.logo{
+    /* background-color: aliceblue; */
+    display: flex;
+    height: 50px;
+    margin: 25px;
+    margin-bottom: 100px;
+}
+
+.btn_espaco{
+    /* height: 10px; */
+    /* width: 50%; */
+    /* background-color: aquamarine; */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-direction: column;
+}
+
+.btn{
+    height: 50px;
+    width: 80%;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    background-color: rgb(255, 123, 0);
+    color: white;
+}
+
+
+
+.conteiner-funcionario{
+    display: flex;
+    width: 100%;
+    background-color: #0e2337;
+}
+
+.cabecalho{
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    height: 100px;
+    width: 180vh;
+    /* background-color: aliceblue; */
+    justify-content: flex-end;
+}
+
+.buscar{
+    height: 40px;
+    width: 250px;
+}
+
+.perfil{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+    background-color: rgb(31, 38, 71);
+}
+
+.space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
