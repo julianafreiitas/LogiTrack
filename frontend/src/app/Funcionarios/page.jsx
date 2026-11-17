@@ -1,13 +1,13 @@
 "use client";
 
 import "./pageFuncionarios.css"
-import Aside from "../components/asideMotorista";
+import AsideMotorista from "../components/asideMotorista";
 
 
 export default function Funcionarios() {
     return (
         <div className="conteiner-funcionario">
-           <Aside/>
+           <AsideMotorista />
 
             <main className="dash">
                 <header className="cabecalho">
