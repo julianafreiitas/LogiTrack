@@ -9,7 +9,7 @@ const navigation = [
   { name: "Dashboard", href: "/Dash", icon: LayoutDashboard },
   { name: "Entregas", href: "/Entregas", icon: Package },
   { name: "Motoristas", href: "/Motoristas", icon: Users },
-  { name: "Funcionários", href: "/Funcionarios", icon: Users },
+  // { name: "Funcionários", href: "/Funcionarios", icon: Users },
   { name: "Usuários", href: "/Usuarios", icon: Users },
   { name: "Rotas", href: "/Rotas", icon: Map }, 
   // { name: "Relatórios", icon: ChartNoAxesColumnIncreasing },
