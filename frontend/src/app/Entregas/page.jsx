@@ -46,9 +46,6 @@ const opcoes = ["Todos os status", "Entregue", "Em trânsito", "Pendente", "Atra
 export default function Entregas() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("Todos os status");
-<<<<<<< HEAD
-  const [aberto, setAberto] = useState(false);
-=======
   const [deliveries, setDeliveries] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
@@ -80,7 +77,6 @@ export default function Entregas() {
   useEffect(() => {
     carregar();
   }, [carregar]);
->>>>>>> origin/Matheus
 
   const filteredDeliveries = useMemo(() => deliveries.filter((delivery) => {
     const matchesStatus = status === "Todos os status" || delivery.status === status;
@@ -109,28 +105,9 @@ export default function Entregas() {
               <Search size={14} aria-hidden="true" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} type="search" placeholder="Buscar código, destino ou motorista..." aria-label="Buscar código, destino ou motorista" />
             </label>
-<<<<<<< HEAD
-            <div className="delivery-status-dropdown">
-              <button className="delivery-status-button" type="button" aria-haspopup="listbox" aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
-                {status}
-                <ChevronDown size={18} className={aberto ? "delivery-status-chevron is-open" : "delivery-status-chevron"} />
-              </button>
-              {aberto && (
-                <div className="delivery-status-options" role="listbox" aria-label="Filtrar por status">
-                  {opcoes.map((option) => (
-                    <button key={option} className={`delivery-status-option ${status === option ? "is-selected" : ""}`} type="button" role="option" aria-selected={status === option} onClick={() => { setStatus(option); setAberto(false); }}>
-                      {option}
-                      {status === option && <Check size={16} />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-=======
             <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Filtrar por status">
               {["Todos os status", "Entregue", "Em trânsito", "Pendente", "Atrasada", "Cancelado"].map((option) => <option key={option}>{option}</option>)}
             </select>
->>>>>>> origin/Matheus
           </div>
 
           <div className="delivery-table-wrap">
