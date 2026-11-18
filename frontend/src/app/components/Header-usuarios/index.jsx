@@ -19,8 +19,13 @@ const navigation = [
   { name: "Início", href: "/Main-usuario", icon: Home },
   { name: "Solicitar Entregas", href: "/Solicitar-Entregas", icon: Package},
   { name: "Acompanhar", href: "/AcompanharEntrega", icon: Truck },
-  { name: "Últimos Pedidos", href: "/Meus-Pedidos", icon: RotateCcwClock},
-  { name: "Endereços", href: "/Enderecos", icon: MapPinHouse },
+  { name: "Últimos Pedidos", href: "/MeusPedidos-usuario", icon: RotateCcwClock},
+  { name: "Endereços", href: "/Enderecos-usuario", icon: MapPinHouse }
+];
+
+const userNavigation = [
+  { name: "Perfil", href: "/Perfil-usuario", icon: UserRound },
+  { name: "Sair", href: "/Login-usuario", icon: LogOut }
 ];
 
 
@@ -68,6 +73,15 @@ export default function Header() {
         <span>Olá, Cliente!</span>
 
         <ChevronDown size={14} />
+
+        <div className="user-menu">
+          {userNavigation.map(({ name, href, icon: Icon }) => (
+            <Link key={name} href={href} className="user-menu-item">
+              <Icon size={17} strokeWidth={1.8} />
+              <span>{name}</span>
+            </Link>
+          ))}
+        </div>
       </div>
 
     </header>
