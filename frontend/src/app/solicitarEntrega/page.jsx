@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { MapPin, Flag, Calendar, Box, MessageSquare, ArrowLeft, Send, User } from 'lucide-react';
 import './SolicitarEntrega.css';

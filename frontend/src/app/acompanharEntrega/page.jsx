@@ -1,7 +1,43 @@
 "use client";
 
+import "./acompanharEntrega.css";
 import { useState } from "react";
-import { Search, Calendar, ChevronLeft, Truck, Package, CheckCircle2, User } from 'lucide-react'; 
+import { Search, Calendar, ChevronLeft, Truck, Package, CheckCircle2, User } from 'lucide-react';
+
+const styles = {
+  container: {},
+  header: {},
+  logo: {},
+  nav: {},
+  navLink: {},
+  navLinkActive: {},
+  avatar: {},
+  hero: {},
+  heroTitle: {},
+  heroSubtitle: {},
+  searchSection: {},
+  searchLabel: {},
+  searchRow: {},
+  input: {},
+  btnConsultar: {},
+  resultCard: {},
+  statusInfoGrid: {},
+  statusMain: {},
+  iconBox: {},
+  statusLabel: {},
+  statusTitle: {},
+  statusDesc: {},
+  deliveryDateBox: {},
+  dateLabel: {},
+  dateValue: {},
+  timeline: {},
+  timelineStep: {},
+  stepCheck: {},
+  stepText: {},
+  timelineLine: {},
+  footer: {},
+  btnVoltar: {}
+};
 
 export default function AcompanharEntrega() {
   const [busca, setBusca] = useState("");
