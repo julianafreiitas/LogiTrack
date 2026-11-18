@@ -24,16 +24,13 @@ app.get("/", (request, response) => {
   });
 });
 
-<<<<<<< HEAD
 app.use("/api/health", healthRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/motoristas", motoristasRoutes);
 app.use("/api/rotas", rotasRoutes);
-=======
 // Regista as rotas de entregas (o endpoint será /api/deliveries)
 app.use("/api", healthRoutes);
 app.use("/api/deliveries", deliveryRoutes);
->>>>>>> origin/Matheus
 
 app.use(errorHandler);
 
