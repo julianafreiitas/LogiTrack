@@ -13,7 +13,7 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: ["http://localhost:3000", "http://localhost:3001", (process.env.FRONTEND_URL || "http://logitrack.10.189.87.231.sslip.io")],
   })
 );
 app.use(express.json());

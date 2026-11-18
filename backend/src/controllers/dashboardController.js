@@ -1,4 +1,4 @@
-import { pool } from "../config/database.js";
+import pool from "../config/database.js";
 
 const descricoes = {
   Entregue: { titulo: "Entrega concluída", tom: "orange" },
