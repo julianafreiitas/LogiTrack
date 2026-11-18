@@ -394,6 +394,10 @@
     border-color: #20c49a;
 }
 
+.update-item.red {
+    border-color: #ef647e;
+}
+
 @media (min-width: 1100px) {
     .sidebar {
         width: 210px;

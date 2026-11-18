@@ -9,21 +9,21 @@ import "./pageMotorista.css";
 import "../sharedDashboard.css";
 
 const opcoes = ["Toda a equipe", "Em rota", "Dispon\u00edvel", "Inativo"];
-const motoristasIniciais = [
-  { id: "driver-01", nome: "Jo\u00e3o Pereira", iniciais: "JP", cidade: "S\u00e3o Paulo", veiculo: "Van - FKT-2048", entregas: 12, status: "Em rota" },
-  { id: "driver-02", nome: "Ana Costa", iniciais: "AC", cidade: "Campinas", veiculo: "Furg\u00e3o - GHT-8192", entregas: 9, status: "Em rota" },
-  { id: "driver-03", nome: "Pedro Alves", iniciais: "PA", cidade: "Santos", veiculo: "Van - DKM-4021", entregas: 7, status: "Dispon\u00edvel" },
-  { id: "driver-04", nome: "Marina Lima", iniciais: "ML", cidade: "S\u00e3o Bernardo", veiculo: "Van - RBN-7734", entregas: 11, status: "Em rota" },
-  { id: "driver-05", nome: "Diego Ramos", iniciais: "DR", cidade: "Sorocaba", veiculo: "Furg\u00e3o - JTZ-1065", entregas: 6, status: "Dispon\u00edvel" },
-  { id: "driver-06", nome: "Carla Nunes", iniciais: "CN", cidade: "Jundia\u00ed", veiculo: "Van - MLP-6620", entregas: 8, status: "Em rota" },
-];
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+
+async function chamarApi(caminho, opcoes = {}) {
+  const resposta = await fetch(`${apiUrl}${caminho}`, { headers: { "Content-Type": "application/json" }, ...opcoes });
+  const dados = resposta.status === 204 ? null : await resposta.json().catch(() => null);
+  if (!resposta.ok) throw new Error(dados?.erro || dados?.message || "Não foi possível concluir a operação.");
+  return dados;
+}
 
 const formularioInicial = { nome: "", cpf: "", telefone: "", cnh: "", categoria: "", status: "Ativo", statusOperacional: "Dispon\u00edvel", cidade: "", veiculo: "", entregas: "0" };
 const chaveMotorista = (motorista) => motorista.id || motorista.cpf || motorista.nome;
 const categoriasCnh = ["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"];
 
 export default function Motoristas() {
-  const [motoristas, setMotoristas] = useState(motoristasIniciais);
+  const [motoristas, setMotoristas] = useState([]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("Toda a equipe");
   const [filtroAberto, setFiltroAberto] = useState(false);
@@ -34,6 +34,13 @@ export default function Motoristas() {
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [erroCadastro, setErroCadastro] = useState("");
+  const [erroLista, setErroLista] = useState("");
+
+  useEffect(() => {
+    chamarApi("/motoristas")
+      .then(setMotoristas)
+      .catch(() => setErroLista("Não foi possível carregar os motoristas."));
+  }, []);
 
   useEffect(() => {
     if (!modalCadastroAberto && !detalhesAbertos) return undefined;
@@ -72,32 +79,17 @@ export default function Motoristas() {
     setErroCadastro("");
   }
 
-  function cadastrarMotorista(event) {
+  async function cadastrarMotorista(event) {
     event.preventDefault();
-    const nome = formulario.nome.trim();
-    const cpfNormalizado = formulario.cpf.replace(/\D/g, "");
-    if (motoristas.some((motorista) => motorista.cpf?.replace(/\D/g, "") === cpfNormalizado)) {
-      setErroCadastro("J\u00e1 existe um motorista cadastrado com este CPF.");
-      return;
+    try {
+      const criado = await chamarApi("/motoristas", { method: "POST", body: JSON.stringify(formulario) });
+      setMotoristas((atuais) => [criado, ...atuais]);
+      setStatus("Toda a equipe");
+      setQuery("");
+      fecharCadastro();
+    } catch (erro) {
+      setErroCadastro(erro.message);
     }
-    const iniciais = nome.split(/\s+/).map((parte) => parte[0]).join("").slice(0, 2).toUpperCase();
-    setMotoristas((atuais) => [{
-      id: `${cpfNormalizado}-${Date.now()}`,
-      nome,
-      iniciais,
-      cidade: formulario.cidade.trim() || "--",
-      veiculo: formulario.veiculo.trim() || "--",
-      entregas: Number(formulario.entregas) || 0,
-      status: formulario.status === "Ativo" ? "Dispon\u00edvel" : "Inativo",
-      statusCadastro: formulario.status,
-      cpf: formulario.cpf,
-      telefone: formulario.telefone,
-      cnh: formulario.cnh,
-      categoria: formulario.categoria,
-    }, ...atuais]);
-    setStatus("Toda a equipe");
-    setQuery("");
-    fecharCadastro();
   }
 
   function carregarFormulario(motorista) {
@@ -133,56 +125,46 @@ export default function Motoristas() {
     setErroCadastro("");
   }
 
-  function atualizarMotoristaSelecionado(atualizacoes) {
-    if (!motoristaSelecionado) return;
-    const atualizado = { ...motoristaSelecionado, ...atualizacoes };
-    const chaveAtual = chaveMotorista(motoristaSelecionado);
-    setMotoristas((atuais) => atuais.map((motorista) => chaveMotorista(motorista) === chaveAtual ? atualizado : motorista));
+  function substituirMotorista(atualizado) {
+    setMotoristas((atuais) => atuais.map((motorista) => motorista.id === atualizado.id ? atualizado : motorista));
     setMotoristaSelecionado(atualizado);
+    carregarFormulario(atualizado);
   }
 
-  function salvarEdicaoMotorista(event) {
+  async function salvarEdicaoMotorista(event) {
     event.preventDefault();
     if (!motoristaSelecionado) return;
-    const cpfNormalizado = formulario.cpf.replace(/\D/g, "");
-    const chaveAtual = chaveMotorista(motoristaSelecionado);
-    const cpfDuplicado = motoristas.some((motorista) => chaveMotorista(motorista) !== chaveAtual && motorista.cpf?.replace(/\D/g, "") === cpfNormalizado);
-    if (formulario.cpf && cpfDuplicado) {
-      setErroCadastro("J\u00e1 existe um motorista cadastrado com este CPF.");
-      return;
+    try {
+      const atualizado = await chamarApi(`/motoristas/${motoristaSelecionado.id}`, { method: "PUT", body: JSON.stringify(formulario) });
+      substituirMotorista(atualizado);
+      setModoEdicao(false);
+      setErroCadastro("");
+    } catch (erro) {
+      setErroCadastro(erro.message);
     }
-    const nome = formulario.nome.trim();
-    const iniciais = nome.split(/\s+/).map((parte) => parte[0]).join("").slice(0, 2).toUpperCase();
-    atualizarMotoristaSelecionado({
-      nome,
-      iniciais,
-      cpf: formulario.cpf,
-      telefone: formulario.telefone,
-      cnh: formulario.cnh,
-      categoria: formulario.categoria,
-      cidade: formulario.cidade.trim() || "--",
-      veiculo: formulario.veiculo.trim() || "--",
-      entregas: Number(formulario.entregas) || 0,
-      status: formulario.status === "Inativo" ? "Inativo" : formulario.statusOperacional,
-      statusCadastro: formulario.status,
-    });
-    setModoEdicao(false);
-    setErroCadastro("");
   }
 
-  function alterarSituacao() {
+  async function alterarSituacao() {
     if (!motoristaSelecionado) return;
     const desativar = motoristaSelecionado.status !== "Inativo";
-    const statusAtualizado = desativar ? "Inativo" : "Dispon\u00edvel";
-    atualizarMotoristaSelecionado({ status: statusAtualizado, statusCadastro: desativar ? "Inativo" : "Ativo" });
-    setFormulario((atual) => ({ ...atual, status: desativar ? "Inativo" : "Ativo", statusOperacional: statusAtualizado }));
+    const dados = { ...formulario, status: desativar ? "Inativo" : "Ativo", statusOperacional: desativar ? "Inativo" : "Disponível" };
+    try {
+      const atualizado = await chamarApi(`/motoristas/${motoristaSelecionado.id}`, { method: "PUT", body: JSON.stringify(dados) });
+      substituirMotorista(atualizado);
+    } catch (erro) {
+      window.alert(erro.message);
+    }
   }
 
-  function excluirMotorista() {
+  async function excluirMotorista() {
     if (!motoristaSelecionado) return;
-    const chaveAtual = chaveMotorista(motoristaSelecionado);
-    setMotoristas((atuais) => atuais.filter((motorista) => chaveMotorista(motorista) !== chaveAtual));
-    fecharDetalhes();
+    try {
+      await chamarApi(`/motoristas/${motoristaSelecionado.id}`, { method: "DELETE" });
+      setMotoristas((atuais) => atuais.filter((motorista) => motorista.id !== motoristaSelecionado.id));
+      fecharDetalhes();
+    } catch (erro) {
+      window.alert(erro.message);
+    }
   }
 
   function valorDetalhe(valor) {
@@ -234,7 +216,7 @@ export default function Motoristas() {
                     <button className="motorista-details-button" type="button" onClick={() => abrirDetalhes(motorista)} aria-label={`Ver detalhes de ${motorista.nome}`}><Eye size={15} /><span>Detalhes</span></button>
                   </div></td>
                 </tr>)}
-                {filteredDrivers.length === 0 && <tr><td className="motorista-empty" colSpan="5">Nenhum motorista encontrado.</td></tr>}
+                {filteredDrivers.length === 0 && <tr><td className="motorista-empty" colSpan="5">{erroLista || "Nenhum motorista encontrado."}</td></tr>}
               </tbody>
             </table>
           </div>

@@ -3,7 +3,10 @@ import express from "express";
 import helmet from "helmet";
 
 import { errorHandler } from "./middlewares/errorHandler.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
+import motoristasRoutes from "./routes/motoristasRoutes.js";
+import rotasRoutes from "./routes/rotasRoutes.js";
 
 const app = express();
 
@@ -22,6 +25,9 @@ app.get("/", (request, response) => {
 });
 
 app.use("/api/health", healthRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/motoristas", motoristasRoutes);
+app.use("/api/rotas", rotasRoutes);
 
 app.use(errorHandler);
 
