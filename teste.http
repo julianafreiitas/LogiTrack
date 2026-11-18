@@ -1,0 +1,4 @@
+POST http://localhost:8080/api/deliveries
+Content-Type: application/json
+
+{ "clientName": "Teste", "address": "Avenida Paulista, 1578, São Paulo" }
