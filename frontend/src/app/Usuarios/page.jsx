@@ -8,7 +8,7 @@ import "../Dash/pageDash.css";
 import "../sharedDashboard.css";
 import "./pageUsuarios.css";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api";
 const POR_PAGINA = 5;
 const LISTA_VAZIA = { dados: [], total: 0, pagina: 1, totalPaginas: 1 };
 const FORM_ADMIN_VAZIO = { nome: "", email: "", senha: "" };
@@ -49,7 +49,7 @@ export default function Usuarios() {
 
   const carregarResumo = useCallback(async () => {
     try {
-      const resposta = await fetch(`${API_URL}/api/usuarios/resumo`);
+      const resposta = await fetch(`${API_URL}/usuarios/resumo`);
       if (!resposta.ok) throw new Error("Falha ao carregar o resumo");
       setResumo(await resposta.json());
     } catch {
@@ -77,7 +77,7 @@ export default function Usuarios() {
     setCarregando(true);
     setErroLista("");
 
-    fetch(`${API_URL}/api/usuarios/${rota}?${parametros.toString()}`, { signal: controlador.signal })
+    fetch(`${API_URL}/usuarios/${rota}?${parametros.toString()}`, { signal: controlador.signal })
       .then((resposta) => {
         if (!resposta.ok) throw new Error("Falha ao carregar a lista");
         return resposta.json();
@@ -113,7 +113,7 @@ export default function Usuarios() {
 
   async function abrirDetalhes(cliente) {
     try {
-      const resposta = await fetch(`${API_URL}/api/usuarios/clientes/${cliente.id}/solicitacao`);
+      const resposta = await fetch(`${API_URL}/usuarios/clientes/${cliente.id}/solicitacao`);
       if (!resposta.ok) throw new Error("Falha ao carregar a solicitação");
       setSelecionado(await resposta.json());
     } catch {
@@ -127,7 +127,7 @@ export default function Usuarios() {
     setErroAdmin("");
 
     try {
-      const resposta = await fetch(`${API_URL}/api/usuarios/administradores`, {
+      const resposta = await fetch(`${API_URL}/usuarios/administradores`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(novoAdmin),

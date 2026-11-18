@@ -1,8 +1,7 @@
+SET NAMES utf8mb4;
 USE logi_track_db;
 
 -- Senha de todos os registros de teste abaixo: Admin@123
--- (hash scrypt gerado pelo mesmo formato do backend/src/utils/password.js)
-
 -- ---------------------------------------------------------------
 -- Motoristas (10)
 -- ---------------------------------------------------------------
