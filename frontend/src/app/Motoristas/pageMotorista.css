@@ -1,49 +1,574 @@
-.motorista-title{
-    height: 100%;
+.motorista-content {
     width: 100%;
-    /* background-color: rgb(3, 56, 56); */
+    max-width:1200px;
+    margin: 0 auto;
+    padding-top: 16px;
+}
+
+.motorista-filters {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: 25px;
-    margin-bottom: 25px;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
-.total-motoristas{
-    color: white;
-    font-size: 13px;
-    margin-right: 20px;
-    background-color: rgb(58, 72, 114);
-    padding: 5px;
+.motorista-search {
+    display: flex;
+    min-width: 0;
+    height: 26px;
+    flex: 1;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid #1a354b;
     border-radius: 5px;
+    background: #0d2236;
+    color: #8095aa;
+    padding: 0 8px;
 }
 
-.motorista-table{
-    height: 100px;
+.motorista-search input {
     width: 100%;
-    /* background-color: brown; */
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #edf4fc;
+    font-size: 8px;
 }
 
-.buscar{
-    height: 55px;
-    width: 80%;
-    border-radius: 10px;
-    border: none;
-    background-color: #132b3f;
-    color: white;
-    padding: 15px;
-    border: solid 1px #1b3950;
+.motorista-search input::placeholder {
+    color: #8095aa;
+    opacity: 1;
 }
 
-.motorista-status {
-    display: inline-flex;
+.motorista-add-button {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    display: flex;
     align-items: center;
-    border-radius: 3px;
-    padding: 2px 6px;
-    font-size: 11px;
+    justify-content: center;
+    border: 1px solid #1a354b;
+    border-radius: 5px;
+    background: #10283c;
+    color: #e4edf6;
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.motorista-add-button:hover {
+    border-color: #ff751f;
+    background: #1c3b52;
+}
+
+.motorista-status-dropdown {
+    position: relative;
+    width: 80px;
+    flex: 0 0 80px;
+}
+
+.motorista-status-button {
+    width: 100%;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    border: 1px solid #456078;
+    border-radius: 5px;
+    background: #10283c;
+    color: #e4edf6;
+    padding: 0 6px;
+    font-size: 8px;
+    cursor: pointer;
+}
+
+.motorista-status-button:hover {
+    border-color: #ff751f;
+}
+
+.motorista-chevron {
+    flex: 0 0 auto;
+    transition: transform .3s;
+}
+
+.motorista-chevron.is-open {
+    transform: rotate(180deg);
+}
+
+.motorista-status-options {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    z-index: 100;
+    width: 130px;
+    padding: 5px;
+    border: 1px solid #456078;
+    border-radius: 7px;
+    background: #10283c;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .35);
+}
+
+.motorista-status-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #dce6ef;
+    padding: 8px 6px;
+    font-size: 9px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.motorista-status-option:hover {
+    background: #1c3b52;
+    color: #ff751f;
+}
+
+.motorista-status-option.is-selected {
+    background: rgba(255, 117, 31, .13);
+    color: #ff751f;
+}
+
+.motorista-table-wrap {
+    overflow-x: auto;
+    border: 1px solid #18344a;
+    border-radius: 7px;
+    background: #0d2236;
+}
+
+.motorista-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.motorista-list-table th {
+    height: 27px;
+    border-bottom: 1px solid #18344a;
+    background: #10283d;
+    color: #91a5b8;
+    padding: 0 8px;
+    font-size: 7px;
+    font-weight: 600;
+}
+
+.motorista-list-table td {
+    height: 34px;
+    border-bottom: 1px solid #18344a;
+    color: #d7e2ec;
+    padding: 0 8px;
+    font-size: 7px;
+}
+
+.motorista-list-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.motorista-list-table tbody tr:hover {
+    background: #10283d;
+}
+
+.motorista-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #f2f6fa;
+}
+
+.motorista-name strong {
+    font-size: 7px;
+}
+
+.motorista-avatar {
+    width: 17px;
+    height: 17px;
+    display: inline-flex;
+    flex: 0 0 17px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #29465c;
+    color: #e1edf7;
+    font-size: 6px;
     font-weight: 700;
 }
 
-.motorista-status.disponivel { background: #10483e; color: #29c99e; }
-.motorista-status.em-rota { background: #173e5b; color: #57b5f5; }
-.motorista-status.indisponivel { background: #512b3a; color: #ff7188; }
+.motorista-badge {
+    display: inline-flex;
+    min-height: 15px;
+    align-items: center;
+    border-radius: 3px;
+    padding: 0 5px;
+    font-size: 6px;
+    font-weight: 700;
+}
+
+.motorista-badge.em-rota {
+    background: #173e5b;
+    color: #57b5f5;
+}
+
+.motorista-badge.disponivel {
+    background: #10483e;
+    color: #29c99e;
+}
+
+.motorista-list-table .motorista-empty {
+    height: 60px;
+    color: #8da1b5;
+    text-align: center;
+}
+
+@media (min-width: 1100px) {
+    .motorista-content {
+        padding-top: 23px;
+    }
+
+    .motorista-filters {
+        gap: 10px;
+        margin-bottom: 9px;
+    }
+
+    .motorista-search {
+        height: 34px;
+        padding: 0 10px;
+    }
+
+    .motorista-search input {
+        font-size: 10px;
+    }
+
+    .motorista-add-button {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+        font-size: 21px;
+    }
+
+    .motorista-status-dropdown {
+        width: 112px;
+        flex-basis: 112px;
+    }
+
+    .motorista-status-button {
+        height: 34px;
+        padding: 0 8px;
+        font-size: 10px;
+    }
+
+    .motorista-status-options {
+        top: 39px;
+    }
+
+    .motorista-status-option {
+        font-size: 10px;
+        padding: 10px 8px;
+    }
+
+    .motorista-list-table th {
+        height: 34px;
+        padding: 0 11px;
+        font-size: 9px;
+    }
+
+    .motorista-list-table td {
+        height: 40px;
+        padding: 0 11px;
+        font-size: 9px;
+    }
+
+    .motorista-name {
+        gap: 8px;
+    }
+
+    .motorista-name strong {
+        font-size: 9px;
+    }
+
+    .motorista-avatar {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+        font-size: 7px;
+    }
+
+    .motorista-badge {
+        min-height: 18px;
+        padding: 0 7px;
+        font-size: 7px;
+    }
+}
+
+@media (max-width: 420px) {
+    .motorista-list-table {
+        min-width: 580px;
+    }
+}
+
+.motorista-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(1, 10, 18, .78);
+    backdrop-filter: blur(4px);
+    animation: motorista-overlay-in .18s ease-out;
+}
+
+.motorista-modal {
+    width: min(600px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    border: 1px solid #29465d;
+    border-radius: 13px;
+    background: #071a2b;
+    color: #edf4fc;
+    padding: 20px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+    animation: motorista-modal-in .22s ease-out;
+}
+
+.motorista-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.motorista-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+.motorista-modal-close {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #a9bbcb;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.motorista-modal-close:hover {
+    transform: rotate(90deg);
+    background: #18364d;
+    color: #fff;
+}
+
+.motorista-modal-description {
+    margin: 8px 0 18px;
+    color: #a5b7c8;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.motorista-modal-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 9px;
+}
+
+.motorista-form-full {
+    grid-column: 1 / -1;
+}
+
+.motorista-form-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+    color: #e7eff8;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.motorista-form-field input,
+.motorista-form-field select {
+    width: 100%;
+    height: 46px;
+    min-width: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    outline: none;
+    background: #15334a;
+    color: #edf4fc;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.motorista-form-field input::placeholder,
+.motorista-form-field select:invalid {
+    color: #8ca6ba;
+    opacity: 1;
+}
+
+.motorista-form-field input:focus,
+.motorista-form-field select:focus {
+    border-color: #4382aa;
+    background: #183b55;
+    box-shadow: 0 0 0 3px rgba(67, 130, 170, .16);
+}
+
+.motorista-form-field select {
+    color-scheme: dark;
+    cursor: pointer;
+}
+
+.motorista-select-wrap {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.motorista-select-wrap select {
+    appearance: none;
+    padding-right: 42px;
+}
+
+.motorista-select-wrap > svg {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    pointer-events: none;
+    color: #9ab1c3;
+    transform: translateY(-50%);
+}
+
+.motorista-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 1px;
+}
+
+.motorista-modal-actions button {
+    min-height: 46px;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.motorista-cancel-button {
+    border: 1px solid #456078;
+    background: transparent;
+    color: #edf4fc;
+}
+
+.motorista-cancel-button:hover {
+    border-color: #7692a8;
+    background: #10283c;
+}
+
+.motorista-submit-button {
+    border: 1px solid #ff751f;
+    background: #ff751f;
+    color: #fff;
+}
+
+.motorista-submit-button:hover {
+    transform: translateY(-1px);
+    border-color: #ff934c;
+    background: #ff934c;
+    box-shadow: 0 6px 18px rgba(255, 117, 31, .2);
+}
+
+.motorista-modal-actions button:active { transform: scale(.985); }
+.motorista-modal-actions button:focus-visible { outline: 2px solid #ffb47f; outline-offset: 3px; }
+.motorista-form-error { margin: 0; color: #ff8292; font-size: 13px; font-weight: 500; }
+.motorista-badge.inativo { background: #512b3a; color: #ff8292; }
+
+.motorista-status-cell { display: flex; align-items: center; gap: 9px; }
+.motorista-details-button, .motorista-detail-actions button, .motorista-delete-confirm button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid #34536b; border-radius: 7px; background: #10283c; color: #dce6ef; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease; }
+.motorista-details-button { min-height: 30px; padding: 0 9px; }
+.motorista-details-button:hover, .motorista-detail-edit:hover { border-color: #4aa7ef; background: #173e5b; color: #fff; }
+.motorista-details-button:active, .motorista-detail-actions button:active, .motorista-delete-confirm button:active { transform: scale(.97); }
+.motorista-detail-modal { width: min(760px, 100%); }
+.motorista-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 18px 0 20px; }
+.motorista-detail-grid > div { min-width: 0; border: 1px solid #1b3950; border-radius: 8px; background: #10283c; padding: 11px 12px; }
+.motorista-detail-grid dt { margin-bottom: 6px; color: #91a5b8; font-size: 11px; }
+.motorista-detail-grid dd { overflow-wrap: anywhere; color: #edf4fc; font-size: 14px; font-weight: 600; }
+.motorista-detail-grid dd .motorista-badge { vertical-align: middle; }
+.motorista-detail-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 6px; }
+.motorista-detail-actions button { min-height: 44px; padding: 0 10px; }
+.motorista-detail-actions .motorista-detail-edit { border-color: #34536b; }
+.motorista-detail-actions .motorista-detail-toggle { border-color: #145344; background: #10483e; color: #49d2ad; }
+.motorista-detail-actions .motorista-detail-toggle:hover { border-color: #29c99e; background: #15584b; color: #d9fff3; }
+.motorista-detail-actions .motorista-detail-delete, .motorista-delete-confirm .motorista-delete-confirm-button { border-color: #713744; background: #512b3a; color: #ff9aa8; }
+.motorista-detail-actions .motorista-detail-delete:hover, .motorista-delete-confirm .motorista-delete-confirm-button:hover { border-color: #ff7188; background: #653141; color: #fff; }
+.motorista-delete-confirm { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; border: 1px solid #713744; border-radius: 8px; background: rgba(81, 43, 58, .28); padding: 14px; }
+.motorista-delete-confirm p { color: #ffdce1; font-size: 13px; line-height: 1.45; }
+.motorista-delete-confirm > div { display: flex; justify-content: flex-end; gap: 8px; }
+.motorista-delete-confirm button { min-height: 38px; padding: 0 12px; }
+.motorista-details-button:focus-visible, .motorista-detail-actions button:focus-visible, .motorista-delete-confirm button:focus-visible { outline: 2px solid #ffb47f; outline-offset: 2px; }
+
+@keyframes motorista-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes motorista-modal-in { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+@media (max-width: 520px) {
+    .motorista-modal-overlay { align-items: flex-start; padding: 12px; }
+    .motorista-modal { max-height: calc(100vh - 24px); border-radius: 11px; padding: 16px; }
+    .motorista-modal-header h2 { font-size: 17px; }
+    .motorista-modal-description { font-size: 12px; }
+    .motorista-modal-form { grid-template-columns: 1fr; }
+    .motorista-form-field { font-size: 13px; }
+    .motorista-form-field input,
+    .motorista-form-field select { height: 44px; font-size: 13px; }
+    .motorista-modal-actions { grid-template-columns: 1fr; }
+    .motorista-detail-grid { grid-template-columns: 1fr; }
+    .motorista-detail-actions { grid-template-columns: 1fr; }
+    .motorista-details-button { padding: 0 7px; font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .motorista-modal-overlay, .motorista-modal, .motorista-modal-close,
+    .motorista-form-field input, .motorista-form-field select,
+    .motorista-modal-actions button { animation: none; transition: none; }
+}
+
+/* Separa a ação de detalhes do status e organiza os dados do motorista. */
+.motorista-status-cell { gap: 18px; }
+.motorista-details-button { margin-left: 6px; }
+.motorista-detail-modal { width: min(820px, 100%); padding: 24px; }
+.motorista-detail-modal .motorista-modal-description { margin: 9px 0 16px; }
+.motorista-detail-grid { gap: 13px; margin: 0 0 22px; }
+.motorista-detail-grid > div { min-height: 66px; padding: 13px 15px; }
+.motorista-detail-grid > div:first-child { grid-column: 1 / -1; }
+.motorista-detail-grid dt { margin-bottom: 8px; font-size: 12px; }
+.motorista-detail-grid dd { font-size: 15px; }
+.motorista-detail-actions { gap: 12px; margin-top: 10px; }
+.motorista-detail-actions button { min-height: 48px; }
+.motorista-status-cell { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: 92px 88px; gap: 12px; justify-content: space-between; }
+.motorista-status-cell .motorista-badge { justify-content: center; }
+.motorista-status-cell .motorista-details-button { width: 88px; margin-left: 0; }
+
+@media (max-width: 520px) {
+    .motorista-status-cell { gap: 13px; }
+    .motorista-details-button { margin-left: 3px; }
+    .motorista-detail-modal { padding: 16px; }
+    .motorista-detail-grid { gap: 9px; }
+    .motorista-detail-grid > div { min-height: 58px; padding: 10px; }
+    .motorista-status-cell { grid-template-columns: 82px 82px; gap: 8px; }
+    .motorista-status-cell .motorista-details-button { width: 82px; }
+}

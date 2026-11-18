@@ -3,10 +3,10 @@ import express from "express";
 import helmet from "helmet";
 
 import { errorHandler } from "./middlewares/errorHandler.js";
-import authRoutes from "./routes/auth.js";
-import entregasRoutes from "./routes/entregas.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
-import motoristasRoutes from "./routes/motoristas.js";
+import motoristasRoutes from "./routes/motoristasRoutes.js";
+import rotasRoutes from "./routes/rotasRoutes.js";
 
 const app = express();
 
@@ -20,14 +20,14 @@ app.use(express.json());
 
 app.get("/", (request, response) => {
   response.json({
-    message: "API do LogiTrack",
+    message: "API do projeto base",
   });
 });
 
 app.use("/api/health", healthRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/entregas", entregasRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/motoristas", motoristasRoutes);
+app.use("/api/rotas", rotasRoutes);
 
 app.use(errorHandler);
 

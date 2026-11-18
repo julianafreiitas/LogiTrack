@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "LogiTrack",
-  description: "Gestão e rastreamento de entregas",
+  title: "Projeto Base",
+  description: "Template base com Next.js, Express e MySQL",
 };
 
 export default function RootLayout({ children }) {

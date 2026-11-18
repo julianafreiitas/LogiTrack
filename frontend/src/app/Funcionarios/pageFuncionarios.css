@@ -1,0 +1,713 @@
+.ft-page {
+    --orange: #ff7108;
+    --line: #173957;
+    display: flex;
+    min-height: 100vh;
+    color: #f3f6fb;
+    background: #061426;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.ft-sidebar {
+    position: relative;
+    display: flex;
+    width: 223px;
+    min-height: 100vh;
+    flex: 0 0 223px;
+    flex-direction: column;
+    border-right: 1px solid #1b3955;
+    background: linear-gradient(180deg, #061426, #071629);
+    padding: 34px 15px 20px;
+}
+
+.ft-brand {
+    display: flex;
+    height: 125px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.ft-brand img {
+    width: 140px;
+    height: 102px;
+    object-fit: contain;
+}
+
+.ft-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ft-nav a {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    gap: 18px;
+    border-radius: 10px;
+    color: #f1f5fb;
+    padding: 0 14px;
+    font-size: 14px;
+}
+
+.ft-nav a:hover {
+    background: #122a42;
+}
+
+.ft-nav a.active {
+    background: linear-gradient(100deg, #ff7c0b, #fa5b00);
+    font-weight: 700;
+}
+
+.ft-nav svg {
+    flex: 0 0 auto;
+}
+
+.ft-online {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-top: auto;
+    border: 1px solid #1b3e5c;
+    border-radius: 11px;
+    padding: 13px 15px;
+}
+
+.ft-online i {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    margin-top: 2px;
+    border-radius: 50%;
+    background: #00c77b;
+}
+
+.ft-online div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ft-online strong {
+    font-size: 12px;
+}
+
+.ft-online small {
+    color: #9eb2c8;
+    font-size: 9px;
+}
+
+.ft-main {
+    min-width: 0;
+    flex: 1;
+    padding: 0 24px 24px 26px;
+}
+
+.ft-topbar {
+    display: flex;
+    height: 78px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ft-search {
+    display: flex;
+    width: 370px;
+    height: 45px;
+    align-items: center;
+    gap: 13px;
+    border: 1px solid #1a3b5a;
+    border-radius: 13px;
+    background: #10243c;
+    color: #9bb4d0;
+    padding: 0 16px;
+}
+
+.ft-search input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #f3f6fb;
+    font-size: 14px;
+}
+
+.ft-search input::placeholder {
+    color: #9db1c7;
+}
+
+.ft-bell {
+    position: relative;
+    display: grid;
+    width: 42px;
+    height: 44px;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: #f5f8fc;
+    cursor: pointer;
+}
+
+.ft-bell span {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid;
+    width: 23px;
+    height: 23px;
+    place-items: center;
+    border-radius: 50%;
+    background: #ff7108;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ft-hero {
+    position: relative;
+    display: flex;
+    min-height: 192px;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid #1a3b58;
+    border-radius: 15px;
+    background: radial-gradient(ellipse at 76% 30%, rgba(255, 146, 90, .7), transparent 28%), linear-gradient(105deg, #07172a 0%, #0b1b30 42%, #263c53 67%, #e27d5d 100%);
+    padding: 28px 36px;
+}
+
+.ft-hero:after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #07172a 0%, rgba(7, 23, 42, .94) 34%, rgba(7, 23, 42, .16) 73%, transparent);
+    content: "";
+}
+
+.ft-hero>div:first-child {
+    position: relative;
+    z-index: 2;
+}
+
+.ft-hero h1 {
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -1px;
+}
+
+.ft-hero h1 em {
+    color: var(--orange);
+    font-style: normal;
+}
+
+.ft-hero p {
+    margin-top: 8px;
+    color: #f1f4f9;
+    font-size: 19px;
+}
+
+.ft-hero>div:first-child>i {
+    display: block;
+    width: 96px;
+    height: 6px;
+    margin-top: 13px;
+    border-radius: 8px;
+    background: var(--orange);
+}
+
+.ft-truck {
+    position: absolute;
+    z-index: 1;
+    right: 9%;
+    bottom: -23px;
+    font-size: 142px;
+    filter: drop-shadow(0 8px 7px #0008);
+}
+
+.ft-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+    margin: 17px 0 26px;
+}
+
+.ft-stats article {
+    display: flex;
+    min-height: 103px;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #1a3c5b;
+    border-radius: 15px;
+    background: linear-gradient(120deg, #10243c, #10233a);
+    padding: 14px 23px;
+}
+
+.ft-stats article p {
+    margin-bottom: 7px;
+    color: #c4d2e2;
+    font-size: 15px;
+}
+
+.ft-stats article strong {
+    font-size: 38px;
+    line-height: 1;
+}
+
+.ft-stat-icon {
+    display: grid;
+    width: 75px;
+    height: 75px;
+    flex: 0 0 75px;
+    place-items: center;
+    border-radius: 50%;
+}
+
+.ft-stat-icon.all {
+    background: #193858;
+    color: #f1f6ff;
+}
+
+.ft-stat-icon.done {
+    background: #07513e;
+    color: #00d58a;
+}
+
+.ft-stat-icon.progress {
+    background: #563316;
+    color: #ff7900;
+}
+
+.ft-stat-icon.pending {
+    background: #432d68;
+    color: #aa5aff;
+}
+
+.ft-table-panel {
+    border: 1px solid #1a3c5b;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #0c2037, #0a1b30);
+    padding: 17px 14px 13px;
+}
+
+.ft-panel-heading {
+    display: flex;
+    min-height: 56px;
+    align-items: center;
+    gap: 15px;
+    margin: 0 10px 14px;
+}
+
+.ft-heading-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border: 3px solid #00ce81;
+    border-radius: 50%;
+    color: #00d586;
+}
+
+.ft-panel-heading h2 {
+    font-size: 21px;
+}
+
+.ft-panel-heading p {
+    margin-top: 4px;
+    color: #a9bdd2;
+    font-size: 14px;
+}
+
+.ft-period-wrap {
+    position: relative;
+    margin-left: auto;
+}
+
+.ft-period {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    gap: 11px;
+    border: 1px solid #1c466a;
+    border-radius: 10px;
+    background: #10253c;
+    color: #f2f6fb;
+    padding: 0 14px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.ft-period-menu {
+    position: absolute;
+    z-index: 5;
+    top: 47px;
+    right: 0;
+    width: 160px;
+    border: 1px solid #28506f;
+    border-radius: 8px;
+    background: #10253c;
+    padding: 5px;
+    box-shadow: 0 8px 20px #0008;
+}
+
+.ft-period-menu button {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #edf4fc;
+    padding: 9px 7px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ft-period-menu button:hover {
+    background: #183957;
+    color: #ff812e;
+}
+
+.ft-table-scroll {
+    overflow-x: auto;
+    border-radius: 9px;
+}
+
+.ft-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.ft-table th {
+    height: 54px;
+    border-bottom: 1px solid #183957;
+    background: #122a45;
+    color: #a9bdd2;
+    padding: 0 17px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.ft-table td {
+    height: 48px;
+    border-bottom: 1px solid #183957;
+    color: #edf2f8;
+    padding: 0 17px;
+    font-size: 14px;
+}
+
+.ft-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.ft-table tbody tr:hover {
+    background: #102741;
+}
+
+.ft-code {
+    font-weight: 700;
+}
+
+.ft-address,
+.ft-date {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ft-address svg,
+.ft-date svg {
+    flex: 0 0 auto;
+    color: #a9bed4;
+    fill: #a9bed4;
+}
+
+.ft-date svg {
+    fill: none;
+}
+
+.ft-done-badge {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    gap: 8px;
+    border-radius: 18px;
+    background: #07854d;
+    color: #effff7;
+    padding: 0 11px;
+}
+
+.ft-done-badge svg {
+    display: block;
+    border: 1px solid #c2ffdf;
+    border-radius: 50%;
+    padding: 1px;
+}
+
+.ft-chevron {
+    width: 36px;
+    color: #f4f7fb !important;
+    font-size: 28px !important;
+}
+
+.ft-empty {
+    height: 110px !important;
+    color: #a9bdd2 !important;
+    text-align: center;
+}
+
+.ft-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 10px 0;
+    color: #b8c8d9;
+    font-size: 14px;
+}
+
+.ft-pagination div {
+    display: flex;
+    gap: 8px;
+}
+
+.ft-pagination button {
+    display: grid;
+    min-width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 0;
+    border-radius: 9px;
+    background: #122a45;
+    color: #e6eef8;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.ft-pagination button.current {
+    background: var(--orange);
+    color: white;
+}
+
+.ft-pagination button:disabled {
+    opacity: .5;
+    cursor: default;
+}
+
+@media(max-width:1100px) {
+    .ft-sidebar {
+        width: 190px;
+        flex-basis: 190px;
+    }
+
+    .ft-main {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .ft-stats {
+        gap: 10px;
+    }
+
+    .ft-stats article {
+        gap: 11px;
+        padding: 12px;
+    }
+
+    .ft-stat-icon {
+        width: 56px;
+        height: 56px;
+        flex-basis: 56px;
+    }
+
+    .ft-stats article p {
+        font-size: 12px;
+    }
+
+    .ft-stats article strong {
+        font-size: 30px;
+    }
+
+    .ft-table th,
+    .ft-table td {
+        padding-right: 10px;
+        padding-left: 10px;
+        font-size: 12px;
+    }
+
+    .ft-hero h1 {
+        font-size: 42px;
+    }
+
+    .ft-hero p {
+        font-size: 16px;
+    }
+}
+
+@media(max-width:700px) {
+    .ft-page {
+        flex-direction: column;
+    }
+
+    .ft-sidebar {
+        width: 100%;
+        min-height: auto;
+        flex: 0 0 auto;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        border-right: 0;
+        border-bottom: 1px solid #1b3955;
+        padding: 8px 12px;
+    }
+
+    .ft-brand {
+        width: 75px;
+        height: 48px;
+        flex: 0 0 75px;
+        align-items: center;
+    }
+
+    .ft-brand img {
+        width: 74px;
+        height: 47px;
+    }
+
+    .ft-nav {
+        min-width: 0;
+        flex: 1;
+        flex-direction: row;
+        gap: 4px;
+        overflow-x: auto;
+    }
+
+    .ft-nav a {
+        min-height: 38px;
+        gap: 6px;
+        padding: 0 8px;
+        font-size: 11px;
+    }
+
+    .ft-nav a svg {
+        width: 17px;
+    }
+
+    .ft-online {
+        display: none;
+    }
+
+    .ft-main {
+        padding: 0 12px 18px;
+    }
+
+    .ft-topbar {
+        height: 62px;
+    }
+
+    .ft-search {
+        width: min(75%, 370px);
+        height: 39px;
+    }
+
+    .ft-hero {
+        min-height: 145px;
+        padding: 20px;
+    }
+
+    .ft-hero h1 {
+        font-size: 32px;
+    }
+
+    .ft-hero p {
+        max-width: 75%;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .ft-truck {
+        right: 3%;
+        bottom: -5px;
+        font-size: 83px;
+        opacity: .8;
+    }
+
+    .ft-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin: 10px 0 15px;
+    }
+
+    .ft-stats article {
+        min-height: 76px;
+        gap: 10px;
+        padding: 9px;
+    }
+
+    .ft-stat-icon {
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+    }
+
+    .ft-stat-icon svg {
+        width: 25px;
+    }
+
+    .ft-stats article p {
+        font-size: 11px;
+    }
+
+    .ft-stats article strong {
+        font-size: 25px;
+    }
+
+    .ft-table-panel {
+        padding: 12px 9px;
+    }
+
+    .ft-panel-heading {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 3px 12px;
+    }
+
+    .ft-heading-icon {
+        width: 35px;
+        height: 35px;
+        flex-basis: 35px;
+    }
+
+    .ft-panel-heading h2 {
+        font-size: 17px;
+    }
+
+    .ft-panel-heading p {
+        font-size: 11px;
+    }
+
+    .ft-period {
+        min-height: 34px;
+        font-size: 11px;
+    }
+
+    .ft-period-wrap {
+        margin-left: auto;
+    }
+
+    .ft-table {
+        min-width: 900px;
+    }
+
+    .ft-pagination {
+        padding: 12px 2px 0;
+        font-size: 11px;
+    }
+
+    .ft-pagination div {
+        gap: 4px;
+    }
+
+    .ft-pagination button {
+        min-width: 31px;
+        height: 32px;
+    }
+}

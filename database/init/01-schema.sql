@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id_usuarios INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL, -- guarda o HASH (bcrypt), nunca a senha pura
+    senha VARCHAR(255) NOT NULL,
     telefone VARCHAR(40) NOT NULL,
     tipo ENUM('admin', 'operador') DEFAULT 'operador',
     status ENUM('ativo', 'inativo') DEFAULT 'ativo',
@@ -20,9 +20,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE IF NOT EXISTS motoristas (
     id_motoristas INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(14) DEFAULT NULL UNIQUE,
+    telefone VARCHAR(40) DEFAULT NULL,
+    cnh VARCHAR(11) DEFAULT NULL,
+    categoria_cnh VARCHAR(2) DEFAULT NULL,
     cidade_base VARCHAR(60) NOT NULL,
     veiculo VARCHAR(100) NOT NULL,
     entregas_hoje INT NOT NULL DEFAULT 0,
+    -- situacao = cadastro (Ativo/Inativo); status = situação operacional
+    situacao ENUM('Ativo', 'Inativo') NOT NULL DEFAULT 'Ativo',
     status ENUM('Disponível', 'Em rota', 'Indisponível') NOT NULL DEFAULT 'Disponível',
     localizacao_atual POINT NOT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -33,13 +39,13 @@ CREATE TABLE IF NOT EXISTS motoristas (
 
 CREATE TABLE IF NOT EXISTS entregas (
     id_entregas INT AUTO_INCREMENT PRIMARY KEY,
-    codigo VARCHAR(20) NOT NULL UNIQUE, -- Código de rastreio único (ex: ENT-12345)
+    codigo VARCHAR(20) NOT NULL UNIQUE, -- Código de rastreio único (ex: LT-2048)
 
     -- Chaves Estrangeiras (Relacionando com as tabelas anteriores)
     id_cliente INT NOT NULL,
     id_motorista INT DEFAULT NULL, -- Pode começar NULL até um motorista aceitar a corrida
 
-    -- Dados de Texto do Destino (para exibição em tela)
+    -- Dados de Texto do Destino (para exibição em tela): "rua, número - bairro - cidade"
     endereco_destino VARCHAR(255) NOT NULL,
 
     -- GEOLOCALIZAÇÃO: O ponto exato no mapa onde o motorista deve ir
@@ -48,6 +54,7 @@ CREATE TABLE IF NOT EXISTS entregas (
     previsao DATETIME NOT NULL,
     status ENUM('Pendente', 'A Caminho', 'Entregue', 'Cancelado') NOT NULL DEFAULT 'Pendente',
 
+    -- checked_at = data/hora em que o pedido foi registrado (usada nos gráficos do Dashboard)
     checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -80,13 +87,28 @@ CREATE TABLE IF NOT EXISTS localizacao_entregadores (
     SPATIAL INDEX idx_coordenadas_entregador (coordenadas)
 );
 
--- Usada pelo "Esqueceu a senha?"
-CREATE TABLE IF NOT EXISTS recuperacao_senha (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
-    token VARCHAR(100) NOT NULL UNIQUE,
-    expira_em DATETIME NOT NULL,
-    usado BOOLEAN NOT NULL DEFAULT FALSE,
+-- Página Rotas
+CREATE TABLE IF NOT EXISTS rotas (
+    id_rotas INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    id_motorista INT DEFAULT NULL,
+    origem VARCHAR(60) NOT NULL,
+    destino VARCHAR(60) NOT NULL,
+    distancia_km DECIMAL(6,1) NOT NULL,
+    status ENUM('Ativa', 'Concluída', 'Planejada') NOT NULL DEFAULT 'Ativa',
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuarios) ON DELETE CASCADE
+    FOREIGN KEY (id_motorista) REFERENCES motoristas(id_motoristas) ON DELETE SET NULL
+);
+
+-- Pontos do trajeto de cada rota, em ordem (POINT = longitude latitude)
+CREATE TABLE IF NOT EXISTS rotas_pontos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_rota INT NOT NULL,
+    ordem INT NOT NULL,
+    coordenadas POINT NOT NULL,
+
+    UNIQUE KEY uq_rota_ordem (id_rota, ordem),
+    FOREIGN KEY (id_rota) REFERENCES rotas(id_rotas) ON DELETE CASCADE,
+    SPATIAL INDEX idx_rotas_pontos (coordenadas)
 );

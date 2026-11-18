@@ -109,13 +109,3 @@
   .login h1 { margin-bottom: 20px; }
   .login > p { margin-bottom: 22px; }
 }
-
-.login .erro {
-  margin-bottom: 15px;
-  color: #ff6b6b;
-}
-
-.login button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}

@@ -1,0 +1,217 @@
+.dash-container { font-size: 14px; }
+.dash { padding: 0 32px 32px; }
+.sidebar { width: 250px; flex-basis: 250px; padding: 24px 18px 18px; }
+.sidebar > div:first-child { width: 100%; min-width: 0; overflow: hidden; }
+.sidebar .logo { display: block; width: auto; max-width: 100%; height: 70px; object-fit: contain; object-position: left center; }
+.nav-label { margin: 32px 0 14px; padding-left: 8px; font-size: 12px; letter-spacing: 1.5px; }
+.area_botoes { margin-top: 0; transform: none; gap: 6px; }
+.sidebar .botao { min-height: 48px; gap: 13px; padding: 0 13px; font-size: 15px; }
+.sidebar .botao svg { width: 22px; height: 22px; }
+.sidebar-footer { padding: 0 8px; font-size: 11px; }
+.sidebar .logout-button { min-height: 48px; font-size: 15px; }
+.sidebar .logout-button span { font-size: 15px; }
+.topbar { min-height: 76px; gap: 20px; }
+.search-box { width: min(100%, 340px); height: 42px; gap: 9px; border-radius: 8px; padding: 0 12px; }
+.search-icon { font-size: 20px; }
+.search-box input { font-size: 13px; }
+.account { gap: 12px; }
+.account>div:first-child { gap: 5px; }
+.account strong { font-size: 13px; }
+.account span { font-size: 11px; }
+.avatar { width: 34px; height: 34px; font-size: 13px; }
+.eyebrow { margin-bottom: 8px; font-size: 11px; letter-spacing: 1px; }
+.subtitle { margin-top: 7px; font-size: 14px; }
+.dashboard-content, .delivery-content, .motorista-content, .rotas-content { max-width: 1440px; padding-top: 28px; }
+.dashboard-heading h1, .delivery-title-row h1, .rotas-heading h1 { font-size: 30px; }
+.dashboard-heading, .delivery-title-row { margin-bottom: 20px; }
+
+.metric-grid, .charts-grid { gap: 16px; margin-bottom: 16px; }
+.metric-card { min-height: 150px; grid-template-columns: 32px 1fr; grid-template-rows: 34px 42px auto; column-gap: 10px; padding: 18px; border-radius: 12px; }
+.metric-icon { width: 30px; height: 30px; border-radius: 8px; }
+.metric-label { font-size: 13px; }
+.metric-value { font-size: 28px; }
+.metric-note { margin-top: 8px; font-size: 12px; }
+.panel { padding: 20px; border-radius: 12px; }
+.panel-heading h2 { font-size: 19px; }
+.panel-heading p { margin-top: 6px; font-size: 13px; }
+.delivery-panel, .status-panel { min-height: 320px; }
+.line-chart { height: 230px; margin-top: 8px; }
+.chart-label { font-size: 9px; }
+.chart-key, .chart-legend { font-size: 11px; }
+.donut-wrap { min-height: 230px; gap: 22px; }
+.donut-chart { width: 170px; height: 170px; flex-basis: 170px; }
+.chart-legend { gap: 10px; }
+.updates-panel { min-height: 140px; }
+.updates-grid { gap: 18px; margin-top: 14px; }
+.update-item { min-height: 46px; gap: 6px; padding-left: 12px; }
+.update-item strong { font-size: 13px; }
+.update-item span { font-size: 11px; }
+.period-switch { gap: 4px; padding: 4px; border-radius: 8px; }
+.period-switch button { min-height: 32px; padding: 0 12px; font-size: 12px; }
+
+.delivery-title-row .subtitle { margin-top: 8px; }
+.result-count { margin-bottom: 4px; border-radius: 6px; padding: 8px 11px; font-size: 12px; }
+.delivery-filters { gap: 10px; margin-bottom: 12px; }
+.delivery-search, .motorista-search { height: 42px; gap: 9px; border-radius: 8px; padding: 0 12px; }
+.delivery-search input, .motorista-search input { font-size: 13px; }
+.delivery-status-dropdown { width: 190px; flex-basis: 190px; }
+.delivery-status-button, .motorista-status-button { height: 42px; gap: 8px; border-radius: 8px; padding: 0 12px; font-size: 13px; }
+.delivery-status-options { top: 48px; padding: 7px; border-radius: 9px; }
+.delivery-status-option { padding: 11px 9px; font-size: 13px; }
+.delivery-table-wrap, .motorista-table-wrap { border-radius: 10px; }
+.delivery-table th, .motorista-list-table th { height: 46px; padding: 0 14px; font-size: 12px; }
+.delivery-table td, .motorista-list-table td { height: 54px; padding: 0 14px; font-size: 12px; }
+.status-badge, .motorista-badge { min-height: 23px; border-radius: 5px; padding: 0 9px; font-size: 10px; }
+
+.motorista-filters { gap: 10px; margin-bottom: 12px; }
+.motorista-add-button { width: 42px; height: 42px; flex-basis: 42px; border-radius: 8px; font-size: 25px; }
+.motorista-status-dropdown { width: 190px; flex-basis: 190px; }
+.motorista-status-options { top: 48px; width: 100%; padding: 7px; border-radius: 9px; }
+.motorista-status-option { padding: 11px 9px; font-size: 13px; }
+.motorista-list-table th { height: 46px; }
+.motorista-list-table td { height: 54px; }
+.motorista-name { gap: 10px; }
+.motorista-name strong { font-size: 12px; }
+.motorista-avatar { width: 28px; height: 28px; flex-basis: 28px; font-size: 10px; }
+
+.rotas-heading { margin-bottom: 20px; }
+.rotas-heading h1 { margin: 5px 0 7px; }
+.rotas-layout { grid-template-columns: minmax(300px, 35%) minmax(0, 1fr); gap: 16px; min-height: 500px; }
+.rotas-panel, .map-panel { border-radius: 12px; padding: 20px; }
+.rotas-panel h2, .map-panel h2 { margin-bottom: 7px; font-size: 19px; }
+.rotas-panel-description { margin-bottom: 14px; font-size: 13px; }
+.rotas-list { gap: 10px; }
+.rota-card { min-height: 72px; gap: 10px; border-radius: 8px; padding: 12px; }
+.rota-card.is-active { padding: 11px; }
+.rota-card-copy { gap: 7px; }
+.rota-card-copy strong { font-size: 13px; }
+.rota-card-copy small, .rota-active-label { font-size: 11px; }
+.route-map { min-height: 300px; border-radius: 8px; }
+.map-caption { margin-top: 9px; font-size: 11px; }
+
+@media (max-width: 1099px) {
+  .sidebar { width: 200px; flex-basis: 200px; }
+  .dash { padding: 0 24px 28px; }
+  .dashboard-content, .delivery-content, .motorista-content, .rotas-content { padding-top: 24px; }
+  .metric-card { min-height: 132px; }
+  .delivery-panel, .status-panel { min-height: 290px; }
+  .rotas-layout { min-height: 420px; }
+}
+
+@media (max-width: 700px) {
+  .dash-container { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; min-height: 0; flex: 0 0 auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; border-right: 0; border-bottom: 1px solid #142e45; padding: 12px 16px; }
+  .sidebar > div:first-child { width: auto; max-width: 180px; flex: 0 1 180px; }
+  .sidebar .logo { height: 46px; }
+  .nav-label { margin: 0; padding: 0; }
+  .area_botoes { width: 100%; flex-direction: row; gap: 5px; overflow-x: auto; }
+  .sidebar .botao { min-height: 42px; flex: 1 0 auto; justify-content: center; gap: 7px; padding: 0 10px; font-size: 13px; }
+  .sidebar .botao svg { width: 19px; height: 19px; }
+  .sidebar .logout-button { min-height: 42px; font-size: 13px; }
+  .sidebar .logout-button span { font-size: 13px; }
+  .sidebar-footer { display: none; }
+  .dash { padding: 0 18px 24px; }
+  .topbar { min-height: 64px; }
+  .search-box { width: min(100%, 340px); height: 38px; }
+  .account strong { font-size: 11px; }
+  .account span { font-size: 10px; }
+  .avatar { width: 30px; height: 30px; font-size: 11px; }
+  .dashboard-content, .delivery-content, .motorista-content, .rotas-content { padding-top: 20px; }
+  .dashboard-heading h1, .delivery-title-row h1, .rotas-heading h1 { font-size: 26px; }
+  .eyebrow { font-size: 10px; }
+  .subtitle { font-size: 13px; }
+  .metric-grid { gap: 10px; }
+  .metric-card { min-height: 125px; padding: 14px; }
+  .charts-grid { grid-template-columns: 1fr; gap: 12px; }
+  .delivery-panel, .status-panel { min-height: 260px; }
+  .line-chart { height: 190px; }
+  .donut-wrap { min-height: 190px; }
+  .dashboard-heading, .delivery-title-row { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .period-switch, .result-count { align-self: flex-end; }
+  .rotas-layout { grid-template-columns: 1fr; min-height: unset; }
+  .map-panel { min-height: 390px; }
+  .route-map { min-height: 300px; }
+}
+
+@media (max-width: 420px) {
+  .dash { padding: 0 12px 18px; }
+  .topbar { gap: 8px; }
+  .search-box { width: min(60%, 260px); padding: 0 8px; }
+  .search-box input { font-size: 11px; }
+  .account { gap: 6px; }
+  .account strong { font-size: 9px; }
+  .account span { font-size: 8px; }
+  .avatar { width: 27px; height: 27px; font-size: 10px; }
+  .metric-card { min-height: 118px; padding: 12px; }
+  .metric-note { font-size: 10px; }
+  .donut-wrap { gap: 12px; }
+  .donut-chart { width: 130px; height: 130px; flex-basis: 130px; }
+  .chart-legend { gap: 8px; font-size: 10px; }
+  .updates-grid { grid-template-columns: 1fr; gap: 10px; }
+  .update-item { min-height: 38px; }
+  .delivery-filters { flex-direction: column; }
+  .delivery-search, .delivery-status-dropdown { width: 100%; flex-basis: auto; }
+  .delivery-status-options { top: 48px; }
+  .motorista-search { min-width: 0; }
+  .motorista-status-dropdown { width: 132px; flex-basis: 132px; }
+  .motorista-add-button { width: 42px; flex-basis: 42px; }
+  .motorista-list-table, .delivery-table { min-width: 680px; }
+  .rotas-panel, .map-panel { padding: 14px; }
+  .rota-card-copy strong { font-size: 11px; }
+}
+
+
+/* Larger content scale for the operations pages */
+.motorista-heading-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.motorista-heading h1 { margin: 0; color: #edf4fc; font-size: 30px; line-height: 1.2; }
+.motorista-heading .subtitle { color: #8da1b5; }
+.motorista-count { margin-bottom: 4px; border: 1px solid #145344; border-radius: 6px; background: #10483e; color: #49d2ad; padding: 8px 11px; font-size: 12px; white-space: nowrap; }
+.delivery-filters, .motorista-filters { gap: 12px; margin-bottom: 15px; }
+.delivery-search, .motorista-search { height: 46px; gap: 10px; border-radius: 8px; padding: 0 13px; }
+.delivery-search input, .motorista-search input { font-size: 14px; }
+.delivery-status-button, .motorista-status-button { height: 46px; border-radius: 8px; padding: 0 13px; font-size: 14px; }
+.delivery-status-options { top: 52px; padding: 8px; }
+.delivery-status-option, .motorista-status-option { padding: 12px 10px; font-size: 14px; }
+.delivery-table th, .motorista-list-table th { height: 50px; padding: 0 16px; font-size: 13px; }
+.delivery-table td, .motorista-list-table td { height: 60px; padding: 0 16px; font-size: 14px; }
+.status-badge, .motorista-badge { min-height: 25px; border-radius: 5px; padding: 0 10px; font-size: 11px; }
+.motorista-add-button { width: 46px; height: 46px; flex-basis: 46px; border-radius: 8px; font-size: 27px; }
+.motorista-status-options { top: 52px; width: 100%; padding: 8px; }
+.motorista-name { gap: 10px; }
+.motorista-name strong { font-size: 14px; }
+.motorista-avatar { width: 30px; height: 30px; flex-basis: 30px; font-size: 11px; }
+.delivery-title-row h1, .rotas-heading h1, .motorista-heading h1 { font-size: 32px; }
+.rotas-layout { grid-template-columns: minmax(320px, 35%) minmax(0, 1fr); gap: 18px; min-height: 550px; }
+.rotas-panel, .map-panel { border-radius: 12px; padding: 22px; }
+.rotas-panel h2, .map-panel h2 { margin-bottom: 8px; font-size: 21px; }
+.rotas-panel-description { margin-bottom: 16px; font-size: 14px; }
+.rotas-list { gap: 12px; }
+.rota-card { min-height: 80px; gap: 12px; border-radius: 8px; padding: 14px; }
+.rota-card.is-active { padding: 13px; }
+.rota-card-copy strong { font-size: 14px; }
+.rota-card-copy small, .rota-active-label { font-size: 12px; }
+.route-map { min-height: 340px; border-radius: 8px; }
+.map-caption { margin-top: 10px; font-size: 12px; }
+
+@media (max-width: 1099px) and (min-width: 701px) {
+  .sidebar { width: 180px; flex-basis: 180px; }
+  .rotas-layout { min-height: 480px; }
+}
+
+@media (max-width: 700px) {
+  .motorista-heading-row { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .motorista-heading h1, .delivery-title-row h1, .rotas-heading h1 { font-size: 27px; }
+  .motorista-count { align-self: flex-end; }
+  .delivery-filters { gap: 10px; }
+  .delivery-table th, .motorista-list-table th { font-size: 12px; }
+  .delivery-table td, .motorista-list-table td { font-size: 13px; }
+  .rotas-layout { min-height: unset; }
+  .rota-card-copy strong { font-size: 13px; }
+}
+
+@media (max-width: 420px) {
+  .motorista-heading h1, .delivery-title-row h1, .rotas-heading h1 { font-size: 25px; }
+  .motorista-count { font-size: 11px; }
+  .delivery-table, .motorista-list-table { min-width: 720px; }
+  .rotas-panel, .map-panel { padding: 14px; }
+}
