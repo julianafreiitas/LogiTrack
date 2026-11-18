@@ -1,14 +1,9 @@
 "use client";
 
-<<<<<<< HEAD
 import { useMemo, useState } from "react";
 import { Bell, Search, House, Package, Map, LogOut, Check, Clock3, CircleAlert, MapPin, CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import "./pageFuncionarios.css";
-=======
-import "./pageFuncionarios.css"
-import AsideMotorista from "../components/asideMotorista";
->>>>>>> de76e191bae095e10055b4b3ba8a02538093869a
 
 const entregas = [
   { codigo: "#LT78452", cliente: "Mercado Souza", endereco: "Rua das Flores, 123 – São Caetano do Sul, SP", data: "14/11/2026" },
@@ -22,7 +17,6 @@ const entregas = [
 ];
 
 export default function Funcionarios() {
-<<<<<<< HEAD
   const [busca, setBusca] = useState("");
   const [pagina, setPagina] = useState(1);
   const [periodo, setPeriodo] = useState("Últimos 30 dias");
@@ -31,22 +25,6 @@ export default function Funcionarios() {
   const totalPaginas = Math.max(1, Math.ceil(filtradas.length / 5));
   const paginaAtual = Math.min(pagina, totalPaginas);
   const linhas = filtradas.slice((paginaAtual - 1) * 5, paginaAtual * 5);
-=======
-    return (
-        <div className="conteiner-funcionario">
-           <AsideMotorista />
-
-            <main className="dash">
-                <header className="cabecalho">
-                    {/* <input className="buscar" type="text" /> */}
-                    <div className="space">
-                        <div className="perfil">JF</div>
-                        <h3>Juliana Freitas</h3>
-                    </div>
-                </header>
-
-            </main>
->>>>>>> de76e191bae095e10055b4b3ba8a02538093869a
 
   return <div className="ft-page">
     <aside className="ft-sidebar">
