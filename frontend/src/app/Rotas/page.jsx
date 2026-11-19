@@ -63,6 +63,7 @@ export default function Rotas() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregarRotas();
   }, [carregarRotas]);
 

@@ -1,17 +1,17 @@
 SET NAMES utf8mb4;
 USE app_db;
 
-INSERT INTO motoristas (nome, cidade_base, veiculo, entregas_hoje, status) VALUES
-('João Pereira', 'São Paulo', 'Fiorino Branca', 4, 'Em rota'),
-('Pedro Alves', 'São Paulo', 'Van Sprinter', 3, 'Em rota'),
-('Diego Ramos', 'São Paulo', 'Moto Honda CG 160', 6, 'Em rota'),
-('Carlos Souza', 'Campinas', 'Fiorino Prata', 2, 'Disponível'),
-('Ana Lima', 'Santos', 'Van Master', 5, 'Em rota'),
-('Marcos Silva', 'Sorocaba', 'Caminhão VUC', 1, 'Disponível'),
-('Rafaela Costa', 'Guarulhos', 'Moto Yamaha Fazer', 7, 'Em rota'),
-('Bruno Martins', 'Santo André', 'Fiorino Branca', 0, 'Disponível'),
-('Fernanda Rocha', 'São Bernardo do Campo', 'Van Sprinter', 0, 'Indisponível'),
-('Lucas Teixeira', 'Osasco', 'Moto Honda Biz', 3, 'Em rota');
+INSERT INTO motoristas (nome, cidade_base, veiculo, entregas_hoje, status, localizacao_atual) VALUES
+('João Pereira', 'São Paulo', 'Fiorino Branca', 4, 'Em rota', ST_GeomFromText('POINT(-46.6400 -23.5500)')),
+('Pedro Alves', 'São Paulo', 'Van Sprinter', 3, 'Em rota', ST_GeomFromText('POINT(-46.6700 -23.5600)')),
+('Diego Ramos', 'São Paulo', 'Moto Honda CG 160', 6, 'Em rota', ST_GeomFromText('POINT(-46.6250 -23.5450)')),
+('Carlos Souza', 'Campinas', 'Fiorino Prata', 2, 'Disponível', ST_GeomFromText('POINT(-47.0500 -22.9100)')),
+('Ana Lima', 'Santos', 'Van Master', 5, 'Em rota', ST_GeomFromText('POINT(-46.3300 -23.9500)')),
+('Marcos Silva', 'Sorocaba', 'Caminhão VUC', 1, 'Disponível', ST_GeomFromText('POINT(-47.4400 -23.5100)')),
+('Rafaela Costa', 'Guarulhos', 'Moto Yamaha Fazer', 7, 'Em rota', ST_GeomFromText('POINT(-46.5300 -23.4600)')),
+('Bruno Martins', 'Santo André', 'Fiorino Branca', 0, 'Disponível', ST_GeomFromText('POINT(-46.5400 -23.6600)')),
+('Fernanda Rocha', 'São Bernardo do Campo', 'Van Sprinter', 0, 'Indisponível', ST_GeomFromText('POINT(-46.5600 -23.6900)')),
+('Lucas Teixeira', 'Osasco', 'Moto Honda Biz', 3, 'Em rota', ST_GeomFromText('POINT(-46.7900 -23.5300)'));
 
 INSERT INTO usuarios (nome, email, senha, telefone, tipo, status) VALUES
 ('Matheus Paz', 'matheus@logitrack.com', 'senha_exemplo_01', '(11) 91111-0001', 'admin', 'ativo'),

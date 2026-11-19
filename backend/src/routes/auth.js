@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 
-import { pool } from "../config/database.js";
+import pool from "../config/database.js";
 import { autenticar } from "../middlewares/authMiddleware.js";
 
 const router = Router();

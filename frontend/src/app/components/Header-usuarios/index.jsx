@@ -17,8 +17,8 @@ import {
 
 const navigation = [
   { name: "Início", href: "/Main-usuario", icon: Home },
-  { name: "Solicitar Entregas", href: "/Solicitar-Entregas", icon: Package},
-  { name: "Acompanhar", href: "/AcompanharEntrega", icon: Truck },
+  { name: "Solicitar Entregas", href: "/solicitarEntrega", icon: Package},
+  { name: "Acompanhar", href: "/acompanharEntrega", icon: Truck },
   { name: "Últimos Pedidos", href: "/Meus-Pedidos", icon: RotateCcwClock},
   { name: "Endereços", href: "/Enderecos", icon: MapPinHouse },
 ];
