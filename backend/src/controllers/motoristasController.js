@@ -1,4 +1,4 @@
-import { pool } from "../config/database.js";
+import pool from "../config/database.js";
 import { pontoDaCidade } from "../utils/cidades.js";
 
 const CATEGORIAS = ["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"];

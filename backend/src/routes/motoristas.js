@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { pool } from "../config/database.js";
+import pool from "../config/database.js";
 import { autenticar } from "../middlewares/authMiddleware.js";
 
 const router = Router();

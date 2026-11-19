@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "lucide": "^1.72.0",
+    "react": "^19.3.1"
+  }
+}

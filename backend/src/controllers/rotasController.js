@@ -1,4 +1,4 @@
-import { pool } from "../config/database.js";
+import pool from "../config/database.js";
 
 export async function listarRotas(request, response) {
   const [rotas] = await pool.query(
