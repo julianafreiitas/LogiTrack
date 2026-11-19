@@ -3,7 +3,7 @@
 import "./aside.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, ChartNoAxesColumnIncreasing, LayoutDashboard, LogOut, Map, Package, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, Map, Package, Users } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/Dash", icon: LayoutDashboard },
@@ -15,8 +15,15 @@ const navigation = [
   // { name: "Relatórios", icon: ChartNoAxesColumnIncreasing },
 ];
 
-export default function Aside() {
+const employeeNavigation = [
+  { name: "Início", href: "/Funcionarios", icon: LayoutDashboard },
+  { name: "Minhas Entregas", href: "/Entregas", icon: Package },
+  { name: "Mapa", href: "/MapaFuncionarios", icon: Map },
+];
+
+export default function Aside({ variant = "default" }) {
   const pathname = usePathname();
+  const items = variant === "employee" ? employeeNavigation : navigation;
 
   return (
     <aside className="sidebar">
@@ -25,11 +32,11 @@ export default function Aside() {
         <span>Logi<strong>Track</strong></span>
       </Link> */}
       <div>
-        <img className="logo" src="../imagens/logo_2.png" alt="" />
+        <img className="logo" src="/imagens/logo_2.png" alt="LogiTrack" />
       </div>
       <p className="nav-label">MENU PRINCIPAL</p>
       <nav className="area_botoes" aria-label="Menu principal">
-        {navigation.map(({ name, href, icon: Icon }) => {
+        {items.map(({ name, href, icon: Icon }) => {
           const selected = pathname === href;
           return (
             <Link key={name} href={href} className={`botao ${selected ? "selecionado" : ""}`} aria-current={selected ? "page" : undefined}>
@@ -40,10 +47,10 @@ export default function Aside() {
         })}
       </nav>
       <p className="sidebar-footer">LogiTrack &middot;</p>
-      <a className="logout-button" href="/login">
+      <Link className="logout-button" href="/login">
         <LogOut size={19} strokeWidth={2} />
         <span>Sair</span>
-      </a>
+      </Link>
     </aside>
   );
 }

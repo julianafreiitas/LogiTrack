@@ -1,4 +1,5 @@
 .ft-page {
+    --sidebar: #091a2b;
     --orange: #ff7108;
     --line: #173957;
     display: flex;

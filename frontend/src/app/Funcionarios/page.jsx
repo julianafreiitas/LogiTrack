@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Bell, Search, House, Package, Map, LogOut, Check, Clock3, CircleAlert, MapPin, CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { Bell, Search, Package, Check, Clock3, CircleAlert, MapPin, CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import Aside from "../components/aside";
+import "../Dash/pageDash.css";
 import "./pageFuncionarios.css";
 
 const entregas = [
@@ -26,17 +27,9 @@ export default function Funcionarios() {
   const paginaAtual = Math.min(pagina, totalPaginas);
   const linhas = filtradas.slice((paginaAtual - 1) * 5, paginaAtual * 5);
 
-  return <div className="ft-page">
-    <aside className="ft-sidebar">
-      <Link href="/Dash" className="ft-brand"><img src="/imagens/logo_2.png" alt="LogiTrack" /></Link>
-      <nav className="ft-nav" aria-label="Navegação principal">
-        <Link href="/Dash"><House size={22}/><span>Início</span></Link>
-        <Link className="active" href="/Funcionarios"><Package size={22}/><span>Minhas Entregas</span></Link>
-        <Link href="/Rotas"><Map size={22}/><span>Mapa</span></Link>
-        <Link href="/login"><LogOut size={22}/><span>Sair</span></Link>
-      </nav>
-      <div className="ft-online"><i/> <div><strong>Online</strong><small>Última atualização: 10:24</small></div></div>
-    </aside>
+  return(
+    <div className="ft-page">
+    <Aside variant="employee" />
     <main className="ft-main">
       <header className="ft-topbar"><label className="ft-search"><Search size={20}/><input value={busca} onChange={(event) => { setBusca(event.target.value); setPagina(1); }} placeholder="Buscar entrega..." aria-label="Buscar entrega"/></label><button className="ft-bell" type="button" aria-label="Notificações"><Bell size={29}/><span>2</span></button></header>
       <section className="ft-hero"><div><h1>Minhas <em>Entregas</em></h1><p>Acompanhe o status das suas entregas em tempo real.</p><i/></div><div className="ft-truck" aria-hidden="true">🚚</div></section>
@@ -57,5 +50,7 @@ export default function Funcionarios() {
         <footer className="ft-pagination"><span>Mostrando {linhas.length ? (paginaAtual - 1) * 5 + 1 : 0}–{Math.min(paginaAtual * 5, filtradas.length)} de {filtradas.length} entregas</span><div><button aria-label="Página anterior" disabled={paginaAtual === 1} onClick={() => setPagina(paginaAtual - 1)}><ChevronLeft size={19}/></button>{Array.from({ length: totalPaginas }, (_, index) => index + 1).map((numero) => <button key={numero} className={paginaAtual === numero ? "current" : ""} onClick={() => setPagina(numero)}>{numero}</button>)}<button aria-label="Próxima página" disabled={paginaAtual === totalPaginas} onClick={() => setPagina(paginaAtual + 1)}><ChevronRight size={19}/></button></div></footer>
       </section>
     </main>
-  </div>;
+  </div>
+  ) ;
+  
 }
