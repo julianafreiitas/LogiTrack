@@ -2,8 +2,8 @@
 'use client'
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Header from "../components/Header-usuarios";
-import Footer from "../components/Footer-usuarios";
 import "./pagemain.css";
 import {Truck, Package, Check, Clock4, Info } from "lucide-react";
 
@@ -29,25 +29,19 @@ const pedidos = [
 ];
 
 export default function MainUsuario() {
+  const router = useRouter();
   const [codigo, setCodigo] = useState("");
-  const [mensagem, setMensagem] = useState("");
 
   function consultarEntrega(e) {
     e.preventDefault();
-
-    if (!codigo.trim()) {
-      setMensagem("Digite um código de rastreamento.");
-      return;
-    }
-
-    // Aqui você poderá conectar sua API de rastreamento.
-    setMensagem(
-      `Código ${codigo.trim()} informado. Aguardando consulta ao sistema.`
-    );
+    const query = codigo.trim()
+      ? `?codigo=${encodeURIComponent(codigo.trim())}`
+      : "";
+    router.push(`/acompanharEntrega${query}`);
   }
 
   return (
-    <div className="dash-container">
+    <div className="dash-container home-page-shell">
       <Header />
 
       <main className="main-content">
@@ -70,6 +64,24 @@ export default function MainUsuario() {
           </div>
 
           
+        </section>
+
+        {/* INDICADORES LOGO ABAIXO DO BANNER */}
+        <section className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon blue"><Truck/></div>
+            <div><span>Em trânsito</span><strong>12</strong></div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon green"><Check/></div>
+            <div><span>Entregues</span><strong>28</strong></div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon orange"><Clock4 /></div>
+            <div><span>Em andamento</span><strong>03</strong></div>
+          </div>
         </section>
 
         {/* ÁREA PRINCIPAL */}
@@ -100,7 +112,6 @@ export default function MainUsuario() {
                   value={codigo}
                   onChange={(e) => {
                     setCodigo(e.target.value);
-                    setMensagem("");
                   }}
                 />
 
@@ -109,11 +120,6 @@ export default function MainUsuario() {
                 </button>
               </div>
 
-              {mensagem && (
-                <p className="tracking-message" role="status">
-                  {mensagem}
-                </p>
-              )}
             </form>
 
             <div className="tracking-help">
@@ -126,7 +132,7 @@ export default function MainUsuario() {
           <div className="content-card orders-card">
             <div className="card-heading">
               <h2>Últimos pedidos</h2>
-              <a href="/meus-pedidos">
+              <a href="/Meus-Pedidos">
                 Ver todos
               </a>
             </div>
@@ -148,37 +154,6 @@ export default function MainUsuario() {
           </div>
 
         </section>
-
-        {/* INDICADORES */}
-        <section className="stats-grid">
-
-          <div className="stat-card">
-            <div className="stat-icon blue"><Truck/></div>
-            <div>
-              <span>Em trânsito</span>
-              <strong>12</strong>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon green"><Check/></div>
-            <div>
-              <span>Entregues</span>
-              <strong>28</strong>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon orange"><Clock4 /></div>
-            <div>
-              <span>Pendentes</span>
-              <strong>03</strong>
-            </div>
-          </div>
-
-        </section>
-
-        <Footer/>
 
       </main>
     </div>

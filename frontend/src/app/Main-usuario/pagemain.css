@@ -99,8 +99,30 @@
   gap: 9px;
   color: #edf4fc;
   font-size: 12px;
-  cursor: pointer;
   flex-shrink: 0;
+}
+
+.user-logout {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-left: 5px;
+  padding: 0 10px;
+  border: 1px solid #294358;
+  border-radius: 7px;
+  color: #dce7f2;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color .18s ease, background .18s ease, color .18s ease;
+}
+
+.user-logout:hover {
+  border-color: #ff751f;
+  background: #ff751f;
+  color: #fff;
 }
 
 .user-avatar {
@@ -140,6 +162,8 @@
   .user-area {
     font-size: 11px;
   }
+
+  .user-logout { min-height: 31px; padding: 0 8px; font-size: 11px; }
 }
 
 /* =========================
@@ -152,6 +176,22 @@
   background: #f1f5fc;
   color: #10243d;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.home-page-shell {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.home-page-shell > .main-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.home-page-shell .dashboard-footer {
+  margin-top: auto;
 }
 
 .main-content {

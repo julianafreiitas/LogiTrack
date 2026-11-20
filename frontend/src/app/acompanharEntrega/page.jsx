@@ -1,158 +1,93 @@
-"use client";
-
+import {
+  Box,
+  Check,
+  CheckCircle2,
+  Clock3,
+  MapPin,
+  Package,
+  Truck,
+  UserRound,
+} from "lucide-react";
+import Header from "../components/Header-usuarios";
+import "../Main-usuario/pagemain.css";
 import "./acompanharEntrega.css";
-import { useState } from "react";
-import { Search, Calendar, ChevronLeft, Truck, Package, CheckCircle2, User } from 'lucide-react';
 
-const styles = {
-  container: {},
-  header: {},
-  logo: {},
-  nav: {},
-  navLink: {},
-  navLinkActive: {},
-  avatar: {},
-  hero: {},
-  heroTitle: {},
-  heroSubtitle: {},
-  searchSection: {},
-  searchLabel: {},
-  searchRow: {},
-  input: {},
-  btnConsultar: {},
-  resultCard: {},
-  statusInfoGrid: {},
-  statusMain: {},
-  iconBox: {},
-  statusLabel: {},
-  statusTitle: {},
-  statusDesc: {},
-  deliveryDateBox: {},
-  dateLabel: {},
-  dateValue: {},
-  timeline: {},
-  timelineStep: {},
-  stepCheck: {},
-  stepText: {},
-  timelineLine: {},
-  footer: {},
-  btnVoltar: {}
-};
+const etapas = [
+  { titulo: "Pedido\nSolicitado", data: "14/11 às 09:15", status: "concluida", icon: Check },
+  { titulo: "Em Rota", data: "14/11 às 10:30", status: "concluida", icon: Check },
+  { titulo: "Saiu para\nEntrega", data: "14/11 às 13:20", status: "atual", icon: Truck },
+  { titulo: "Entregue", data: "Aguardando", status: "futura", icon: Check },
+];
 
 export default function AcompanharEntrega() {
-  const [busca, setBusca] = useState("");
-  const [mostrarResultado, setMostrarResultado] = useState(false);
-
-  // Função para simular o clique no botão "Consultar"
-  const handleConsultar = () => {
-    if (busca.trim() !== "") {
-      setMostrarResultado(true);
-    }
-  };
-
   return (
-    <div style={styles.container}>
-      {/* 1. Header / Navbar */}
-      <header style={styles.header}>
-        <div style={styles.logo}>
-          <span style={{ color: '#0F172A', fontWeight: 'bold' }}>Logi</span>
-          <span style={{ color: '#F97316', fontWeight: 'bold' }}>Track</span>
-        </div>
-        <nav style={styles.nav}>
-          <a href="#" style={styles.navLink}>Solicitar entrega</a>
-          <a href="#" style={{ ...styles.navLink, ...styles.navLinkActive }}>Acompanhar entrega</a>
-        </nav>
-        <div style={styles.avatar}>
-          <User size={20} color="#64748B" />
-        </div>
-      </header>
+    <div className="dash-container tracking-page-shell">
+      <Header />
 
-      {/* 2. Banner Hero */}
-      <section style={styles.hero}>
-        <h1 style={styles.heroTitle}>Acompanhar Entrega</h1>
-        <p style={styles.heroSubtitle}>
-          Informe o código da sua entrega<br />
-          para acompanhar o status em tempo real.
-        </p>
-      </section>
-
-      {/* 3. Seção do Input de Busca */}
-      <section style={styles.searchSection}>
-        <label style={styles.searchLabel}>
-          <Search size={18} color="#0F172A" style={{ marginRight: '8px' }} />
-          Código da Entrega
-        </label>
-        <div style={styles.searchRow}>
-          <input
-            type="text"
-            placeholder="Digite o código da sua entrega"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            style={styles.input}
-          />
-          <button onClick={handleConsultar} style={styles.btnConsultar}>
-            <Search size={16} color="#FFF" style={{ marginRight: '6px' }} />
-            Consultar
-          </button>
-        </div>
-      </section>
-
-      {/* 4. Card de Resultados (Só aparece se o usuário buscar) */}
-      {mostrarResultado && (
-        <section style={styles.resultCard}>
-          <div style={styles.statusInfoGrid}>
-            <div style={styles.statusMain}>
-              <div style={styles.iconBox}>
-                <Package size={28} color="#F97316" />
-              </div>
-              <div>
-                <span style={styles.statusLabel}>Status da sua entrega</span>
-                <h3 style={styles.statusTitle}>Em trânsito</h3>
-                <p style={styles.statusDesc}>Sua entrega está a caminho do destino.</p>
-              </div>
-            </div>
-
-            <div style={styles.deliveryDateBox}>
-              <Calendar size={24} color="#0F172A" style={{ marginRight: '12px' }} />
-              <div>
-                <span style={styles.dateLabel}>Previsão de chegada</span>
-                <h4 style={styles.dateValue}>Hoje, até 18h</h4>
-              </div>
-            </div>
-          </div>
-
-          {/* Linha do Tempo (Stepper) */}
-          <div style={styles.timeline}>
-            <div style={styles.timelineStep}>
-              <div style={{ ...styles.stepCheck, backgroundColor: '#0F172A' }}><CheckCircle2 size={14} color="#FFF" /></div>
-              <span style={styles.stepText}>Solicitação<br/>recebida</span>
-            </div>
-            <div style={styles.timelineLine}></div>
-            <div style={styles.timelineStep}>
-              <div style={{ ...styles.stepCheck, backgroundColor: '#0F172A' }}><CheckCircle2 size={14} color="#FFF" /></div>
-              <span style={styles.stepText}>Coleta<br/>realizada</span>
-            </div>
-            <div style={{ ...styles.timelineLine, backgroundColor: '#F97316' }}></div>
-            <div style={styles.timelineStep}>
-              <div style={{ ...styles.stepCheck, backgroundColor: '#F97316' }}><Truck size={14} color="#FFF" /></div>
-              <span style={{ ...styles.stepText, fontWeight: 'bold', color: '#0F172A' }}>Em trânsito</span>
-            </div>
-            <div style={{ ...styles.timelineLine, backgroundColor: '#E2E8F0' }}></div>
-            <div style={styles.timelineStep}>
-              <div style={{ ...styles.stepCheck, backgroundColor: '#E2E8F0' }}></div>
-              <span style={{ ...styles.stepText, color: '#94A3B8' }}>Entregue</span>
-            </div>
+      <main className="tracking-page-content">
+        <section className="tracking-hero-banner">
+          <div>
+            <span>ACOMPANHAR ENTREGA</span>
+            <h1>Acompanhe sua entrega <em>em tempo real</em></h1>
+            <p>Confira o status da sua entrega e saiba exatamente onde ela está.</p>
+            <i />
           </div>
         </section>
-      )}
 
-      {/* 5. Botão Voltar */}
-      <footer style={styles.footer}>
-        <button style={styles.btnVoltar}>
-          <ChevronLeft size={18} style={{ marginRight: '4px' }} />
-          Voltar
-        </button>
-      </footer>
+        <section className="tracking-overview">
+          <article className="tracking-current-card">
+            <div className="tracking-current-heading">
+              <div className="tracking-section-icon"><Package size={20} /></div>
+              <div><h2>Sua entrega</h2><p>Acompanhamento atualizado</p></div>
+            </div>
+            <div className="tracking-current-order">
+              <div className="tracking-package-icon"><Box size={23} /></div>
+              <div><strong>Entrega em andamento</strong><span>Mercado Souza · 1 pacote</span></div>
+              <span className="tracking-live-dot" aria-label="Em andamento" />
+            </div>
+            <div className="tracking-current-address"><MapPin size={17} /><span>Rua das Flores, 123<br />São Caetano do Sul, SP</span></div>
+          </article>
+
+          <article className="tracking-progress-card">
+            <div className="tracking-timeline" aria-label="Etapas da entrega">
+              {etapas.map(({ titulo, data, status, icon: Icon }, index) => (
+                <div className="tracking-step-wrap" key={titulo}>
+                  <div className={`tracking-step ${status}`}><Icon size={index === 2 ? 20 : 18} /></div>
+                  {index < etapas.length - 1 && <div className={`tracking-step-line ${index < 2 ? "done" : ""}`} />}
+                  <strong>{titulo.split("\n").map((line) => <span key={line}>{line}</span>)}</strong>
+                  <small>{data}</small>
+                </div>
+              ))}
+            </div>
+
+            <div className="tracking-vehicle-status">
+              <div className="tracking-vehicle-icon"><Truck size={34} /></div>
+              <div><strong>Seu veículo está a caminho!</strong><span>Previsão de chegada: <b>14/11 às 14:30</b></span></div>
+            </div>
+          </article>
+        </section>
+
+        <section className="tracking-bottom-grid">
+          <article className="tracking-details-card">
+            <h2><span><CheckCircle2 size={17} /></span> Detalhes da Entrega</h2>
+            <div className="tracking-detail-columns">
+              <div className="tracking-detail-item"><small><Package size={13} /> Pedido</small><strong>Em andamento</strong></div>
+              <div className="tracking-detail-item"><small><UserRound size={13} /> Cliente</small><strong>Mercado Souza</strong></div>
+              <div className="tracking-detail-item"><small><MapPin size={13} /> Endereço</small><strong>Rua das Flores, 123<br />São Caetano do Sul, SP</strong></div>
+              <div className="tracking-detail-item"><small><Box size={13} /> Volumes</small><strong>1 pacote</strong></div>
+            </div>
+          </article>
+
+          <article className="tracking-arrival-card">
+            <div className="tracking-arrival-copy">
+              <h2><Clock3 size={18} /> Previsão de Chegada</h2>
+              <strong>14:30</strong>
+              <span>Hoje, 14 de Novembro</span>
+            </div>
+            <div className="tracking-arrival-illustration" aria-hidden="true"><Truck size={65} /></div>
+          </article>
+        </section>
+      </main>
     </div>
   );
 }

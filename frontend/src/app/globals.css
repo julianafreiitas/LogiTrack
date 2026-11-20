@@ -24,10 +24,44 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* O fundo ilustrado aparece apenas nas páginas do portal do cliente. */
+.dash-container.home-page-shell,
+.dash-container.tracking-page-shell,
+.dash-container.orders-page-shell,
+.dash-container.client-profile-shell,
+.page-container {
+  background-color: #f1f5fc !important;
+  background-image: url("/imagens/fundo-logitrack.svg") !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+/* Altura compartilhada dos banners, seguindo a referência da página Início. */
+.banner,
+.tracking-hero-banner {
+  min-height: 299px !important;
+}
+
+@media (max-width: 768px) {
+  .banner,
+  .tracking-hero-banner {
+    min-height: 180px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner,
+  .tracking-hero-banner {
+    min-height: 190px !important;
+  }
 }
 
 a {

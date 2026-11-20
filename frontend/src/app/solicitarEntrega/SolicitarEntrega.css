@@ -7,7 +7,7 @@
   
   .page-container {
     min-height: 100vh;
-    background-color: #f4f6f9;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -25,7 +25,7 @@
     justify-content: space-between;
   }
   
-  .logo {
+.request-logo {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -45,7 +45,7 @@
     justify-content: center;
   }
   
-  .logo span {
+.request-logo span {
     color: #f97316;
   }
   
@@ -83,10 +83,20 @@
   
   /* Banner */
   .hero-banner {
-    background: linear-gradient(90deg, #0d1629 40%, rgba(13, 22, 41, 0.7) 100%),
-                url('https://unsplash.com') center/cover;
+    background: linear-gradient(90deg, rgba(0, 17, 46, .52), rgba(0, 17, 46, .05)),
+                url('/imagens/banner-entrega.svg') center/cover no-repeat;
     color: white;
     padding: 4.5rem 2rem 6rem;
+  }
+
+  .request-hero-banner {
+    width: min(1800px, 92%);
+    margin: 30px auto 22px;
+    background-color: #10243d;
+    background-image: url('/imagens/img-caminhao2.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center 65%;
   }
   
   .hero-content {
@@ -110,10 +120,12 @@
   }
   
   /* Card Formulário */
-  .main-content {
-    padding: 0 1.5rem;
-    margin-top: -2.5rem;
-    margin-bottom: 4rem;
+  .page-container .request-main-content {
+    position: relative;
+    z-index: 2;
+    width: min(1800px, 92%);
+    margin: -72px auto 2rem;
+    padding: 0;
     flex-grow: 1;
   }
   

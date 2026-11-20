@@ -4,12 +4,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ArrowUpRight,
   Home,
   Package,
   UserRound,
   Truck,
-  MapPinHouse,
   LogOut,
   RotateCcwClock,
   ChevronDown
@@ -20,7 +18,7 @@ const navigation = [
   { name: "Solicitar Entregas", href: "/solicitarEntrega", icon: Package},
   { name: "Acompanhar", href: "/acompanharEntrega", icon: Truck },
   { name: "Últimos Pedidos", href: "/Meus-Pedidos", icon: RotateCcwClock},
-  { name: "Endereços", href: "/Enderecos", icon: MapPinHouse },
+  { name: "Perfil", href: "/PerfilCliente", icon: UserRound },
 ];
 
 
@@ -68,6 +66,11 @@ export default function Header() {
         <span>Olá, Cliente!</span>
 
         <ChevronDown size={14} />
+
+        <Link className="user-logout" href="/login">
+          <LogOut size={16} />
+          <span>Sair</span>
+        </Link>
       </div>
 
     </header>
