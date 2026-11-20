@@ -1,0 +1,66 @@
+.delivery-hero-banner {
+  position: relative;
+  display: flex;
+  min-height: 148px;
+  align-items: center;
+  gap: 21px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1px solid #1a3b58;
+  border-radius: 15px;
+  background:
+    linear-gradient(90deg, #07172a 0%, rgba(7, 23, 42, .97) 31%, rgba(7, 23, 42, .57) 56%, rgba(7, 23, 42, .02) 100%),
+    url('/imagens/img-caminhao2.png') center 55% / cover no-repeat;
+  padding: 22px 30px;
+  color: #f4f7fb;
+}
+
+.delivery-hero-icon,
+.delivery-hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.delivery-hero-icon {
+  display: grid;
+  flex: 0 0 54px;
+  place-items: center;
+  color: #ff7108;
+}
+
+.delivery-hero-copy h1 {
+  margin: 0;
+  color: #f4f7fb;
+  font-size: 38px;
+  line-height: 1.12;
+  letter-spacing: -.5px;
+}
+
+.delivery-hero-copy p {
+  margin-top: 4px;
+  color: #e0e8f1;
+  font-size: 16px;
+}
+
+.delivery-hero-copy i {
+  display: block;
+  width: 84px;
+  height: 5px;
+  margin-top: 12px;
+  border-radius: 5px;
+  background: #ff7108;
+}
+
+@media (max-width: 1100px) {
+  .delivery-hero-banner { min-height: 136px; }
+  .delivery-hero-copy h1 { font-size: 32px; }
+  .delivery-hero-copy p { font-size: 14px; }
+}
+
+@media (max-width: 700px) {
+  .delivery-hero-banner { min-height: 125px; gap: 12px; background-position: 62% center; padding: 16px; }
+  .delivery-hero-icon { flex-basis: 40px; }
+  .delivery-hero-icon svg { width: 38px; }
+  .delivery-hero-copy h1 { font-size: 27px; }
+  .delivery-hero-copy p { max-width: 75%; font-size: 12px; line-height: 1.4; }
+}

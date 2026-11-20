@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Bell, Search, Package, Check, Clock3, CircleAlert, MapPin, CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Package, Check, Clock3, CircleAlert, MapPin, CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import Aside from "../components/aside";
+import DeliveryBanner from "../components/DeliveryBanner";
 import "../Dash/pageDash.css";
 import "./pageFuncionarios.css";
 
@@ -28,11 +29,11 @@ export default function Funcionarios() {
   const linhas = filtradas.slice((paginaAtual - 1) * 5, paginaAtual * 5);
 
   return(
-    <div className="ft-page">
+    <div className="ft-page home-employee-page">
     <Aside variant="employee" />
     <main className="ft-main">
-      <header className="ft-topbar"><label className="ft-search"><Search size={20}/><input value={busca} onChange={(event) => { setBusca(event.target.value); setPagina(1); }} placeholder="Buscar entrega..." aria-label="Buscar entrega"/></label><button className="ft-bell" type="button" aria-label="Notificações"><Bell size={29}/><span>2</span></button></header>
-      <section className="ft-hero"><div><h1>Minhas <em>Entregas</em></h1><p>Acompanhe o status das suas entregas em tempo real.</p><i/></div><div className="ft-truck" aria-hidden="true">🚚</div></section>
+      <header className="ft-topbar"><label className="ft-search"><Search size={20}/><input value={busca} onChange={(event) => { setBusca(event.target.value); setPagina(1); }} placeholder="Buscar entrega..." aria-label="Buscar entrega"/></label><div className="ft-profile" aria-label="Perfil de João Silva"><span className="ft-profile-avatar">JD</span><span className="ft-profile-name">João Silva</span></div></header>
+      <DeliveryBanner title="Início" subtitle="Acompanhe suas entregas e gerencie seu dia." />
       <section className="ft-stats" aria-label="Resumo das entregas">
         <article><span className="ft-stat-icon all"><Package size={34}/></span><div><p>Total de Entregas</p><strong>12</strong></div></article>
         <article><span className="ft-stat-icon done"><Check size={36}/></span><div><p>Entregues</p><strong>8</strong></div></article>

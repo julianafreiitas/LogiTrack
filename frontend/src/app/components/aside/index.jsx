@@ -3,7 +3,7 @@
 import "./aside.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Map, Package, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, Map, Package, UserRound, Users } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/Dash", icon: LayoutDashboard },
@@ -17,8 +17,9 @@ const navigation = [
 
 const employeeNavigation = [
   { name: "Início", href: "/Funcionarios", icon: LayoutDashboard },
-  { name: "Minhas Entregas", href: "/Entregas", icon: Package },
+  { name: "Minhas Entregas", href: "/MinhasEntregas", icon: Package },
   { name: "Mapa", href: "/MapaFuncionarios", icon: Map },
+  { name: "Perfil", href: "/Perfil", icon: UserRound },
 ];
 
 export default function Aside({ variant = "default" }) {
