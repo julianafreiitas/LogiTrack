@@ -64,12 +64,12 @@ export default function Login() {
           </div>
 
           <div className="login-options">
-            <a href="">Esqueceu a senha?</a>
+            <a href="/RecuperarSenha">Esqueceu a senha?</a>
           </div>
 
           <button className="login-submit" type="submit">Entrar</button>
           <div className="cadastro">
-            <p>Não possui uma conta? <a href="#">Cadastre-se</a></p>
+            <p>Não possui uma conta? <a href="/Cadastro">Cadastre-se</a></p>
           </div>
         </form>
       </section>

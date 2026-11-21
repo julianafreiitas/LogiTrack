@@ -1,0 +1,171 @@
+
+.register-page {
+  display: grid;
+  min-height: 100vh;
+  width: 100%;
+  place-items: center;
+  padding: 28px clamp(16px, 3vw, 56px);
+  background-color: #071424;
+  background-image: url("/imagens/fundo-logitrack.svg");
+  background-position: center ;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #f5f8ff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.register {
+  width: min(100%, 680px);
+  padding: 40px 48px 34px;
+  border: 1px solid rgba(113, 151, 194, .48);
+  border-radius: 15px;
+  background: linear-gradient(155deg, #000000, #153454);
+  box-shadow: 0 18px 44px rgba(5, 29, 65, .27), 0 4px 14px rgba(7, 30, 64, .15);
+}
+
+.register-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  margin: 0 auto 20px;
+  color: #f5f8ff;
+  font-size: 30px;
+  font-weight: 800;
+}
+.register-brand img { width: 58px; height: 64px; object-fit: contain; }
+.register-brand strong { color: #ff7814; }
+
+.register h1 { margin: 0; color: #fff; font-size: 32px; font-weight: 800; text-align: center; }
+.register-subtitle { margin: 8px 0 24px; color: #bfd0e4; font-size: 16px; text-align: center; }
+
+/* Seletor de tipo de conta */
+.register-tipos {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 5px;
+  border: 1px solid #2b4b70;
+  border-radius: 10px;
+  background: rgba(3, 22, 48, .72);
+}
+.register-tipo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #9ab1cf;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .18s, color .18s;
+}
+.register-tipo:hover { color: #fff; }
+.register-tipo.ativo { background: linear-gradient(90deg, #ff7914, #ff6500); color: #fff; }
+.register-tipo:focus-visible { outline: 2px solid #ffc27c; outline-offset: 2px; }
+
+/* Grade do formulário */
+.register form { display: flex; flex-direction: column; }
+.register-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+.register-group { display: flex; flex-direction: column; min-width: 0; }
+.register-group.full { grid-column: 1 / -1; }
+.register-group > label { margin: 0 0 8px; color: #e1eaf5; font-size: 15px; font-weight: 700; }
+
+.register-field {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 0 15px;
+  border: 1px solid #2b4b70;
+  border-radius: 7px;
+  background: rgba(3, 22, 48, .72);
+  color: #9ab1cf;
+  transition: border-color .18s, box-shadow .18s;
+}
+.register-field:focus-within { border-color: #ff7816; box-shadow: 0 0 0 3px rgba(255, 120, 22, .13); }
+.register-field > svg { flex: 0 0 auto; }
+.register-field input,
+.register-field select {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+}
+.register-field input::placeholder { color: #8299b5; }
+.register-field select { cursor: pointer; }
+.register-field select:invalid { color: #8299b5; }
+.register-field select option { background: #0b1d33; color: #fff; }
+
+.register .password-toggle {
+  display: grid;
+  width: 24px;
+  height: 27px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #9ab1cf;
+  cursor: pointer;
+}
+.register .password-toggle:hover { color: #fff; }
+
+.register-erro {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 120, 22, .5);
+  border-radius: 7px;
+  background: rgba(255, 120, 22, .1);
+  color: #ffc27c;
+  font-size: 14px;
+}
+
+.register-submit {
+  min-height: 56px;
+  margin: 6px 0 20px;
+  border: 0;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #ff7914, #ff6500);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 5px 13px rgba(255, 105, 0, .18);
+  transition: filter .18s, transform .18s;
+}
+.register-submit:hover { transform: translateY(-1px); filter: brightness(1.08); }
+
+.register-login { width: 100%; text-align: center; }
+.register-login p { margin: 0; color: #c0cfe1; font-size: 13px; }
+.register-login a { margin-left: 3px; color: #ff9b40; font-weight: 700; text-decoration: none; }
+.register-login a:hover { color: #ffc27c; text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .register { padding: 30px 22px 26px; }
+  .register-grid { grid-template-columns: 1fr; }
+  .register-tipo { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-submit,
+  .register-field,
+  .register-tipo { transition: none; }
+}
