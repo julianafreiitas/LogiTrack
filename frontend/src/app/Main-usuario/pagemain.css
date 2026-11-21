@@ -54,7 +54,9 @@
 }
 
 .logo{
-  height: 50px
+  width: auto;
+  height: 40px;
+  object-fit: contain;
 }
 
 /* NAVEGAÇÃO */

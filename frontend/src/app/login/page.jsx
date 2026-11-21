@@ -19,9 +19,8 @@ export default function Login() {
   return (
     <main className="login-page">
       <section className="login" aria-label="Acesso à conta">
-        <div className="login-brand">
-          <img src="/imagens/logo2.png" alt="" />
-          <span>Logi<strong>Track</strong></span>
+        <div className="centro">
+          <img className="login-brand" src="/imagens/logotipo.png" alt="" />
         </div>
         <h1>Bem-vindo!</h1>
         <p className="login-subtitle">Faça login para continuar.</p>

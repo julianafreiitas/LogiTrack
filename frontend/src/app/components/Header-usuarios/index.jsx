@@ -34,8 +34,7 @@ export default function Header() {
         href="/Main-usuario"
         aria-label="LogiTrack início"
       >
-        <img src="/imagens/logo2.png" className="logo" />
-        <span>Logi<strong>Track</strong></span>
+        <img src="/imagens/CAPA.png" className="logo" alt="LogiTrack" />
       </Link>
 
       {/* NAVEGAÇÃO */}

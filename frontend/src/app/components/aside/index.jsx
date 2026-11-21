@@ -32,8 +32,8 @@ export default function Aside({ variant = "default" }) {
         <ArrowUpRight size={25} strokeWidth={3} />
         <span>Logi<strong>Track</strong></span>
       </Link> */}
-      <div>
-        <img className="logo" src="/imagens/logo_2.png" alt="LogiTrack" />
+      <div className="espaco">
+        <img className="logo" src="/imagens/CAPA.png" alt="LogiTrack" />
       </div>
       <p className="nav-label">MENU PRINCIPAL</p>
       <nav className="area_botoes" aria-label="Menu principal">

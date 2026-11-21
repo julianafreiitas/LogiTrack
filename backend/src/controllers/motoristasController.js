@@ -5,7 +5,7 @@ const CATEGORIAS = ["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"];
 
 const CAMPOS = `
   id_motoristas AS id, nome, cidade_base AS cidade, veiculo, entregas_hoje AS entregas,
-  status, situacao, cpf, telefone, cnh, categoria_cnh AS categoria
+  status, situacao, cpf, telefone, email, cnh, categoria_cnh AS categoria
 `;
 
 // Converte a linha do banco para o formato que a tela usa
@@ -22,6 +22,7 @@ function paraTela(linha) {
     statusCadastro: inativo ? "Inativo" : "Ativo",
     cpf: linha.cpf ?? "",
     telefone: linha.telefone ?? "",
+    email: linha.email ?? "",
     cnh: linha.cnh ?? "",
     categoria: linha.categoria ?? "",
   };
@@ -46,6 +47,9 @@ function lerCorpo(corpo, { criando }) {
   const categoria = String(corpo.categoria ?? "");
   if (categoria && !CATEGORIAS.includes(categoria)) return { erro: "Categoria da CNH inválida." };
 
+  const email = String(corpo.email ?? "").trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { erro: "Informe um e-mail válido." };
+
   const entregas = Number(corpo.entregas ?? 0);
   if (!Number.isInteger(entregas) || entregas < 0) return { erro: "Entregas hoje deve ser um número inteiro." };
 
@@ -58,6 +62,7 @@ function lerCorpo(corpo, { criando }) {
       nome,
       cpf: digitosCpf ? formatarCpf(digitosCpf) : null,
       telefone: String(corpo.telefone ?? "").trim() || null,
+      email: email || null,
       cnh: cnh || null,
       categoria: categoria || null,
       cidade: String(corpo.cidade ?? "").trim() || "--",
@@ -98,10 +103,10 @@ export async function criarMotorista(request, response) {
   try {
     const [resultado] = await pool.query(
       `INSERT INTO motoristas
-         (nome, cpf, telefone, cnh, categoria_cnh, cidade_base, veiculo, entregas_hoje, situacao, status, localizacao_atual)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?))`,
+         (nome, cpf, telefone, email, cnh, categoria_cnh, cidade_base, veiculo, entregas_hoje, situacao, status, localizacao_atual)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?))`,
       [
-        valores.nome, valores.cpf, valores.telefone, valores.cnh, valores.categoria,
+        valores.nome, valores.cpf, valores.telefone, valores.email, valores.cnh, valores.categoria,
         valores.cidade, valores.veiculo, valores.entregas, valores.situacao, valores.status,
         pontoDaCidade(valores.cidade),
       ],
@@ -128,12 +133,12 @@ export async function atualizarMotorista(request, response) {
   try {
     await pool.query(
       `UPDATE motoristas SET
-         nome = ?, cpf = ?, telefone = ?, cnh = ?, categoria_cnh = ?, cidade_base = ?,
+         nome = ?, cpf = ?, telefone = ?, email = ?, cnh = ?, categoria_cnh = ?, cidade_base = ?,
          veiculo = ?, entregas_hoje = ?, situacao = ?, status = ?
          ${mudouCidade ? ", localizacao_atual = ST_GeomFromText(?)" : ""}
        WHERE id_motoristas = ?`,
       [
-        valores.nome, valores.cpf, valores.telefone, valores.cnh, valores.categoria,
+        valores.nome, valores.cpf, valores.telefone, valores.email, valores.cnh, valores.categoria,
         valores.cidade, valores.veiculo, valores.entregas, valores.situacao, valores.status,
         ...(mudouCidade ? [pontoDaCidade(valores.cidade)] : []),
         id,

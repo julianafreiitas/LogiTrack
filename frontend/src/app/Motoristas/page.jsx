@@ -18,7 +18,7 @@ async function chamarApi(caminho, opcoes = {}) {
   return dados;
 }
 
-const formularioInicial = { nome: "", cpf: "", telefone: "", cnh: "", categoria: "", status: "Ativo", statusOperacional: "Dispon\u00edvel", cidade: "", veiculo: "", entregas: "0" };
+const formularioInicial = { nome: "", cpf: "", telefone: "", email: "", cnh: "", categoria: "", status: "Ativo", statusOperacional: "Dispon\u00edvel", cidade: "", veiculo: "", entregas: "0" };
 const chaveMotorista = (motorista) => motorista.id || motorista.cpf || motorista.nome;
 const categoriasCnh = ["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"];
 
@@ -98,6 +98,7 @@ export default function Motoristas() {
       nome: motorista.nome || "",
       cpf: motorista.cpf || "",
       telefone: motorista.telefone || "",
+      email: motorista.email || "",
       cnh: motorista.cnh || "",
       categoria: motorista.categoria || "",
       status: motorista.statusCadastro || (motorista.status === "Inativo" ? "Inativo" : "Ativo"),
@@ -235,6 +236,7 @@ export default function Motoristas() {
               <label className="motorista-form-field motorista-form-full"><span>Nome completo</span><input autoFocus name="nome" value={formulario.nome} onChange={atualizarFormulario} placeholder="Digite o nome do motorista" autoComplete="name" required /></label>
               <label className="motorista-form-field"><span>CPF</span><input name="cpf" value={formulario.cpf} onChange={atualizarFormulario} placeholder="000.000.000-00" inputMode="numeric" maxLength={14} autoComplete="off" required /></label>
               <label className="motorista-form-field"><span>Telefone</span><input name="telefone" value={formulario.telefone} onChange={atualizarFormulario} placeholder="(00) 00000-0000" type="tel" inputMode="tel" maxLength={16} autoComplete="tel" required /></label>
+              <label className="motorista-form-field motorista-form-full"><span>E-mail</span><input name="email" value={formulario.email ?? ""} onChange={atualizarFormulario} placeholder="motorista@exemplo.com" type="email" autoComplete="email" required /></label>
               <label className="motorista-form-field motorista-form-full"><span>CNH</span><input name="cnh" value={formulario.cnh} onChange={atualizarFormulario} placeholder="N&uacute;mero da habilita&ccedil;&atilde;o" inputMode="numeric" maxLength={11} required /></label>
               <label className="motorista-form-field motorista-form-full">
                 <span>Categoria da CNH</span>
@@ -260,6 +262,7 @@ export default function Motoristas() {
                 <label className="motorista-form-field motorista-form-full"><span>Nome completo</span><input name="nome" value={formulario.nome} onChange={atualizarFormulario} required /></label>
                 <label className="motorista-form-field"><span>CPF</span><input name="cpf" value={formulario.cpf} onChange={atualizarFormulario} inputMode="numeric" maxLength={14} /></label>
                 <label className="motorista-form-field"><span>Telefone</span><input name="telefone" value={formulario.telefone} onChange={atualizarFormulario} type="tel" inputMode="tel" maxLength={16} /></label>
+                <label className="motorista-form-field"><span>E-mail</span><input name="email" value={formulario.email ?? ""} onChange={atualizarFormulario} placeholder="motorista@exemplo.com" type="email" autoComplete="email" /></label>
                 <label className="motorista-form-field"><span>CNH</span><input name="cnh" value={formulario.cnh} onChange={atualizarFormulario} inputMode="numeric" maxLength={11} /></label>
                 <label className="motorista-form-field"><span>Categoria da CNH</span><select name="categoria" value={formulario.categoria} onChange={atualizarFormulario}><option value="">N&atilde;o informado</option>{categoriasCnh.map((categoria) => <option key={categoria}>{categoria}</option>)}</select></label>
                 <label className="motorista-form-field"><span>Cidade-base</span><input name="cidade" value={formulario.cidade} onChange={atualizarFormulario} /></label>
@@ -277,6 +280,7 @@ export default function Motoristas() {
                   <div><dt>Nome completo</dt><dd>{motoristaSelecionado.nome}</dd></div>
                   <div><dt>CPF</dt><dd>{valorDetalhe(motoristaSelecionado.cpf)}</dd></div>
                   <div><dt>Telefone</dt><dd>{valorDetalhe(motoristaSelecionado.telefone)}</dd></div>
+                  <div><dt>E-mail</dt><dd>{valorDetalhe(motoristaSelecionado.email)}</dd></div>
                   <div><dt>CNH</dt><dd>{valorDetalhe(motoristaSelecionado.cnh)}</dd></div>
                   <div><dt>Categoria da CNH</dt><dd>{valorDetalhe(motoristaSelecionado.categoria)}</dd></div>
                   <div><dt>Cidade-base</dt><dd>{valorDetalhe(motoristaSelecionado.cidade)}</dd></div>
