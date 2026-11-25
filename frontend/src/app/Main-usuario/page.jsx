@@ -1,56 +1,67 @@
 
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Header from "../components/Header-usuarios";
-import Footer from "../components/Footer-usuarios";
+import SeletorIdentificacao from "../components/SeletorIdentificacao";
+import { chamarApi, useIdentificacao } from "../lib/identificacao";
 import "./pagemain.css";
 import {Truck, Package, Check, Clock4, Info } from "lucide-react";
 
-const pedidos = [
-  {
-    codigo: "LT-2049",
-    cidade: "Campinas, SP",
-    status: "Em trânsito",
-    tipo: "transito"
-  },
-  {
-    codigo: "LT-2048",
-    cidade: "São Paulo, SP",
-    status: "Entregue",
-    tipo: "entregue"
-  },
-  {
-    codigo: "LT-2050",
-    cidade: "Santos, SP",
-    status: "Pendente",
-    tipo: "pendente"
-  }
-];
-
 export default function MainUsuario() {
+  const router = useRouter();
+  const cliente = useIdentificacao("cliente");
   const [codigo, setCodigo] = useState("");
-  const [mensagem, setMensagem] = useState("");
+  const [resumo, setResumo] = useState(null);
+  const [erro, setErro] = useState("");
+  const [erroCodigo, setErroCodigo] = useState("");
+  const [consultando, setConsultando] = useState(false);
 
-  function consultarEntrega(e) {
+  useEffect(() => {
+    if (!cliente.id) return;
+    let cancelado = false;
+    chamarApi(`/portal/cliente/${cliente.id}/resumo`)
+      .then((dados) => { if (!cancelado) { setResumo(dados); setErro(""); } })
+      .catch((falha) => { if (!cancelado) setErro(falha.message); });
+    return () => { cancelado = true; };
+  }, [cliente.id]);
+
+  async function consultarEntrega(e) {
     e.preventDefault();
+    const digitado = codigo.trim();
+    setErroCodigo("");
 
-    if (!codigo.trim()) {
-      setMensagem("Digite um código de rastreamento.");
+    // sem código: abre a tela de acompanhamento vazia, como antes
+    if (!digitado) {
+      router.push("/acompanharEntrega");
       return;
     }
 
-    // Aqui você poderá conectar sua API de rastreamento.
-    setMensagem(
-      `Código ${codigo.trim()} informado. Aguardando consulta ao sistema.`
-    );
+    setConsultando(true);
+    try {
+      const encontrado = await chamarApi(`/portal/cliente/rastreio/${encodeURIComponent(digitado)}`);
+      router.push(`/acompanharEntrega?codigo=${encodeURIComponent(encontrado.codigo)}`);
+    } catch (falha) {
+      setErroCodigo(falha.status === 404 ? "Não encontramos nenhuma entrega com esse código." : falha.message);
+    } finally {
+      setConsultando(false);
+    }
   }
 
+  const dois = (valor) => (resumo ? String(valor).padStart(2, "0") : "–");
+  const pedidos = resumo?.ultimosPedidos ?? [];
+
   return (
-    <div className="dash-container">
+    <div className="dash-container home-page-shell">
       <Header />
 
       <main className="main-content">
+
+        <div className="seletor-faixa">
+          <SeletorIdentificacao rotulo="Testando como" lista={cliente.lista} id={cliente.id} onChange={(novo) => { cliente.escolher(novo); setResumo(null); }} />
+        </div>
+        {(erro || cliente.erro) && <p className="aviso-erro" role="alert">{erro || cliente.erro}</p>}
 
         {/* BANNER PRINCIPAL */}
         <section className="banner">
@@ -72,6 +83,24 @@ export default function MainUsuario() {
           
         </section>
 
+        {/* INDICADORES LOGO ABAIXO DO BANNER */}
+        <section className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon blue"><Truck/></div>
+            <div><span>Em trânsito</span><strong>{dois(resumo?.emTransito)}</strong></div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon green"><Check/></div>
+            <div><span>Entregues</span><strong>{dois(resumo?.entregues)}</strong></div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon orange"><Clock4 /></div>
+            <div><span>Pendentes</span><strong>{dois(resumo?.pendentes)}</strong></div>
+          </div>
+        </section>
+
         {/* ÁREA PRINCIPAL */}
         <section className="dashboard-grid">
 
@@ -81,7 +110,7 @@ export default function MainUsuario() {
               <div>
                 <h2>Acompanhe sua entrega</h2>
                 <p>
-                  Digite um código demonstrativo, como LT-2049.
+                  Digite o código de rastreio da sua entrega.
                 </p>
               </div>
               <span className="card-icon"><Package/></span>
@@ -96,24 +125,20 @@ export default function MainUsuario() {
                 <input
                   id="codigo"
                   type="text"
-                  placeholder="Ex: LT-2049"
+                  placeholder="Ex: ENT-10001"
                   value={codigo}
                   onChange={(e) => {
                     setCodigo(e.target.value);
-                    setMensagem("");
+                    setErroCodigo("");
                   }}
                 />
 
-                <button type="submit">
-                  Consultar entrega
+                <button type="submit" disabled={consultando}>
+                  {consultando ? "Consultando..." : "Consultar entrega"}
                 </button>
               </div>
+              {erroCodigo && <p className="aviso-erro" role="alert">{erroCodigo}</p>}
 
-              {mensagem && (
-                <p className="tracking-message" role="status">
-                  {mensagem}
-                </p>
-              )}
             </form>
 
             <div className="tracking-help">
@@ -126,12 +151,13 @@ export default function MainUsuario() {
           <div className="content-card orders-card">
             <div className="card-heading">
               <h2>Últimos pedidos</h2>
-              <a href="/meus-pedidos">
+              <a href="/Meus-Pedidos">
                 Ver todos
               </a>
             </div>
 
             <div className="orders-list">
+              {resumo && pedidos.length === 0 && <p>Você ainda não tem pedidos.</p>}
               {pedidos.map((pedido) => (
                 <div className="order-item" key={pedido.codigo}>
                   <div className="order-info">
@@ -148,37 +174,6 @@ export default function MainUsuario() {
           </div>
 
         </section>
-
-        {/* INDICADORES */}
-        <section className="stats-grid">
-
-          <div className="stat-card">
-            <div className="stat-icon blue"><Truck/></div>
-            <div>
-              <span>Em trânsito</span>
-              <strong>12</strong>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon green"><Check/></div>
-            <div>
-              <span>Entregues</span>
-              <strong>28</strong>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon orange"><Clock4 /></div>
-            <div>
-              <span>Pendentes</span>
-              <strong>03</strong>
-            </div>
-          </div>
-
-        </section>
-
-        <Footer/>
 
       </main>
     </div>

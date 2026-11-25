@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, ChevronDown, Check } from "lucide-react";
 import Aside from "../components/aside";
 import Header from "../components/header";
 import { API_URL } from "../lib/api";
@@ -46,6 +46,7 @@ const opcoes = ["Todos os status", "Entregue", "Em trânsito", "Pendente", "Atra
 export default function Entregas() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("Todos os status");
+  const [filtroStatusAberto, setFiltroStatusAberto] = useState(false);
   const [deliveries, setDeliveries] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
@@ -106,9 +107,16 @@ export default function Entregas() {
               <Search size={14} aria-hidden="true" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} type="search" placeholder="Buscar código, destino ou motorista..." aria-label="Buscar código, destino ou motorista" />
             </label>
-            <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Filtrar por status">
-              {["Todos os status", "Entregue", "Em trânsito", "Pendente", "Atrasada", "Cancelado"].map((option) => <option key={option}>{option}</option>)}
-            </select>
+            <div className="delivery-status-dropdown">
+              <button className="delivery-status-button" type="button" aria-haspopup="listbox" aria-expanded={filtroStatusAberto} onClick={() => setFiltroStatusAberto(!filtroStatusAberto)}>
+                {status}<ChevronDown size={15} className={filtroStatusAberto ? "delivery-status-chevron is-open" : "delivery-status-chevron"} />
+              </button>
+              {filtroStatusAberto && <div className="delivery-status-options" role="listbox" aria-label="Filtrar entregas por status">
+                {["Todos os status", "Entregue", "Em trânsito", "Pendente", "Atrasada", "Cancelado"].map((option) => <button key={option} className={`delivery-status-option ${status === option ? "is-selected" : ""}`} type="button" role="option" aria-selected={status === option} onClick={() => { setStatus(option); setFiltroStatusAberto(false); }}>
+                  {option}{status === option && <Check size={14} />}
+                </button>)}
+              </div>}
+            </div>
           </div>
 
           <div className="delivery-table-wrap">

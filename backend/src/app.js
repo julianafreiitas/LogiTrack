@@ -7,13 +7,34 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import motoristasRoutes from "./routes/motoristasRoutes.js";
 import rotasRoutes from "./routes/rotasRoutes.js";
+import motoristaPortalRoutes from "./routes/motoristaPortalRoutes.js";
+import clientePortalRoutes from "./routes/clientePortalRoutes.js";
 
 const app = express();
+const normalizarOrigem = (url) => url.trim().replace(/\/+$/, "");
 
-app.use(helmet());
+const origensPermitidas = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://logitrack.10.189.87.231.sslip.io",
+  process.env.FRONTEND_URL,
+  ...(process.env.CORS_ORIGINS || "").split(","),
+]
+  .filter(Boolean)
+  .map(normalizarOrigem);
+
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001", (process.env.FRONTEND_URL || "http://logitrack.10.189.87.231.sslip.io")],
+    origin(origin, callback) {
+      // Sem origin (curl, health checks) ou origem na lista: permitido
+      if (!origin || origensPermitidas.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(express.json());
@@ -28,6 +49,8 @@ app.use("/api/health", healthRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/motoristas", motoristasRoutes);
 app.use("/api/rotas", rotasRoutes);
+app.use("/api/portal/motorista", motoristaPortalRoutes);
+app.use("/api/portal/cliente", clientePortalRoutes);
 // Regista as rotas de entregas (o endpoint será /api/deliveries)
 app.use("/api", healthRoutes);
 app.use("/api/deliveries", deliveryRoutes);

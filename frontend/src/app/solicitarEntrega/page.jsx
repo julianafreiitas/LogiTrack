@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MapPin, Flag, Calendar, Box, MessageSquare, ArrowLeft, Send, User } from 'lucide-react';
+import { MapPin, Flag, Calendar, Box, MessageSquare, ArrowLeft, Send } from 'lucide-react';
+import Header from '../components/Header-usuarios';
+import '../Main-usuario/pagemain.css';
 import './SolicitarEntrega.css';
 
 export default function SolicitarEntrega() {
@@ -20,26 +22,17 @@ export default function SolicitarEntrega() {
 
   return (
     <div className="page-container">
-      <header className="navbar">
-        <div className="logo">
-          <div className="logo-icon"><MapPin size={20} /></div>
-          Logi<span>Track</span>
-        </div>
-        <nav className="nav-links">
-          <a href="#solicitar" className="active">Solicitar entrega</a>
-          <a href="#acompanhar">Acompanhar entrega</a>
-        </nav>
-        <button className="user-btn"><User size={20} /></button>
-      </header>
+      <Header />
 
-      <section className="hero-banner">
-        <div className="hero-content">
-          <h1>Solicitar <span>Entrega</span></h1>
+      <section className="banner request-hero-banner">
+        <div className="banner-text">
+          <span className="banner-label">PORTAL DO CLIENTE · LOGITRACK</span>
+          <h1>Solicitar entrega</h1>
           <p>Preencha as informações abaixo para solicitar seu serviço de entrega.</p>
         </div>
       </section>
 
-      <main className="main-content">
+      <main className="request-main-content">
         <div className="form-card">
           <div className="card-header">
             <div className="card-header-icon"><Box size={20} /></div>
