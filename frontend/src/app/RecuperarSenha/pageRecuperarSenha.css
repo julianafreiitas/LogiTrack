@@ -35,8 +35,8 @@
 }
 
 .recover-brand img {
-  width: 58px;
-  height: 64px;
+  width: min(250px, 80vw);
+  max-height: 66px;
   object-fit: contain;
 }
 

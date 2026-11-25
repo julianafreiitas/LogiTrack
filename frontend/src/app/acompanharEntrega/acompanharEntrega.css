@@ -627,6 +627,216 @@
   }
 }
 
+.tracking-cancel-action {
+  display: flex;
+  justify-content: center;
+  margin: 18px 0 28px;
+}
+
+.tracking-cancel-action button {
+  min-height: 42px;
+  border: 1px solid #ff751f;
+  border-radius: 9px;
+  background: #ff751f;
+  color: #fff;
+  padding: 0 22px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  box-shadow: 0 5px 16px rgba(255, 117, 31, .28);
+  transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.tracking-cancel-action button:hover {
+  background: #ff8738;
+  box-shadow: 0 7px 20px rgba(255, 117, 31, .38);
+  transform: translateY(-1px);
+}
+
+.tracking-modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, .78);
+  padding: 18px;
+}
+
+.tracking-cancel-modal {
+  position: relative;
+  width: min(100%, 600px);
+  border: 1px solid rgba(90, 122, 153, .16);
+  border-radius: 22px;
+  background: #07192a;
+  color: #f3f7fc;
+  padding: 34px 28px 24px;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .4);
+}
+
+.tracking-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #a9bacb;
+  cursor: pointer;
+}
+
+.tracking-modal-icon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  margin: 4px auto 12px;
+  border-radius: 50%;
+}
+
+.tracking-modal-icon.warning {
+  background: rgba(255, 117, 31, .2);
+  color: #ff751f;
+}
+
+.tracking-modal-icon.success {
+  background: rgba(49, 207, 141, .19);
+  color: #35d69b;
+}
+
+.tracking-cancel-modal h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.tracking-modal-subtitle {
+  margin: 10px 0 14px;
+  color: #d5e0ec;
+  font-size: 14px;
+}
+
+.tracking-cancel-info,
+.tracking-return-info {
+  border-radius: 13px;
+  background: #112b44;
+  padding: 14px;
+  text-align: left;
+}
+
+.tracking-cancel-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0 10px;
+  color: #d4dfeb;
+  font-size: 14px;
+}
+
+.tracking-cancel-info-row strong { color: #f5f8fc; }
+
+.tracking-cancel-status {
+  border-radius: 20px;
+  background: rgba(255, 117, 31, .17);
+  color: #ff8b48 !important;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.tracking-cancel-warning {
+  margin-top: 8px;
+  border-top: 1px solid rgba(176, 199, 221, .2);
+  padding-top: 14px;
+}
+
+.tracking-cancel-warning strong,
+.tracking-return-info strong {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+}
+
+.tracking-cancel-warning strong { color: #f2f6fb; }
+.tracking-cancel-warning strong svg,
+.tracking-return-info strong svg { color: #ff751f; }
+
+.tracking-cancel-warning p,
+.tracking-return-info p {
+  margin: 12px 0 0;
+  color: #d6e1ed;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.tracking-modal-actions {
+  display: grid;
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.tracking-modal-actions button,
+.tracking-success-modal > .tracking-keep-delivery {
+  min-height: 50px;
+  border-radius: 11px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tracking-confirm-cancel {
+  border: 1px solid #ff751f;
+  background: #ff751f;
+  color: #fff;
+}
+
+.tracking-keep-delivery {
+  width: 100%;
+  border: 1px solid #526a80;
+  background: transparent;
+  color: #f4f7fb;
+}
+
+.tracking-keep-delivery:hover { background: rgba(255, 255, 255, .06); }
+
+.tracking-cancel-note {
+  margin: 12px 0 0;
+  color: #94abc0;
+  font-size: 12px;
+}
+
+.tracking-success-modal {
+  width: min(100%, 610px);
+  padding: 24px 18px 14px;
+}
+
+.tracking-success-modal .tracking-modal-icon { margin-top: 0; }
+.tracking-success-modal .tracking-modal-subtitle { margin-bottom: 13px; }
+.tracking-return-info strong { color: #e9f1f9; font-size: 16px; }
+
+.tracking-return-notice {
+  margin: 12px 0;
+  border-radius: 12px;
+  background: rgba(49, 207, 141, .19);
+  color: #35d69b;
+  padding: 13px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .tracking-cancel-modal { padding: 30px 16px 18px; }
+  .tracking-success-modal { padding: 22px 14px 14px; }
+  .tracking-modal-subtitle, .tracking-cancel-warning p, .tracking-return-info p { font-size: 13px; }
+}
+
 .tracking-page-content {
   width: min(1680px, 97%);
 }

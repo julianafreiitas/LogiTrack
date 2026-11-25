@@ -1,92 +1,253 @@
 "use client";
 
-import React, { useState } from 'react';
-import { MapPin, Flag, Calendar, Box, MessageSquare, ArrowLeft, Send } from 'lucide-react';
-import Header from '../components/Header-usuarios';
-import '../Main-usuario/pagemain.css';
-import './SolicitarEntrega.css';
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, Box, Calendar, CheckCircle2, CreditCard, Flag, MapPin, MessageSquare, Package, Send, Truck, Wallet } from "lucide-react";
+import Header from "../components/Header-usuarios";
+import { API_URL } from "../lib/api";
+import "../Main-usuario/pagemain.css";
+import "./SolicitarEntrega.css";
+
+const initialForm = {
+  coleta: "", destino: "", data: "", servico: "", observacoes: "",
+  tamanho: "medio", pesoKg: "1", urgencia: "normal", pagamento: "pix",
+};
+
+const moeda = (valor) => Number(valor || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function PixDemoQr({ seed }) {
+  const modules = useMemo(() => {
+    const size = 29;
+    let hash = [...seed].reduce((value, character) => (value * 31 + character.charCodeAt(0)) >>> 0, 7);
+    const matrix = Array.from({ length: size }, () => Array.from({ length: size }, () => {
+      hash = (hash * 1664525 + 1013904223) >>> 0;
+      return (hash >>> 28) % 2 === 1;
+    }));
+    const addFinder = (left, top) => {
+      for (let y = -1; y <= 7; y += 1) for (let x = -1; x <= 7; x += 1) {
+        const row = top + y;
+        const column = left + x;
+        if (row < 0 || column < 0 || row >= size || column >= size) continue;
+        matrix[row][column] = x >= 0 && x <= 6 && y >= 0 && y <= 6 &&
+          (x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4));
+      }
+    };
+    addFinder(0, 0);
+    addFinder(size - 7, 0);
+    addFinder(0, size - 7);
+    return matrix.flatMap((row, y) => row.map((active, x) => active ? <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" /> : null));
+  }, [seed]);
+
+  return <svg className="pix-demo-qr" viewBox="-2 -2 33 33" role="img" aria-label="QR code Pix demonstrativo">{modules}</svg>;
+}
 
 export default function SolicitarEntrega() {
-  const [formData, setFormData] = useState({
-    coleta: '', destino: '', data: '', servico: '', observacoes: ''
-  });
+  const [formData, setFormData] = useState(initialForm);
+  const [etapa, setEtapa] = useState(1);
+  const [orcamento, setOrcamento] = useState(null);
+  const [carregando, setCarregando] = useState(false);
+  const [erro, setErro] = useState("");
+  const [solicitacaoEnviada, setSolicitacaoEnviada] = useState(false);
+  const [pixEmExibicao, setPixEmExibicao] = useState(false);
+  const [pixSeed, setPixSeed] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (!pixEmExibicao) return undefined;
+    const inicio = Date.now();
+    const atualizador = setInterval(() => {
+      const restante = Math.max(0, Math.ceil((5000 - (Date.now() - inicio)) / 1000));
+      if (restante === 0) {
+        setPixEmExibicao(false);
+        setSolicitacaoEnviada(true);
+      }
+    }, 150);
+    return () => clearInterval(atualizador);
+  }, [pixEmExibicao]);
+
+  const handleChange = (event) => {
+    setFormData((atual) => ({ ...atual, [event.target.name]: event.target.value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert('Solicitação enviada!');
-  };
+  async function irParaPagamento(event) {
+    event.preventDefault();
+    setCarregando(true);
+    setErro("");
+    try {
+      const response = await fetch(`${API_URL}/deliveries/quote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          coleta: formData.coleta,
+          destino: formData.destino,
+          servico: formData.servico,
+          tamanho: formData.tamanho,
+          pesoKg: Number(formData.pesoKg),
+          urgencia: formData.urgencia,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível calcular o frete.");
+      setOrcamento(data);
+      setEtapa(2);
+    } catch (error) {
+      setErro(error.message || "Falha ao calcular o frete. Confira os endereços e tente novamente.");
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  function confirmarPagamento(event) {
+    event.preventDefault();
+    if (formData.pagamento === "pix") {
+      setPixSeed(`PIX-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+      setPixEmExibicao(true);
+      return;
+    }
+    setSolicitacaoEnviada(true);
+  }
 
   return (
-    <div className="page-container">
+    <div className={`page-container request-page ${etapa === 2 ? "is-payment-step" : ""}`}>
       <Header />
 
       <section className="banner request-hero-banner">
         <div className="banner-text">
           <span className="banner-label">PORTAL DO CLIENTE · LOGITRACK</span>
-          <h1>Solicitar entrega</h1>
-          <p>Preencha as informações abaixo para solicitar seu serviço de entrega.</p>
+          <h1>{etapa === 1 ? "Solicitar entrega" : "Pagamento da solicitação"}</h1>
+          <p>{etapa === 1 ? "Preencha as informações abaixo para solicitar seu serviço de entrega." : "Confira o frete calculado e escolha como deseja pagar."}</p>
         </div>
       </section>
 
       <main className="request-main-content">
-        <div className="form-card">
-          <div className="card-header">
-            <div className="card-header-icon"><Box size={20} /></div>
-            <h2>Dados da Entrega</h2>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <div className="form-group">
-                <label><MapPin size={16} /> Endereço de Coleta</label>
-                <div className="input-wrapper">
-                  <input type="text" name="coleta" placeholder="Digite o endereço completo" className="form-control" onChange={handleChange} required />
-                  <MapPin size={16} className="input-icon-right" />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label><Flag size={16} /> Endereço de Destino</label>
-                <div className="input-wrapper">
-                  <input type="text" name="destino" placeholder="Digite o endereço completo" className="form-control" onChange={handleChange} required />
-                  <MapPin size={16} className="input-icon-right" />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label><Calendar size={16} /> Data Desejada para Coleta</label>
-                <input type="date" name="data" className="form-control" onChange={handleChange} required />
-              </div>
-
-              <div className="form-group">
-                <label><Box size={16} /> Tipo de Serviço</label>
-                <select name="servico" className="form-control" onChange={handleChange} defaultValue="" required>
-                  <option value="" disabled>Selecione o tipo de serviço</option>
-                  <option value="expressa">Entrega Expressa</option>
-                  <option value="convencional">Carga Convencional</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label><MessageSquare size={16} /> Observações (opcional)</label>
-              <textarea name="observacoes" rows="3" placeholder="Adicione informações extras sobre sua entrega..." className="form-control" onChange={handleChange} />
-            </div>
-
-            <div className="form-actions">
-              <button type="button" className="btn-back" onClick={() => window.history.back()}>
-                <ArrowLeft size={16} /> Voltar para início
-              </button>
-              <button type="submit" className="btn-submit">
-                <Send size={16} /> Solicitar Entrega
-              </button>
-            </div>
-          </form>
+        <div className="request-steps" aria-label="Etapas da solicitação">
+          <span className={etapa === 1 ? "active" : "complete"}><b>1</b> Dados da entrega</span>
+          <i />
+          <span className={etapa === 2 ? "active" : ""}><b>2</b> Pagamento</span>
         </div>
+
+        {solicitacaoEnviada ? (
+          <section className="request-success-card" role="status">
+            <CheckCircle2 size={48} />
+            <h2>Pedido pago com sucesso!</h2>
+            <p>Pagamento demonstrativo de <strong>{moeda(orcamento?.total)}</strong> confirmado via {formData.pagamento === "pix" ? "Pix" : "cartão"}.</p>
+            <p className="request-demo-note">Esta confirmação é uma simulação. Nenhuma cobrança real foi realizada.</p>
+            <button className="btn-submit" type="button" onClick={() => { setSolicitacaoEnviada(false); setPixSeed(""); setEtapa(1); }}>Voltar às solicitações</button>
+          </section>
+        ) : pixEmExibicao ? (
+          <section className="request-pix-card" aria-live="polite">
+            <div className="card-header-icon"><Wallet size={20} /></div>
+            <h2>Escaneie para pagar via Pix</h2>
+            <p>Valor do frete</p>
+            <strong className="pix-amount">{moeda(orcamento?.total)}</strong>
+            <PixDemoQr seed={pixSeed} />
+            <p className="pix-countdown">Aguardando confirmação do pagamento...</p>
+            <p className="request-demo-note">Este QR code é aleatório e não processa um pagamento real.</p>
+          </section>
+        ) : etapa === 1 ? (
+          <div className="form-card">
+            <div className="card-header">
+              <div className="card-header-icon"><Box size={20} /></div>
+              <div><h2>Dados da Entrega</h2><p>Informe os endereços e as características do pacote.</p></div>
+            </div>
+
+            <form onSubmit={irParaPagamento}>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label><MapPin size={16} /> Endereço de Coleta</label>
+                  <div className="input-wrapper"><input type="text" name="coleta" value={formData.coleta} placeholder="Rua, número, cidade e estado" className="form-control" onChange={handleChange} required /><MapPin size={16} className="input-icon-right" /></div>
+                </div>
+                <div className="form-group">
+                  <label><Flag size={16} /> Endereço de Destino</label>
+                  <div className="input-wrapper"><input type="text" name="destino" value={formData.destino} placeholder="Rua, número, cidade e estado" className="form-control" onChange={handleChange} required /><MapPin size={16} className="input-icon-right" /></div>
+                </div>
+                <div className="form-group">
+                  <label><Calendar size={16} /> Data Desejada para Coleta</label>
+                  <input type="date" name="data" value={formData.data} className="form-control" onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label><Truck size={16} /> Tipo de Serviço</label>
+                  <select name="servico" value={formData.servico} className="form-control" onChange={handleChange} required>
+                    <option value="" disabled>Selecione o tipo de serviço</option>
+                    <option value="expressa">Entrega Expressa</option>
+                    <option value="convencional">Carga Convencional</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label><Package size={16} /> Tamanho do pacote</label>
+                  <select name="tamanho" value={formData.tamanho} className="form-control" onChange={handleChange} required>
+                    <option value="pequeno">Pequeno</option><option value="medio">Médio</option><option value="grande">Grande</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label><Box size={16} /> Peso aproximado (kg)</label>
+                  <input type="number" name="pesoKg" value={formData.pesoKg} min="0" max="1000" step="0.1" className="form-control" onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label><Truck size={16} /> Urgência</label>
+                  <select name="urgencia" value={formData.urgencia} className="form-control" onChange={handleChange}>
+                    <option value="normal">Normal</option><option value="urgente">Urgente</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label><MessageSquare size={16} /> Observações (opcional)</label>
+                <textarea name="observacoes" value={formData.observacoes} rows="3" placeholder="Adicione informações extras sobre sua entrega..." className="form-control" onChange={handleChange} />
+              </div>
+
+              {erro && <p className="request-error" role="alert">{erro}</p>}
+              <div className="form-actions">
+                <button type="button" className="btn-back" onClick={() => window.history.back()}><ArrowLeft size={16} /> Voltar para início</button>
+                <button type="submit" className="btn-submit" disabled={carregando}>{carregando ? "Calculando frete..." : <>Continuar para pagamento <ArrowRight size={16} /></>}</button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          <div className="form-card payment-card">
+            <div className="card-header">
+              <div className="card-header-icon"><CreditCard size={20} /></div>
+              <div><h2>Resumo e pagamento</h2><p>O valor é estimado com base na rota e nas opções selecionadas.</p></div>
+            </div>
+
+            <div className="freight-summary">
+              <div className="freight-route"><div><small>Coleta</small><strong>{formData.coleta}</strong></div><ArrowRight size={18} /><div><small>Destino</small><strong>{formData.destino}</strong></div></div>
+              <div className="freight-lines">
+                <div><span>Distância estimada pela rota</span><strong>{orcamento?.distanciaKm} km</strong></div>
+                <div><span>Taxa base</span><strong>{moeda(orcamento?.taxaBase)}</strong></div>
+                <div><span>Distância ({orcamento?.distanciaKm} km × {moeda(orcamento?.valorPorKm)})</span><strong>{moeda((orcamento?.distanciaKm || 0) * (orcamento?.valorPorKm || 0))}</strong></div>
+                <div><span>Pacote ({formData.tamanho}, {formData.pesoKg} kg)</span><strong>{moeda((orcamento?.adicionalTamanho || 0) + (orcamento?.adicionalPeso || 0))}</strong></div>
+                <div><span>Serviço e urgência</span><strong>{formData.servico === "expressa" ? "Expressa" : "Convencional"} · {formData.urgencia === "urgente" ? "Urgente" : "Normal"}</strong></div>
+              </div>
+              <div className="freight-total"><span>Total estimado do frete</span><strong>{moeda(orcamento?.total)}</strong></div>
+              <p className="freight-formula">Frete = (taxa base + km × valor por km + adicionais do pacote) × serviço × urgência.</p>
+            </div>
+
+            <form onSubmit={confirmarPagamento}>
+              <fieldset className="payment-methods">
+                <legend>Forma de pagamento</legend>
+                <label className={formData.pagamento === "pix" ? "selected" : ""}><input type="radio" name="pagamento" value="pix" checked={formData.pagamento === "pix"} onChange={handleChange} /><Wallet size={18} /><span><strong>Pix</strong><small>Pagamento instantâneo</small></span></label>
+                <label className={formData.pagamento === "cartao" ? "selected" : ""}><input type="radio" name="pagamento" value="cartao" checked={formData.pagamento === "cartao"} onChange={handleChange} /><CreditCard size={18} /><span><strong>Cartão</strong><small>Crédito ou débito</small></span></label>
+              </fieldset>
+
+              {formData.pagamento === "cartao" && (
+                <fieldset className="card-payment-fields">
+                  <legend>Dados do cartão</legend>
+                  <div className="form-grid">
+                    <div className="form-group card-field-full"><label htmlFor="cardholder">Nome impresso no cartão</label><input id="cardholder" name="nomeCartao" autoComplete="cc-name" className="form-control" placeholder="Como aparece no cartão" required /></div>
+                    <div className="form-group card-field-full"><label htmlFor="card-number">Número do cartão</label><input id="card-number" name="numeroCartao" type="text" inputMode="numeric" autoComplete="cc-number" maxLength="19" pattern="[0-9 ]{13,19}" className="form-control" placeholder="0000 0000 0000 0000" required /></div>
+                    <div className="form-group"><label htmlFor="card-expiry">Validade</label><input id="card-expiry" name="validadeCartao" type="month" autoComplete="cc-exp" className="form-control" required /></div>
+                    <div className="form-group"><label htmlFor="card-cvc">CVV</label><input id="card-cvc" name="cvvCartao" type="password" inputMode="numeric" autoComplete="cc-csc" maxLength="4" pattern="[0-9]{3,4}" className="form-control" placeholder="123" required /></div>
+                  </div>
+                </fieldset>
+              )}
+
+              <p className="request-demo-note">Ambiente demonstrativo: não use dados reais do cartão. Nenhuma cobrança será realizada.</p>
+              <div className="form-actions">
+                <button type="button" className="btn-back" onClick={() => { setErro(""); setEtapa(1); }}><ArrowLeft size={16} /> Voltar aos dados</button>
+                <button type="submit" className="btn-submit"><Send size={16} /> {formData.pagamento === "pix" ? "Gerar QR Code Pix" : "Confirmar pagamento"}</button>
+              </div>
+            </form>
+          </div>
+        )}
       </main>
 
       <footer className="footer-bar" />

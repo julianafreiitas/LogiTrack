@@ -12,6 +12,28 @@
     padding: 14px 9px 12px;
 }
 
+.rotas-page > .sidebar {
+    align-self: flex-start;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Mantém a navegação do mapa visível e sem rolagem própria. */
+.container_mapa .sidebar {
+    position: fixed;
+    left: 0;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.container_mapa > .delivery-map-page {
+    margin-left: 138px;
+}
+
 .logo {
     /* height: px; */
     width: 150px;

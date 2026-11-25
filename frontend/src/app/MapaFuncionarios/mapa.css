@@ -16,6 +16,12 @@
 
 .container_mapa .area_botoes { gap: 14px; }
 
+.container_mapa .sidebar {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+}
+
 .map-topbar {
   display: flex;
   height: 51px;

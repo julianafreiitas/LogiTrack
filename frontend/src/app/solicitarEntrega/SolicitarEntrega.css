@@ -98,6 +98,27 @@
     background-size: cover;
     background-position: center 65%;
   }
+
+  .request-page .request-hero-banner {
+    min-height: 299px !important;
+    margin-top: 14px;
+    margin-bottom: 0;
+    padding: 32px 40px;
+  }
+
+  .request-page .request-hero-banner h1 {
+    margin-bottom: 5px;
+    font-size: clamp(25px, 3vw, 34px);
+  }
+
+  .request-page .request-hero-banner p { font-size: 14px; line-height: 1.35; }
+
+  .request-page {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
   
   .hero-content {
     max-width: 960px;
@@ -124,11 +145,75 @@
     position: relative;
     z-index: 2;
     width: min(1800px, 92%);
-    margin: -72px auto 2rem;
+    margin: -132px auto 12px;
     padding: 0;
     flex-grow: 1;
+    min-height: 0;
+    overflow: hidden;
   }
-  
+
+  @media (max-width: 768px) {
+    .request-page .request-hero-banner {
+      min-height: 180px !important;
+      margin-top: 8px;
+      padding: 25px;
+    }
+
+    .page-container .request-main-content { margin-top: -104px; }
+  }
+
+  @media (max-width: 600px) {
+    .request-page .request-hero-banner {
+      min-height: 180px !important;
+      margin-top: 4px;
+      padding: 22px;
+    }
+
+    .request-page .request-hero-banner h1 { font-size: 23px; }
+
+    .request-page .request-hero-banner h1 { margin-bottom: 3px; font-size: 23px; }
+    .request-page .request-hero-banner p { font-size: 11px; }
+    .page-container .request-main-content { margin-top: -88px; margin-bottom: 4px; }
+    .request-steps { margin-bottom: 8px; gap: 7px; font-size: .7rem; }
+    .request-steps b { width: 22px; height: 22px; }
+    .form-card, .payment-card.form-card { padding: 12px; border-radius: 12px; }
+    .form-card .card-header { gap: 8px; margin-bottom: 10px; }
+    .form-card .card-header-icon { width: 28px; height: 28px; flex: 0 0 28px; }
+    .form-card .card-header h2 { font-size: 17px; }
+    .form-card .card-header p { font-size: 11px; }
+    .request-page .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 9px; margin-bottom: 9px; }
+    .request-page .form-group label { gap: 4px; margin-bottom: 3px; font-size: 10px; line-height: 1.15; }
+    .request-page .form-group label svg { width: 12px; height: 12px; flex: 0 0 12px; }
+    .request-page .form-control { min-height: 34px; padding: 6px 8px; border-radius: 6px; font-size: 11px; }
+    .request-page textarea.form-control { height: 40px; min-height: 40px; resize: none; }
+    .request-page .form-actions { flex-direction: row; gap: 8px; margin-top: 9px; }
+    .request-page .form-actions button { min-height: 34px; padding: 6px 8px; font-size: 10px; }
+    .request-page .freight-summary { padding: 9px; }
+    .request-page .freight-route { gap: 5px; padding-bottom: 8px; }
+    .request-page .freight-route strong { font-size: 10px; }
+    .request-page .freight-route small, .request-page .freight-lines span { font-size: 9px; }
+    .request-page .freight-lines { gap: 5px; padding: 8px 0; }
+    .request-page .freight-lines strong { font-size: 10px; }
+    .request-page .freight-total { padding-top: 7px; font-size: 11px; }
+    .request-page .freight-total strong { font-size: 17px; }
+    .request-page .freight-formula { display: none; }
+    .request-page .payment-methods { gap: 6px; margin-top: 10px; }
+    .request-page .payment-methods legend, .request-page .card-payment-fields legend { margin-bottom: 5px; font-size: 11px; }
+    .request-page .payment-methods label { min-height: 40px; gap: 6px; padding: 6px; }
+    .request-page .payment-methods label svg { width: 14px; height: 14px; }
+    .request-page .payment-methods label strong { font-size: 10px; }
+    .request-page .payment-methods label small { font-size: 8px; }
+    .request-page .card-payment-fields { margin-top: 8px; }
+    .request-page .card-payment-fields .form-grid { margin-bottom: 0; }
+    .request-page .request-demo-note { margin-top: 6px; font-size: 9px; line-height: 1.25; }
+    .request-page .request-pix-card, .request-page .request-success-card { gap: 7px; padding: 14px; }
+    .request-page .pix-demo-qr { width: 150px; height: 150px; }
+  }
+
+  @media (max-width: 480px) {
+    .request-page .request-hero-banner { min-height: 190px !important; }
+  }
+
   .form-card {
     max-width: 900px;
     margin: 0 auto;
@@ -267,5 +352,175 @@
     .nav-links {
       display: none;
     }
+  }
+
+  .request-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    max-width: 900px;
+    margin: 0 auto 18px;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  .request-steps span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .request-steps b {
+    display: grid;
+    width: 27px;
+    height: 27px;
+    place-items: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    font-size: 0.8rem;
+  }
+
+  .request-steps span.active { color: #c2410c; font-weight: 700; }
+  .request-steps span.active b { border-color: #f97316; background: #f97316; color: #fff; }
+  .request-steps span.complete b { border-color: #16a34a; background: #16a34a; color: #fff; }
+  .request-steps i { width: min(12vw, 100px); height: 1px; background: #cbd5e1; }
+
+  .payment-card { max-width: 900px; }
+  .payment-card .card-header { margin-bottom: 1.4rem; }
+  .payment-card .card-header p { margin-top: 5px; color: #64748b; font-size: .9rem; }
+
+  .freight-summary {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    padding: 18px;
+  }
+
+  .freight-route {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .freight-route > div { min-width: 0; display: grid; gap: 5px; }
+  .freight-route small, .freight-lines span { color: #64748b; font-size: .82rem; }
+  .freight-route strong { overflow-wrap: anywhere; color: #1e293b; font-size: .9rem; }
+  .freight-route > svg { color: #f97316; }
+
+  .freight-lines { display: grid; gap: 11px; padding: 16px 0; }
+  .freight-lines > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .freight-lines strong { color: #1e293b; font-size: .9rem; text-align: right; }
+
+  .freight-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 14px;
+    color: #1e293b;
+    font-weight: 700;
+  }
+
+  .freight-total strong { color: #ea580c; font-size: 1.45rem; }
+  .freight-formula { margin-top: 12px; color: #64748b; font-size: .78rem; line-height: 1.5; }
+
+  .payment-methods {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 22px 0 0;
+    border: 0;
+  }
+
+  .payment-methods legend { margin-bottom: 10px; color: #334155; font-size: .9rem; font-weight: 700; }
+  .payment-methods label { display: flex; align-items: center; gap: 11px; min-height: 68px; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; cursor: pointer; }
+  .payment-methods label.selected { border-color: #f97316; background: #fff7ed; }
+  .payment-methods label > svg { color: #f97316; }
+  .payment-methods label span { display: grid; gap: 3px; }
+  .payment-methods label strong { color: #1e293b; font-size: .9rem; }
+  .payment-methods label small { color: #64748b; font-size: .78rem; }
+
+  .request-demo-note { margin: 14px 0 0; color: #64748b; font-size: .82rem; line-height: 1.5; }
+  .request-error { margin-top: 14px; color: #dc2626; font-size: .9rem; }
+
+  .request-success-card {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    max-width: 700px;
+    margin: 0 auto;
+    border-radius: 16px;
+    background: #fff;
+    padding: 36px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .05);
+  }
+
+  .request-success-card > svg { color: #16a34a; }
+  .request-success-card h2 { color: #1e293b; }
+  .request-success-card p { color: #475569; line-height: 1.5; }
+  .request-success-card .btn-submit { margin-top: 6px; }
+
+  .request-pix-card {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    max-width: 520px;
+    margin: 0 auto;
+    border-radius: 16px;
+    background: #fff;
+    padding: 28px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .05);
+  }
+
+  .request-pix-card h2 { color: #1e293b; }
+  .request-pix-card > p { color: #64748b; }
+  .request-pix-card .pix-amount { color: #ea580c; font-size: 1.5rem; }
+  .pix-demo-qr { width: 210px; height: 210px; margin: 6px 0; border: 10px solid #fff; background: #fff; box-shadow: 0 0 0 1px #e2e8f0; shape-rendering: crispEdges; }
+  .request-pix-card .pix-countdown { color: #c2410c; font-size: .9rem; font-weight: 700; }
+
+  .card-payment-fields { margin-top: 20px; border: 0; }
+  .card-payment-fields legend { margin-bottom: 12px; color: #334155; font-size: .9rem; font-weight: 700; }
+  .card-payment-fields .form-grid { margin-bottom: 0; }
+  .card-payment-fields .form-group label { display: block; }
+  .card-field-full { grid-column: 1 / -1; }
+
+  @media (max-width: 600px) {
+    .payment-card.form-card { padding: 1.25rem; }
+    .request-steps { gap: 8px; font-size: .74rem; }
+    .request-steps i { width: 8vw; }
+    .freight-summary { padding: 13px; }
+    .freight-route { gap: 7px; }
+    .freight-route strong { font-size: .78rem; }
+    .freight-lines span { font-size: .76rem; }
+    .freight-lines strong { font-size: .8rem; }
+    .payment-methods { grid-template-columns: 1fr; }
+    .request-main-content .form-actions { align-items: stretch; flex-direction: column-reverse; gap: 14px; }
+    .request-main-content .form-actions > button { justify-content: center; }
+    .request-success-card { padding: 24px 18px; }
+  }
+
+  .request-page .form-card { padding: clamp(14px, 2vw, 24px); }
+  .request-page .card-header { margin-bottom: 14px; }
+  .request-page .form-grid { gap: 12px; margin-bottom: 12px; }
+  .request-page .form-control { padding-top: 9px; padding-bottom: 9px; }
+  .request-page textarea.form-control { min-height: 64px; }
+  .request-page .form-actions { margin-top: 14px; }
+
+  @media (max-width: 600px) {
+    .request-page .form-card { padding: 12px; }
+    .request-page .card-header { margin-bottom: 10px; }
+    .request-page .form-grid { gap: 7px 9px; margin-bottom: 9px; }
+    .request-page .form-control { padding: 6px 8px; }
+    .request-page textarea.form-control { min-height: 40px; }
+    .request-page .form-actions { margin-top: 9px; }
+    .request-page .request-main-content .form-actions { flex-direction: row; }
   }
   

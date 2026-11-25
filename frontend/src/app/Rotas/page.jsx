@@ -77,7 +77,7 @@ export default function Rotas() {
   );
 
   return (
-    <div className="dash-container">
+    <div className="dash-container rotas-page">
       <Aside />
       <main className="dash">
         <Header />

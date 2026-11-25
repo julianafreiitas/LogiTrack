@@ -62,10 +62,7 @@ export default function Cadastro() {
     <main className="register-page">
       <section className="register" aria-label="Criar conta">
         <div className="register-brand">
-          <img src="/imagens/logo2.png" alt="" />
-          <span>
-            Logi<strong>Track</strong>
-          </span>
+          <img src="/imagens/CAPA.png" alt="LogiTrack" />
         </div>
 
         <h1>Crie sua conta</h1>
