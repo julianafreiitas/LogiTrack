@@ -5,7 +5,10 @@ import deliveryRoutes from "./routes/deliveryRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
-import usuariosRoutes from "./routes/usuariosRoutes.js";
+import motoristasRoutes from "./routes/motoristasRoutes.js";
+import rotasRoutes from "./routes/rotasRoutes.js";
+import motoristaPortalRoutes from "./routes/motoristaPortalRoutes.js";
+import clientePortalRoutes from "./routes/clientePortalRoutes.js";
 
 const app = express();
 const normalizarOrigem = (url) => url.trim().replace(/\/+$/, "");
@@ -23,7 +26,15 @@ const origensPermitidas = [
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin(origin, callback) {
+      // Sem origin (curl, health checks) ou origem na lista: permitido
+      if (!origin || origensPermitidas.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(express.json());
@@ -35,7 +46,14 @@ app.get("/", (request, response) => {
 });
 
 app.use("/api/health", healthRoutes);
-app.use("/api/usuarios", usuariosRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/motoristas", motoristasRoutes);
+app.use("/api/rotas", rotasRoutes);
+app.use("/api/portal/motorista", motoristaPortalRoutes);
+app.use("/api/portal/cliente", clientePortalRoutes);
+// Regista as rotas de entregas (o endpoint será /api/deliveries)
+app.use("/api", healthRoutes);
+app.use("/api/deliveries", deliveryRoutes);
 
 app.use(errorHandler);
 

@@ -145,7 +145,7 @@
     position: relative;
     z-index: 2;
     width: min(1800px, 92%);
-    margin: -132px auto 12px;
+    margin: -72px auto 2rem;
     padding: 0;
     flex-grow: 1;
     min-height: 0;

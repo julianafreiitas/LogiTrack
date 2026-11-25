@@ -1,5 +1,4 @@
 SET NAMES utf8mb4;
-USE logi_track_db;
 
 -- Senha de todos os registros de teste abaixo: Admin@123
 -- ---------------------------------------------------------------
@@ -62,63 +61,49 @@ SELECT 'ENT-20002', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Osasco, S
        NULL, '2026-11-03 17:00:00', 'Entregue', '2026-11-02 12:00:00'
 FROM cadastro c JOIN motoristas m ON m.nome = 'Rodrigo Faria' WHERE c.email = 'marcos@email.com';
 
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20003', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Campinas, SP', ST_GeomFromText('POINT(-47.0626 -22.9099)'), 'Entrega agendada',
-       'Entrega concluída em 10/11/2026.', '2026-11-10 16:00:00', 'Entregue', '2026-11-10 13:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'João Pereira' WHERE c.email = 'ana@email.com';
+INSERT INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_destino, coordenadas_destino, previsao, status) VALUES
+('ENT-10001', 1, 1, 'Avenida Francisco Glicério, 1200 - Centro, Campinas - SP', ST_GeomFromText('POINT(-47.0608 -22.9056)'), '2026-11-12 14:00:00', 'A Caminho'),
+('ENT-10002', 2, 2, 'Avenida Ana Costa, 350 - Gonzaga, Santos - SP', ST_GeomFromText('POINT(-46.3336 -23.9608)'), '2026-11-12 15:30:00', 'A Caminho'),
+('ENT-10003', 3, 3, 'Rua XV de Novembro, 480 - Centro, Sorocaba - SP', ST_GeomFromText('POINT(-47.4526 -23.5015)'), '2026-11-12 16:00:00', 'A Caminho'),
+('ENT-10004', 4, 7, 'Avenida Tiradentes, 900 - Centro, Guarulhos - SP', ST_GeomFromText('POINT(-46.5333 -23.4543)'), '2026-11-12 10:00:00', 'Entregue'),
+('ENT-10005', 5, 8, 'Avenida Kennedy, 700 - Centro, Santo André - SP', ST_GeomFromText('POINT(-46.5383 -23.6639)'), '2026-11-13 09:00:00', 'Pendente'),
+('ENT-10006', 6, NULL, 'Rua Marechal Deodoro, 620 - Centro, São Bernardo do Campo - SP', ST_GeomFromText('POINT(-46.5650 -23.6914)'), '2026-11-13 11:00:00', 'Pendente'),
+('ENT-10007', 7, 10, 'Avenida dos Autonomistas, 1500 - Vila Yara, Osasco - SP', ST_GeomFromText('POINT(-46.7917 -23.5325)'), '2026-11-12 13:00:00', 'A Caminho'),
+('ENT-10008', 8, 4, 'Avenida Jundiaí, 300 - Anhangabaú, Jundiaí - SP', ST_GeomFromText('POINT(-46.8842 -23.1857)'), '2026-11-11 17:00:00', 'Entregue'),
+('ENT-10009', 9, 6, 'Avenida Voluntário Fernando Braga, 210 - Centro, Mogi das Cruzes - SP', ST_GeomFromText('POINT(-46.1884 -23.5229)'), '2026-11-11 12:00:00', 'Cancelado'),
+('ENT-10010', 10, 5, 'Avenida Paulista, 1578 - Bela Vista, São Paulo - SP', ST_GeomFromText('POINT(-46.6560 -23.5614)'), '2026-11-12 18:00:00', 'A Caminho');
 
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20004', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Santos, SP', ST_GeomFromText('POINT(-46.3336 -23.9608)'), 'Entrega padrão',
-       NULL, '2026-10-21 18:00:00', 'Entregue', '2026-10-20 12:30:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'Pedro Alves' WHERE c.email = 'ana@email.com';
 
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20005', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Guarulhos, SP', ST_GeomFromText('POINT(-46.5333 -23.4543)'), 'Entrega expressa',
-       'Entrega concluída em 05/11/2026.', '2026-11-05 15:00:00', 'Entregue', '2026-11-05 12:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'Aline Souza' WHERE c.email = 'juliana@email.com';
-
--- Rafael: pendente e ainda sem motorista atribuído
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20006', c.id_cadastro, NULL, 'São Paulo, SP', 'São Bernardo do Campo, SP', ST_GeomFromText('POINT(-46.5650 -23.6914)'), 'Entrega padrão',
-       NULL, '2026-11-19 18:00:00', 'Pendente', '2026-11-01 13:00:00'
-FROM cadastro c WHERE c.email = 'rafael@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20007', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Mauá, SP', ST_GeomFromText('POINT(-46.4613 -23.6677)'), 'Entrega padrão',
-       'Entrega concluída em 30/10/2026.', '2026-10-30 17:00:00', 'Entregue', '2026-10-30 12:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'Tatiane Lopes' WHERE c.email = 'beatriz@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20008', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Jundiaí, SP', ST_GeomFromText('POINT(-46.8842 -23.1857)'), 'Entrega agendada',
-       NULL, '2026-10-26 18:00:00', 'A Caminho', '2026-10-24 12:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'Felipe Moura' WHERE c.email = 'camila@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20009', c.id_cadastro, NULL, 'São Paulo, SP', 'Sorocaba, SP', ST_GeomFromText('POINT(-47.4526 -23.5015)'), 'Entrega padrão',
-       'Cliente cancelou antes da coleta.', '2026-11-14 18:00:00', 'Cancelado', '2026-11-12 14:00:00'
-FROM cadastro c WHERE c.email = 'thiago@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20010', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Santo André, SP', ST_GeomFromText('POINT(-46.5383 -23.6737)'), 'Entrega expressa',
-       NULL, '2026-11-08 16:00:00', 'Entregue', '2026-11-08 12:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'Marcelo Barros' WHERE c.email = 'larissa@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20011', c.id_cadastro, NULL, 'São Paulo, SP', 'Guarulhos, SP', ST_GeomFromText('POINT(-46.5333 -23.4543)'), 'Entrega padrão',
-       NULL, '2026-11-18 18:00:00', 'Pendente', '2026-11-13 15:00:00'
-FROM cadastro c WHERE c.email = 'eduardo@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20012', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Campinas, SP', ST_GeomFromText('POINT(-47.0626 -22.9099)'), 'Entrega agendada',
-       'Entrega concluída em 03/11/2026.', '2026-11-03 17:00:00', 'Entregue', '2026-11-03 12:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'João Pereira' WHERE c.email = 'patricia@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20013', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Osasco, SP', ST_GeomFromText('POINT(-46.7917 -23.5325)'), 'Entrega padrão',
-       NULL, '2026-10-12 17:00:00', 'Entregue', '2026-10-11 12:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'Vanessa Cardoso' WHERE c.email = 'juliana@email.com';
-
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20014', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Sorocaba, SP', ST_GeomFromText('POINT(-47.4526 -23.5015)'), 'Entrega expressa',
-       NULL, '2026-10-05 16:00:00', 'Entregue', '2026-10-05 12:00:00'
-FROM cadastro c JOIN motoristas m ON m.nome = 'Diego Ramos' WHERE c.email = 'camila@email.com';
+-- ---------------------------------------------------------------------------
+-- Entregas de exemplo para as telas do motorista e do cliente.
+-- As datas são relativas a NOW()/CURDATE(), então sempre há entregas "de hoje"
+-- e histórico dos últimos dias, em qualquer dia que o banco for recriado.
+-- Motoristas 1 (João Pereira), 2 (Pedro Alves) e 3 (Diego Ramos); cliente 1 tem vários pedidos.
+-- ---------------------------------------------------------------------------
+INSERT INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_destino, coordenadas_destino, previsao, status, checked_at, atualizado_em) VALUES
+-- João Pereira: em andamento, pendentes e concluídas hoje
+('ENT-20001', 1, 1, 'Avenida Paulista, 1578 - Bela Vista, São Paulo - SP', ST_GeomFromText('POINT(-46.6560 -23.5614)'), DATE_ADD(NOW(), INTERVAL 2 HOUR), 'A Caminho', NOW(), NOW()),
+('ENT-20002', 4, 1, 'Rua Augusta, 900 - Consolação, São Paulo - SP', ST_GeomFromText('POINT(-46.6562 -23.5531)'), DATE_ADD(NOW(), INTERVAL 3 HOUR), 'A Caminho', NOW(), NOW()),
+('ENT-20003', 5, 1, 'Rua Vergueiro, 2300 - Vila Mariana, São Paulo - SP', ST_GeomFromText('POINT(-46.6339 -23.5894)'), DATE_ADD(NOW(), INTERVAL 5 HOUR), 'Pendente', NOW(), NOW()),
+('ENT-20004', 1, 1, 'Rua dos Pinheiros, 450 - Pinheiros, São Paulo - SP', ST_GeomFromText('POINT(-46.6918 -23.5672)'), DATE_ADD(NOW(), INTERVAL 6 HOUR), 'Pendente', NOW(), NOW()),
+('ENT-20005', 6, 1, 'Rua da Mooca, 1200 - Mooca, São Paulo - SP', ST_GeomFromText('POINT(-46.5990 -23.5560)'), TIMESTAMP(CURDATE(), '09:00:00'), 'Entregue', TIMESTAMP(CURDATE(), '08:00:00'), TIMESTAMP(CURDATE(), '09:10:00')),
+('ENT-20006', 7, 1, 'Rua Tuiuti, 700 - Tatuapé, São Paulo - SP', ST_GeomFromText('POINT(-46.5766 -23.5403)'), TIMESTAMP(CURDATE(), '10:30:00'), 'Entregue', TIMESTAMP(CURDATE(), '08:00:00'), TIMESTAMP(CURDATE(), '10:25:00')),
+-- João Pereira: histórico (para testar busca, paginação e filtro de período)
+('ENT-20007', 1, 1, 'Praça da Sé, 100 - Sé, São Paulo - SP', ST_GeomFromText('POINT(-46.6333 -23.5505)'), DATE_SUB(NOW(), INTERVAL 1 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
+('ENT-20008', 8, 1, 'Avenida do Estado, 3000 - Cambuci, São Paulo - SP', ST_GeomFromText('POINT(-46.6200 -23.5700)'), DATE_SUB(NOW(), INTERVAL 2 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+('ENT-20009', 9, 1, 'Rua Domingos de Morais, 1500 - Vila Mariana, São Paulo - SP', ST_GeomFromText('POINT(-46.6370 -23.5930)'), DATE_SUB(NOW(), INTERVAL 4 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 4 DAY)),
+('ENT-20010', 10, 1, 'Avenida Ipiranga, 200 - República, São Paulo - SP', ST_GeomFromText('POINT(-46.6430 -23.5440)'), DATE_SUB(NOW(), INTERVAL 6 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY)),
+('ENT-20011', 4, 1, 'Avenida Lins de Vasconcelos, 1100 - Cambuci, São Paulo - SP', ST_GeomFromText('POINT(-46.6150 -23.5750)'), DATE_SUB(NOW(), INTERVAL 9 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 9 DAY)),
+('ENT-20012', 1, 1, 'Rua Oscar Freire, 600 - Jardins, São Paulo - SP', ST_GeomFromText('POINT(-46.6710 -23.5620)'), DATE_SUB(NOW(), INTERVAL 15 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 16 DAY), DATE_SUB(NOW(), INTERVAL 15 DAY)),
+('ENT-20013', 5, 1, 'Avenida Rebouças, 1800 - Pinheiros, São Paulo - SP', ST_GeomFromText('POINT(-46.6720 -23.5640)'), DATE_SUB(NOW(), INTERVAL 25 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 26 DAY), DATE_SUB(NOW(), INTERVAL 25 DAY)),
+('ENT-20014', 6, 1, 'Rua Vergueiro, 3185 - Vila Mariana, São Paulo - SP', ST_GeomFromText('POINT(-46.6400 -23.5950)'), DATE_SUB(NOW(), INTERVAL 40 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 41 DAY), DATE_SUB(NOW(), INTERVAL 40 DAY)),
+-- Pedro Alves
+('ENT-20020', 2, 2, 'Rua Teodoro Sampaio, 1000 - Pinheiros, São Paulo - SP', ST_GeomFromText('POINT(-46.6700 -23.5620)'), DATE_ADD(NOW(), INTERVAL 1 HOUR), 'A Caminho', NOW(), NOW()),
+('ENT-20021', 3, 2, 'Avenida Brigadeiro Faria Lima, 2000 - Jardim Paulistano, São Paulo - SP', ST_GeomFromText('POINT(-46.6920 -23.5760)'), DATE_ADD(NOW(), INTERVAL 4 HOUR), 'Pendente', NOW(), NOW()),
+('ENT-20022', 1, 2, 'Rua Haddock Lobo, 500 - Cerqueira César, São Paulo - SP', ST_GeomFromText('POINT(-46.6600 -23.5580)'), TIMESTAMP(CURDATE(), '08:30:00'), 'Entregue', TIMESTAMP(CURDATE(), '07:30:00'), TIMESTAMP(CURDATE(), '08:20:00')),
+('ENT-20023', 2, 2, 'Rua Cardeal Arcoverde, 700 - Pinheiros, São Paulo - SP', ST_GeomFromText('POINT(-46.6770 -23.5650)'), DATE_SUB(NOW(), INTERVAL 3 DAY), 'Entregue', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY)),
+-- Diego Ramos
+('ENT-20030', 3, 3, 'Avenida Celso Garcia, 2500 - Tatuapé, São Paulo - SP', ST_GeomFromText('POINT(-46.5800 -23.5400)'), DATE_ADD(NOW(), INTERVAL 2 HOUR), 'A Caminho', NOW(), NOW()),
+('ENT-20031', 1, 3, 'Rua Voluntários da Pátria, 1500 - Santana, São Paulo - SP', ST_GeomFromText('POINT(-46.6280 -23.5090)'), DATE_ADD(NOW(), INTERVAL 3 HOUR), 'Pendente', NOW(), NOW()),
+-- Pedido cancelado do cliente 1 (sem motorista)
+('ENT-20032', 1, NULL, 'Rua Consolação, 2000 - Consolação, São Paulo - SP', ST_GeomFromText('POINT(-46.6580 -23.5530)'), DATE_SUB(NOW(), INTERVAL 2 DAY), 'Cancelado', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY));

@@ -593,3 +593,37 @@
   .map-profile-name strong { font-size: 12px; }
 }
 
+
+/* Lista de paradas no cartão de detalhes (dados vindos do banco) */
+.delivery-stops {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.delivery-stop {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  border: 1px solid #1a3b5a;
+  border-radius: 10px;
+  background: #10243c;
+  color: #f3f6fb;
+  cursor: pointer;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.delivery-stop span {
+  color: #9bb4d0;
+  font-size: 12px;
+}
+
+.delivery-stop.active {
+  border-color: #ff710f;
+}
+
+.delivery-map-page .seletor-id {
+  margin-right: 14px;
+}

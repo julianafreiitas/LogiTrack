@@ -1,5 +1,4 @@
 SET NAMES utf8mb4;
-USE app_db;
 
 CREATE TABLE IF NOT EXISTS usuarios (
     id_usuarios INT AUTO_INCREMENT PRIMARY KEY,

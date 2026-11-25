@@ -5,14 +5,7 @@ import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from 'react-
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const ROUTE = [
-  [-23.6274, -46.5795],
-  [-23.6234, -46.5751],
-  [-23.6202, -46.5701],
-  [-23.6227, -46.5651],
-  [-23.6174, -46.5605],
-];
-const CENTER = [-23.622, -46.570];
+const CENTRO_PADRAO = [-23.55, -46.64];
 const TILES = {
   mapa: {
     url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
@@ -41,34 +34,56 @@ const icons = {
   done: markerIcon('done'),
 };
 
-function AjustarMapa() {
+const ICONE_POR_STATUS = { 'A Caminho': icons.package, Pendente: icons.pending, Entregue: icons.done };
+const LEGENDA_POR_STATUS = { 'A Caminho': 'Entrega em andamento', Pendente: 'Entrega pendente', Entregue: 'Entrega concluída' };
+
+function AjustarMapa({ pontos }) {
   const map = useMap();
 
   useEffect(() => {
-    map.fitBounds(ROUTE, { padding: [50, 50] });
-    const focus = () => map.fitBounds(ROUTE, { padding: [50, 50] });
-    window.addEventListener('tracking-map-focus', focus);
-    return () => window.removeEventListener('tracking-map-focus', focus);
-  }, [map]);
+    const ajustar = () => {
+      if (pontos.length > 1) map.fitBounds(pontos, { padding: [50, 50] });
+      else if (pontos.length === 1) map.setView(pontos[0], 14);
+    };
+    ajustar();
+    window.addEventListener('tracking-map-focus', ajustar);
+    return () => window.removeEventListener('tracking-map-focus', ajustar);
+  }, [map, pontos]);
 
   return null;
 }
 
-export default function TrackingMap({ layer }) {
+export default function TrackingMap({ layer, origem, entregas, selecionadaId, onSelecionar }) {
   const tiles = TILES[layer] || TILES.mapa;
+  const posicaoOrigem = origem ? [origem.lat, origem.lng] : null;
+  const abertas = entregas.filter((entrega) => entrega.status !== 'Entregue');
+  // trajeto: posição do motorista -> entregas abertas na ordem da previsão (linhas retas, sem serviço de rotas)
+  const trajeto = [...(posicaoOrigem ? [posicaoOrigem] : []), ...abertas.map((entrega) => [entrega.lat, entrega.lng])];
+  const todosOsPontos = [...(posicaoOrigem ? [posicaoOrigem] : []), ...entregas.map((entrega) => [entrega.lat, entrega.lng])];
+  // referência estável para o efeito do AjustarMapa só rodar quando os pontos mudarem de verdade
+  const chavePontos = JSON.stringify(todosOsPontos);
 
   return (
-    <MapContainer center={CENTER} zoom={14} zoomControl className="tracking-leaflet-map">
+    <MapContainer center={posicaoOrigem ?? CENTRO_PADRAO} zoom={13} zoomControl className="tracking-leaflet-map">
       <TileLayer key={layer} attribution={tiles.attribution} url={tiles.url} />
-      <AjustarMapa />
+      <AjustarMapa key={chavePontos} pontos={todosOsPontos} />
 
-      <Polyline positions={ROUTE} pathOptions={{ color: '#ff710f', weight: 4, opacity: .98 }} />
+      {trajeto.length > 1 && <Polyline positions={trajeto} pathOptions={{ color: '#ff710f', weight: 4, opacity: 0.98 }} />}
 
-      <Marker position={ROUTE[0]} icon={icons.origin}><Popup>Sua localização</Popup></Marker>
-      <Marker position={ROUTE[1]} icon={icons.package}><Popup>Entrega em andamento</Popup></Marker>
-      <Marker position={ROUTE[2]} icon={icons.done}><Popup>Entrega concluída</Popup></Marker>
-      <Marker position={ROUTE[3]} icon={icons.package}><Popup>Entrega em andamento</Popup></Marker>
-      <Marker position={ROUTE[4]} icon={icons.pending}><Popup>Rua das Flores, 123 · Entrega pendente</Popup></Marker>
+      {posicaoOrigem && (
+        <Marker position={posicaoOrigem} icon={icons.origin}><Popup>Sua localização</Popup></Marker>
+      )}
+      {entregas.map((entrega) => (
+        <Marker
+          key={entrega.id}
+          position={[entrega.lat, entrega.lng]}
+          icon={ICONE_POR_STATUS[entrega.status] ?? icons.pending}
+          zIndexOffset={entrega.id === selecionadaId ? 1000 : 0}
+          eventHandlers={{ click: () => onSelecionar(entrega.id) }}
+        >
+          <Popup>{entrega.codigo} · {LEGENDA_POR_STATUS[entrega.status]}</Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 }

@@ -58,7 +58,7 @@ export default function AcompanharEntrega() {
             </div>
             <div className="tracking-current-order">
               <div className="tracking-package-icon"><Box size={23} /></div>
-              <div><strong>{cancelamentoConcluido ? "Pedido cancelado" : "Entrega em andamento"}</strong><span>Mercado Souza · 1 pacote</span></div>
+              <div><strong>Entrega em andamento</strong><span>Mercado Souza · 1 pacote</span></div>
               <span className="tracking-live-dot" aria-label="Em andamento" />
             </div>
             <div className="tracking-current-address"><MapPin size={17} /><span>Rua das Flores, 123<br />São Caetano do Sul, SP</span></div>
@@ -87,7 +87,7 @@ export default function AcompanharEntrega() {
           <article className="tracking-details-card">
             <h2><span><CheckCircle2 size={17} /></span> Detalhes da Entrega</h2>
             <div className="tracking-detail-columns">
-              <div className="tracking-detail-item"><small><Package size={13} /> Pedido</small><strong>{cancelamentoConcluido ? "Cancelado" : "Em andamento"}</strong></div>
+              <div className="tracking-detail-item"><small><Package size={13} /> Pedido</small><strong>Em andamento</strong></div>
               <div className="tracking-detail-item"><small><UserRound size={13} /> Cliente</small><strong>Mercado Souza</strong></div>
               <div className="tracking-detail-item"><small><MapPin size={13} /> Endereço</small><strong>Rua das Flores, 123<br />São Caetano do Sul, SP</strong></div>
               <div className="tracking-detail-item"><small><Box size={13} /> Volumes</small><strong>1 pacote</strong></div>
@@ -103,55 +103,7 @@ export default function AcompanharEntrega() {
             <div className="tracking-arrival-illustration" aria-hidden="true"><Truck size={65} /></div>
           </article>
         </section>
-
-        {!cancelamentoConcluido && (
-          <div className="tracking-cancel-action">
-            <button type="button" onClick={() => setModalCancelamento(true)}>Cancelar entrega</button>
-          </div>
-        )}
       </main>
-
-      {modalCancelamento && (
-        <div className="tracking-modal-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setModalCancelamento(false); }}>
-          <section className="tracking-cancel-modal" role="dialog" aria-modal="true" aria-labelledby="tracking-cancel-title">
-            <button className="tracking-modal-close" type="button" aria-label="Fechar" onClick={() => setModalCancelamento(false)}><X size={20} /></button>
-            <div className="tracking-modal-icon warning"><PackageX size={30} /></div>
-            <h2 id="tracking-cancel-title">Cancelar entrega?</h2>
-            <p className="tracking-modal-subtitle">Tem certeza de que deseja cancelar este pedido?</p>
-
-            <div className="tracking-cancel-info">
-              <div className="tracking-cancel-info-row"><span>Pedido</span><strong>#10245</strong></div>
-              <div className="tracking-cancel-info-row"><span>Status</span><strong className="tracking-cancel-status">Em andamento</strong></div>
-              <div className="tracking-cancel-warning">
-                <strong><AlertCircle size={15} /> Atenção</strong>
-                <p>Seu pacote já está com o motorista. Será necessário realizar a devolução ao endereço de origem.</p>
-              </div>
-            </div>
-
-            <div className="tracking-modal-actions">
-              <button className="tracking-confirm-cancel" type="button" onClick={confirmarCancelamento}>Confirmar cancelamento</button>
-              <button className="tracking-keep-delivery" type="button" onClick={() => setModalCancelamento(false)}>Continuar com a entrega</button>
-            </div>
-            <p className="tracking-cancel-note">A devolução poderá gerar uma cobrança adicional, conforme as regras do serviço.</p>
-          </section>
-        </div>
-      )}
-
-      {modalSucessoAberto && (
-        <div className="tracking-modal-overlay">
-          <section className="tracking-cancel-modal tracking-success-modal" role="dialog" aria-modal="true" aria-labelledby="tracking-success-title">
-            <div className="tracking-modal-icon success"><CheckCircle2 size={30} /></div>
-            <h2 id="tracking-success-title">Pedido cancelado!</h2>
-            <p className="tracking-modal-subtitle">O cancelamento foi realizado com sucesso.</p>
-            <div className="tracking-return-info">
-              <strong><Truck size={19} /> Devolução em andamento</strong>
-              <p>O motorista está retornando com seu pacote para o endereço de origem.</p>
-            </div>
-            <p className="tracking-return-notice">Você será avisado quando o pacote for devolvido.</p>
-            <button className="tracking-keep-delivery" type="button" onClick={() => setModalSucessoAberto(false)}>Entendi</button>
-          </section>
-        </div>
-      )}
     </div>
   );
 }

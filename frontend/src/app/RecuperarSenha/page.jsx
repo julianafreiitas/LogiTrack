@@ -19,7 +19,10 @@ const ESPERA_REENVIO = 30; // segundos
 function Marca() {
   return (
     <div className="recover-brand">
-      <img src="/imagens/CAPA.png" alt="LogiTrack" />
+      <img src="/imagens/logo2.png" alt="" />
+      <span>
+        Logi<strong>Track</strong>
+      </span>
     </div>
   );
 }
