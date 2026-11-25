@@ -309,7 +309,7 @@
 .marker-location { --marker-color: #278cff; }
 .marker-location::after { content: '▲'; font-size: 11px; }
 .marker-package { --marker-color: #ff710f; }
-.marker-package::after { content: '□'; }
+.marker-package::after { content: '▣'; }
 .marker-pin { --marker-color: #e83242; }
 .marker-pin::after { content: '•'; font-size: 18px; }
 .marker-done { --marker-color: #10b981; }

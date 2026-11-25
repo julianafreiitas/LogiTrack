@@ -1,10 +1,43 @@
 "use client";
 
-import React, { useState } from 'react';
-import { MapPin, Flag, Calendar, Box, MessageSquare, ArrowLeft, Send } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, ArrowRight, Box, Calendar, CheckCircle2, CreditCard, Flag, MapPin, MessageSquare, Package, Send, Truck, Wallet } from 'lucide-react';
 import Header from '../components/Header-usuarios';
+import { API_URL } from '../lib/api';
 import '../Main-usuario/pagemain.css';
 import './SolicitarEntrega.css';
+
+const initialForm = {
+  coleta: "", destino: "", data: "", servico: "", observacoes: "",
+  tamanho: "medio", pesoKg: "1", urgencia: "normal", pagamento: "pix",
+};
+
+const moeda = (valor) => Number(valor || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function PixDemoQr({ seed }) {
+  const modules = useMemo(() => {
+    const size = 29;
+    let hash = [...seed].reduce((value, character) => (value * 31 + character.charCodeAt(0)) >>> 0, 7);
+    const matrix = Array.from({ length: size }, () => Array.from({ length: size }, () => {
+      hash = (hash * 1664525 + 1013904223) >>> 0;
+      return (hash >>> 28) % 2 === 1;
+    }));
+    const addFinder = (left, top) => {
+      for (let y = -1; y <= 7; y += 1) for (let x = -1; x <= 7; x += 1) {
+        const row = top + y;
+        const column = left + x;
+        if (row < 0 || column < 0 || row >= size || column >= size) continue;
+        matrix[row][column] = x >= 0 && x <= 6 && y >= 0 && y <= 6 &&
+          (x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4));
+      }
+    };
+    addFinder(0, 0);
+    addFinder(size - 7, 0);
+    addFinder(0, size - 7);
+    return matrix.flatMap((row, y) => row.map((active, x) => active ? <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" /> : null));
+  }, [seed]);
+  return <svg className="pix-demo-qr" viewBox="-2 -2 33 33" role="img" aria-label="QR code Pix demonstrativo">{modules}</svg>;
+}
 
 export default function SolicitarEntrega() {
   const [formData, setFormData] = useState(initialForm);
@@ -84,61 +117,6 @@ export default function SolicitarEntrega() {
       </section>
 
       <main className="request-main-content">
-        <div className="form-card">
-          <div className="card-header">
-            <div className="card-header-icon"><Box size={20} /></div>
-            <h2>Dados da Entrega</h2>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <div className="form-group">
-                <label><MapPin size={16} /> Endereço de Coleta</label>
-                <div className="input-wrapper">
-                  <input type="text" name="coleta" placeholder="Digite o endereço completo" className="form-control" onChange={handleChange} required />
-                  <MapPin size={16} className="input-icon-right" />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label><Flag size={16} /> Endereço de Destino</label>
-                <div className="input-wrapper">
-                  <input type="text" name="destino" placeholder="Digite o endereço completo" className="form-control" onChange={handleChange} required />
-                  <MapPin size={16} className="input-icon-right" />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label><Calendar size={16} /> Data Desejada para Coleta</label>
-                <input type="date" name="data" className="form-control" onChange={handleChange} required />
-              </div>
-
-              <div className="form-group">
-                <label><Box size={16} /> Tipo de Serviço</label>
-                <select name="servico" className="form-control" onChange={handleChange} defaultValue="" required>
-                  <option value="" disabled>Selecione o tipo de serviço</option>
-                  <option value="expressa">Entrega Expressa</option>
-                  <option value="convencional">Carga Convencional</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label><MessageSquare size={16} /> Observações (opcional)</label>
-              <textarea name="observacoes" rows="3" placeholder="Adicione informações extras sobre sua entrega..." className="form-control" onChange={handleChange} />
-            </div>
-
-            <div className="form-actions">
-              <button type="button" className="btn-back" onClick={() => window.history.back()}>
-                <ArrowLeft size={16} /> Voltar para início
-              </button>
-              <button type="submit" className="btn-submit">
-                <Send size={16} /> Solicitar Entrega
-              </button>
-            </div>
-          </form>
-        </div>
-
         {solicitacaoEnviada ? (
           <section className="request-success-card" role="status">
             <CheckCircle2 size={48} />

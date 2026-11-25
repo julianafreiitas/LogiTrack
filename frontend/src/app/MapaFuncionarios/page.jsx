@@ -28,7 +28,8 @@ export default function MapaFuncionarios() {
 
   const carregar = useCallback(async (idMotorista, codigoPreferido) => {
     try {
-      const resposta = await chamarApi(`/portal/motorista/${idMotorista}/mapa`);
+      const sufixoCodigo = codigoPreferido ? `?codigo=${encodeURIComponent(codigoPreferido)}` : "";
+      const resposta = await chamarApi(`/portal/motorista/${idMotorista}/mapa${sufixoCodigo}`);
       setDados(resposta);
       setErro("");
       setSelecionadaId((atual) => {
@@ -157,7 +158,7 @@ export default function MapaFuncionarios() {
               </div>
 
               <div className="delivery-detail-actions">
-                <button type="button" className="detail-route-button" onClick={() => window.dispatchEvent(new Event("tracking-map-focus"))}>
+                <button type="button" className="detail-route-button" onClick={() => window.dispatchEvent(new CustomEvent("tracking-map-focus", { detail: { entregaId: selecionada.id } }))}>
                   <Navigation size={14} fill="currentColor" /> Ver rota
                 </button>
                 {selecionada.status === "Entregue" ? (
