@@ -1,22 +1,15 @@
 import pool from "../config/database.js";
 import { cidadeDoEndereco, iniciais } from "../utils/endereco.js";
 
-// Portal do cliente: o "cliente" é um registro da tabela cadastro.
-// (Enquanto o login real não existe, o front manda o id escolhido no seletor.)
-
-// status do banco -> texto e classe usados na tela (status-badge.<tipo>)
 const SITUACOES = {
   "A Caminho": { texto: "Em trânsito", tipo: "transito" },
   Entregue: { texto: "Entregue", tipo: "entregue" },
   Pendente: { texto: "Pendente", tipo: "pendente" },
   Cancelado: { texto: "Cancelado", tipo: "cancelado" },
 };
+const situacao = (status) => SITUACOES[status] ?? SITUACOES.Pendente;
+const validarId = (valor) => Number.isInteger(Number(valor)) && Number(valor) > 0;
 
-function situacao(status) {
-  return SITUACOES[status] ?? SITUACOES.Pendente;
-}
-
-// Lista usada pelo seletor de identificação provisória (nunca devolve senha)
 export async function listarClientes(request, response) {
   const [linhas] = await pool.query("SELECT id, nome FROM cadastro ORDER BY id");
   response.json(linhas.map((linha) => ({ id: linha.id, nome: linha.nome, iniciais: iniciais(linha.nome) })));
@@ -24,66 +17,96 @@ export async function listarClientes(request, response) {
 
 export async function resumoDoCliente(request, response) {
   const id = Number(request.params.id);
-  if (!Number.isInteger(id) || id < 1) {
-    return response.status(400).json({ message: "Id de cliente inválido." });
-  }
-
+  if (!validarId(id)) return response.status(400).json({ message: "Id de cliente inválido." });
   const [[cliente]] = await pool.query("SELECT id, nome FROM cadastro WHERE id = ?", [id]);
-  if (!cliente) {
-    return response.status(404).json({ message: "Cliente não encontrado." });
-  }
-
-  const [[contagem]] = await pool.query(
-    `SELECT
-       COALESCE(SUM(status = 'A Caminho'), 0) AS emTransito,
-       COALESCE(SUM(status = 'Entregue'), 0) AS entregues,
-       COALESCE(SUM(status = 'Pendente'), 0) AS pendentes
-     FROM entregas WHERE id_cliente = ?`,
-    [id],
-  );
-
-  const [pedidos] = await pool.query(
-    `SELECT codigo_rastreio AS codigo, endereco_destino AS endereco, status
-     FROM entregas WHERE id_cliente = ?
-     ORDER BY checked_at DESC, id_entregas DESC
-     LIMIT 3`,
-    [id],
-  );
-
+  if (!cliente) return response.status(404).json({ message: "Cliente não encontrado." });
+  const [[contagem]] = await pool.query(`SELECT
+    COALESCE(SUM(status = 'A Caminho'), 0) AS emTransito,
+    COALESCE(SUM(status = 'Entregue'), 0) AS entregues,
+    COALESCE(SUM(status = 'Pendente'), 0) AS pendentes,
+    COALESCE(SUM(status = 'Cancelado'), 0) AS canceladas
+    FROM entregas WHERE id_cliente = ?`, [id]);
+  const [pedidos] = await pool.query(`SELECT codigo_rastreio AS codigo, endereco_destino AS endereco, status
+    FROM entregas WHERE id_cliente = ? ORDER BY checked_at DESC, id_entregas DESC LIMIT 3`, [id]);
   response.json({
     cliente: { id: cliente.id, nome: cliente.nome, iniciais: iniciais(cliente.nome) },
-    emTransito: Number(contagem.emTransito),
-    entregues: Number(contagem.entregues),
-    pendentes: Number(contagem.pendentes),
-    ultimosPedidos: pedidos.map((pedido) => ({
-      codigo: pedido.codigo,
-      cidade: cidadeDoEndereco(pedido.endereco),
-      status: situacao(pedido.status).texto,
-      tipo: situacao(pedido.status).tipo,
-    })),
+    emTransito: Number(contagem.emTransito), entregues: Number(contagem.entregues),
+    pendentes: Number(contagem.pendentes), canceladas: Number(contagem.canceladas),
+    ultimosPedidos: pedidos.map((pedido) => ({ codigo: pedido.codigo, cidade: cidadeDoEndereco(pedido.endereco), status: situacao(pedido.status).texto, tipo: situacao(pedido.status).tipo })),
   });
 }
 
-// Consulta pelo código de rastreio (quem tem o código pode consultar, como em qualquer rastreio)
+const COLUNAS_PEDIDO = `e.codigo_rastreio AS codigo, e.id_cliente AS clientId,
+  COALESCE(e.nome_cliente, c.nome) AS cliente, e.endereco_coleta AS coleta,
+  e.endereco_destino AS destino, e.data_coleta AS dataColeta, e.tipo_servico AS servico,
+  e.tamanho_pacote AS tamanho, e.peso_kg AS pesoKg, e.urgencia, e.observacoes,
+  e.valor_frete AS valorFrete, e.distancia_km AS distanciaKm, e.forma_pagamento AS pagamento,
+  (e.id_motorista IS NOT NULL) AS motoristaAtribuido,
+  e.status, DATE_FORMAT(e.checked_at, '%Y-%m-%dT%H:%i:%s') AS solicitadoEm,
+  DATE_FORMAT(e.previsao, '%Y-%m-%dT%H:%i:%s') AS previsao,
+  DATE_FORMAT(e.atualizado_em, '%Y-%m-%dT%H:%i:%s') AS atualizadoEm`;
+
 export async function consultarRastreio(request, response) {
   const codigo = String(request.params.codigo ?? "").trim();
-  if (!codigo) {
-    return response.status(400).json({ message: "Informe o código de rastreio." });
+  if (!codigo) return response.status(400).json({ message: "Informe o código de rastreio." });
+  const [[entrega]] = await pool.query(`SELECT ${COLUNAS_PEDIDO} FROM entregas e
+    LEFT JOIN cadastro c ON c.id = e.id_cliente WHERE e.codigo_rastreio = ?`, [codigo]);
+  if (!entrega) return response.status(404).json({ message: "Código de rastreio não encontrado." });
+  response.json({ ...entrega, cidade: cidadeDoEndereco(entrega.destino), ...situacao(entrega.status) });
+}
+
+export async function listarPedidos(request, response) {
+  const id = Number(request.params.id);
+  if (!validarId(id)) return response.status(400).json({ message: "Id de cliente inválido." });
+  const [pedidos] = await pool.query(`SELECT ${COLUNAS_PEDIDO} FROM entregas e
+    LEFT JOIN cadastro c ON c.id = e.id_cliente WHERE e.id_cliente = ?
+    ORDER BY e.checked_at DESC, e.id_entregas DESC`, [id]);
+  response.json(pedidos.map((pedido) => ({ ...pedido, ...situacao(pedido.status) })));
+}
+
+export async function cancelarPedido(request, response) {
+  const codigo = String(request.params.codigo ?? "").trim();
+  const [resultado] = await pool.query(`UPDATE entregas SET status = 'Cancelado'
+    WHERE codigo_rastreio = ? AND status IN ('Pendente', 'A Caminho')`, [codigo]);
+  if (!resultado.affectedRows) {
+    const [[pedido]] = await pool.query("SELECT status FROM entregas WHERE codigo_rastreio = ?", [codigo]);
+    if (!pedido) return response.status(404).json({ message: "Pedido não encontrado." });
+    if (pedido.status === "Cancelado") return response.json({ codigo, status: "Cancelado", taxaAplicavel: false });
+    return response.status(409).json({ message: "Este pedido não pode mais ser cancelado." });
   }
+  const [[pedido]] = await pool.query("SELECT status, id_motorista FROM entregas WHERE codigo_rastreio = ?", [codigo]);
+  response.json({ codigo, status: pedido.status, taxaAplicavel: pedido.status === "Cancelado" && Boolean(pedido.id_motorista) });
+}
 
-  const [[entrega]] = await pool.query(
-    "SELECT codigo_rastreio AS codigo, endereco_destino AS endereco, status FROM entregas WHERE codigo_rastreio = ?",
-    [codigo],
-  );
+export async function obterPerfil(request, response) {
+  const id = Number(request.params.id);
+  if (!validarId(id)) return response.status(400).json({ message: "Id de cliente inválido." });
+  const [[perfil]] = await pool.query(`SELECT id, nome, email, telefone, cpf,
+    DATE_FORMAT(nascimento, '%Y-%m-%d') AS nascimento, cep, rua, numero, bairro, cidade, estado
+    FROM cadastro WHERE id = ?`, [id]);
+  if (!perfil) return response.status(404).json({ message: "Cliente não encontrado." });
+  response.json(perfil);
+}
 
-  if (!entrega) {
-    return response.status(404).json({ message: "Código de rastreio não encontrado." });
+export async function salvarPerfil(request, response) {
+  const id = Number(request.params.id);
+  if (!validarId(id)) return response.status(400).json({ message: "Id de cliente inválido." });
+  const dados = request.body ?? {};
+  const nome = String(dados.nome ?? "").trim();
+  const email = String(dados.email ?? "").trim();
+  const telefone = String(dados.telefone ?? "").trim();
+  if (!nome || nome.length > 100 || !/^\S+@\S+\.\S+$/.test(email) || email.length > 100 || !telefone || telefone.length > 40) {
+    return response.status(400).json({ message: "Informe nome, e-mail válido e telefone." });
   }
-
-  response.json({
-    codigo: entrega.codigo,
-    cidade: cidadeDoEndereco(entrega.endereco),
-    status: situacao(entrega.status).texto,
-    tipo: situacao(entrega.status).tipo,
-  });
+  const opcional = (chave, limite) => String(dados[chave] ?? "").trim().slice(0, limite) || null;
+  try {
+    const [resultado] = await pool.execute(`UPDATE cadastro SET nome = ?, email = ?, telefone = ?, cpf = ?,
+      nascimento = ?, cep = ?, rua = ?, numero = ?, bairro = ?, cidade = ?, estado = ? WHERE id = ?`,
+    [nome, email, telefone, opcional("cpf", 20), dados.nascimento || null, opcional("cep", 12), opcional("rua", 150), opcional("numero", 20), opcional("bairro", 100), opcional("cidade", 100), opcional("estado", 50), id]);
+    if (!resultado.affectedRows) return response.status(404).json({ message: "Cliente não encontrado." });
+    response.json({ message: "Perfil salvo.", perfil: { ...dados, nome, email, telefone } });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") return response.status(409).json({ message: "Este e-mail já está sendo usado por outro cliente." });
+    throw error;
+  }
 }

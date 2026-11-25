@@ -152,6 +152,8 @@
   font-size: 9px;
 }
 
+.tracking-live-dot.cancelado { background: #e11d48; box-shadow: 0 0 0 4px #ffe4e6; }
+
 .tracking-live-dot {
   width: 8px;
   height: 8px;
@@ -652,6 +654,13 @@
   box-shadow: 0 7px 20px rgba(255, 117, 31, .38);
   transform: translateY(-1px);
 }
+
+.tracking-cancel-action button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.tracking-canceled-state { display: grid; min-height: 190px; align-content: center; justify-items: center; gap: 9px; padding: 20px; text-align: center; }
+.tracking-canceled-state > div { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 50%; background: #ffe4e6; color: #e11d48; }
+.tracking-canceled-state strong { color: #be123c; font-size: 19px; }
+.tracking-canceled-state span { max-width: 360px; color: #667b9c; font-size: 13px; line-height: 1.5; }
+.tracking-observations { margin-top: 14px; padding: 12px 14px; border-radius: 9px; background: #f3f7fc; color: #344c6b; font-size: 13px; line-height: 1.5; }
 
 .tracking-modal-overlay {
   position: fixed;

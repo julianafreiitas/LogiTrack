@@ -120,6 +120,10 @@
   color: #1266d8;
 }
 
+.orders-status.transito { background: #e1edff; color: #1266d8; }
+.orders-status.pendente { background: #fff0dd; color: #bd5a04; }
+.orders-status.cancelado { background: #ffe4e6; color: #be123c; }
+
 .orders-action {
   display: inline-flex;
   min-height: 33px;
@@ -133,8 +137,45 @@
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
+  background: #fff;
+  font-family: inherit;
+  cursor: pointer;
   transition: background .18s, color .18s;
 }
+
+.orders-modal-overlay {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 18px;
+  background: rgba(4, 16, 34, .72);
+}
+
+.orders-detail-modal {
+  position: relative;
+  width: min(100%, 540px);
+  padding: 28px;
+  border: 1px solid #d8e4fa;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 75px #071c3d55;
+}
+
+.orders-modal-close { position: absolute; top: 13px; right: 13px; display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #eef3fb; color: #425b82; cursor: pointer; }
+.orders-modal-icon { display: grid; width: 54px; height: 54px; place-items: center; margin-bottom: 13px; border-radius: 50%; }
+.orders-modal-icon.entregue { background: #def8ed; color: #07884c; }
+.orders-modal-icon.cancelado { background: #ffe4e6; color: #be123c; }
+.orders-detail-modal h2 { margin: 0 36px 4px 0; color: #0c2046; }
+.orders-modal-subtitle { margin: 0 0 18px; color: #667b9c; }
+.orders-modal-data { display: grid; gap: 0; margin: 0; border: 1px solid #dce6f7; border-radius: 12px; background: #f8faff; }
+.orders-modal-data > div { display: grid; grid-template-columns: 125px minmax(0, 1fr); gap: 12px; padding: 11px 13px; border-bottom: 1px solid #e0e8f6; }
+.orders-modal-data > div:last-child { border-bottom: 0; }
+.orders-modal-data dt { color: #667b9c; font-size: 13px; }
+.orders-modal-data dd { margin: 0; color: #182d53; font-size: 13px; font-weight: 650; overflow-wrap: anywhere; }
+.orders-modal-done { width: 100%; min-height: 44px; margin-top: 15px; border: 0; border-radius: 9px; background: #ff751f; color: #fff; font: inherit; font-weight: 750; cursor: pointer; }
 
 .orders-action:hover {
   background: #1670ff;

@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 import Header from "../components/Header-usuarios";
 import Footer from "../components/Footer-usuarios";
+import { chamarApi, useIdentificacao } from "../lib/identificacao";
 import "../Main-usuario/pagemain.css";
 import "./perfilCliente.css";
 
-const CHAVE_PERFIL = "logitrack-perfil-cliente";
 const DADOS_INICIAIS = {
   nome: "",
   email: "",
@@ -49,17 +49,26 @@ const CAMPOS_ENDERECO = [
 ];
 
 export default function PerfilCliente() {
+  const cliente = useIdentificacao("cliente");
   const [dados, setDados] = useState(DADOS_INICIAIS);
   const [salvo, setSalvo] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState("");
 
   useEffect(() => {
-    try {
-      const perfilSalvo = window.localStorage.getItem(CHAVE_PERFIL);
-      if (perfilSalvo) setDados({ ...DADOS_INICIAIS, ...JSON.parse(perfilSalvo) });
-    } catch {
-      window.localStorage.removeItem(CHAVE_PERFIL);
+    if (!cliente.id) {
+      if (cliente.erro) { setErro(cliente.erro); setCarregando(false); }
+      return;
     }
-  }, []);
+    let cancelado = false;
+    setCarregando(true);
+    chamarApi(`/portal/cliente/${cliente.id}/perfil`)
+      .then((perfil) => { if (!cancelado) setDados({ ...DADOS_INICIAIS, ...perfil }); })
+      .catch((falha) => { if (!cancelado) setErro(falha.message); })
+      .finally(() => { if (!cancelado) setCarregando(false); });
+    return () => { cancelado = true; };
+  }, [cliente.id, cliente.erro]);
 
   function atualizarCampo(event) {
     const { name, value } = event.target;
@@ -67,10 +76,23 @@ export default function PerfilCliente() {
     setSalvo(false);
   }
 
-  function salvar(event) {
+  async function salvar(event) {
     event.preventDefault();
-    window.localStorage.setItem(CHAVE_PERFIL, JSON.stringify(dados));
-    setSalvo(true);
+    setSalvando(true);
+    setErro("");
+    try {
+      const resultado = await chamarApi(`/portal/cliente/${cliente.id}/perfil`, {
+        method: "PUT",
+        body: JSON.stringify(dados),
+      });
+      setDados({ ...DADOS_INICIAIS, ...resultado.perfil });
+      setSalvo(true);
+    } catch (falha) {
+      setErro(falha.message);
+      setSalvo(false);
+    } finally {
+      setSalvando(false);
+    }
   }
 
   function renderCampos(campos) {
@@ -125,7 +147,8 @@ export default function PerfilCliente() {
           <form className="client-profile-form" onSubmit={salvar}>
             <div className="client-profile-form-heading">
               <div><span>MINHA CONTA</span><h2>Informações do cliente</h2><p>Mantenha seu contato e endereço de entrega atualizados.</p></div>
-              {salvo && <span className="client-profile-saved" role="status"><Check size={16} /> Alterações salvas neste navegador</span>}
+              {carregando && <span className="client-profile-saved">Carregando perfil...</span>}
+              {salvo && <span className="client-profile-saved" role="status"><Check size={16} /> Alterações salvas</span>}
             </div>
 
             <section className="client-profile-section">
@@ -138,9 +161,11 @@ export default function PerfilCliente() {
               <div className="client-profile-fields">{renderCampos(CAMPOS_ENDERECO)}</div>
             </section>
 
+            {erro && <p className="aviso-erro" role="alert">{erro}</p>}
+
             <div className="client-profile-form-footer">
-              <p>Os dados são salvos apenas neste navegador.</p>
-              <button type="submit"><Save size={17} /> Salvar alterações</button>
+              <p>Suas informações ficam salvas na sua conta.</p>
+              <button type="submit" disabled={salvando || carregando || !cliente.id}><Save size={17} /> {salvando ? "Salvando..." : "Salvar alterações"}</button>
             </div>
           </form>
         </section>

@@ -15,6 +15,48 @@ function criarErro(mensagem, status) {
 // POST /api/deliveries
 export async function createDelivery(req, res, next) {
   try {
+    const { clientId, coleta, destino, dataColeta, servico, tamanho, pesoKg, urgencia, observacoes, valorFrete, distanciaKm, pagamento } = req.body ?? {};
+
+    // Criação do pedido do portal do cliente após a confirmação demonstrativa do pagamento.
+    if (clientId != null) {
+      const clienteId = Number(clientId);
+      const origem = String(coleta ?? '').trim();
+      const enderecoDestino = String(destino ?? '').trim();
+      const peso = Number(pesoKg);
+      const total = Number(valorFrete);
+      const distancia = Number(distanciaKm);
+      if (!Number.isInteger(clienteId) || clienteId < 1 || !origem || !enderecoDestino || origem.length > 255 || enderecoDestino.length > 255) {
+        return res.status(400).json({ error: 'Cliente e endereços válidos são obrigatórios.' });
+      }
+      if (!['expressa', 'convencional'].includes(servico) || !['pequeno', 'medio', 'grande'].includes(tamanho) || !['normal', 'urgente'].includes(urgencia) || !['pix', 'cartao'].includes(pagamento) || !Number.isFinite(peso) || peso < 0 || !Number.isFinite(total) || total < 0 || !Number.isFinite(distancia) || distancia < 0) {
+        return res.status(400).json({ error: 'Dados do pacote, frete ou pagamento inválidos.' });
+      }
+
+      const [[cliente]] = await db.query('SELECT id, nome FROM cadastro WHERE id = ?', [clienteId]);
+      if (!cliente) return res.status(404).json({ error: 'Cliente não encontrado.' });
+
+      const coordenadas = await getCoordinates(enderecoDestino);
+      const codigoRastreio = gerarCodigoRastreio();
+      const pointWKT = `POINT(${coordenadas.longitude.toFixed(7)} ${coordenadas.latitude.toFixed(7)})`;
+      const minutosEstimados = Math.max(60, Math.round((distancia / (servico === 'expressa' ? 45 : 32)) * 60) + 45);
+      const dataDesejada = /^\d{4}-\d{2}-\d{2}$/.test(String(dataColeta ?? '')) ? dataColeta : null;
+      const [result] = await db.execute(`
+        INSERT INTO entregas
+          (codigo_rastreio, id_cliente, nome_cliente, endereco_coleta, endereco_destino,
+           coordenadas_destino, data_coleta, tipo_servico, tamanho_pacote, peso_kg,
+           urgencia, observacoes, valor_frete, distancia_km, forma_pagamento,
+           pago_em, previsao, status)
+        VALUES (?, ?, ?, ?, ?, ST_GeomFromText(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),
+          DATE_ADD(GREATEST(NOW(), COALESCE(TIMESTAMP(?, '09:00:00'), NOW())), INTERVAL ? MINUTE), 'Pendente')
+      `, [codigoRastreio, clienteId, cliente.nome, origem, enderecoDestino, pointWKT, dataDesejada, servico, tamanho, peso, urgencia, String(observacoes ?? '').slice(0, 2000), total, distancia, pagamento, dataDesejada, minutosEstimados]);
+
+      return res.status(201).json({
+        message: 'Pagamento demonstrativo confirmado e entrega criada.',
+        data: { id: result.insertId, codigoRastreio, clientId: clienteId, clientName: cliente.nome, coleta: origem, destino: enderecoDestino, previsaoMinutos: minutosEstimados, valorFrete: total, status: 'Pendente' },
+      });
+    }
+
+    // Compatibilidade com o formulário administrativo de rotas.
     const clientName = String(req.body?.clientName ?? '').trim();
     const address = String(req.body?.address ?? '').trim();
 

@@ -9,8 +9,7 @@ import {
   UserRound,
   Truck,
   LogOut,
-  RotateCcwClock,
-  ChevronDown
+  RotateCcwClock
 } from "lucide-react";
 
 const navigation = [
@@ -63,8 +62,6 @@ export default function Header() {
         </div>
 
         <span>Olá, Cliente!</span>
-
-        <ChevronDown size={14} />
 
         <Link className="user-logout" href="/login">
           <LogOut size={16} />

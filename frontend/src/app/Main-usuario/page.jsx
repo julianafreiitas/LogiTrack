@@ -7,7 +7,7 @@ import Header from "../components/Header-usuarios";
 import SeletorIdentificacao from "../components/SeletorIdentificacao";
 import { chamarApi, useIdentificacao } from "../lib/identificacao";
 import "./pagemain.css";
-import {Truck, Package, Check, Clock4, Info } from "lucide-react";
+import {Truck, Package, Check, Clock4, Info, PackageX } from "lucide-react";
 
 export default function MainUsuario() {
   const router = useRouter();
@@ -98,6 +98,11 @@ export default function MainUsuario() {
           <div className="stat-card">
             <div className="stat-icon orange"><Clock4 /></div>
             <div><span>Pendentes</span><strong>{dois(resumo?.pendentes)}</strong></div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon red"><PackageX /></div>
+            <div><span>Cancelados</span><strong>{dois(resumo?.canceladas)}</strong></div>
           </div>
         </section>
 

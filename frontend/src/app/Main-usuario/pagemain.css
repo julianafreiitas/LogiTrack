@@ -495,7 +495,7 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -536,6 +536,8 @@
   background: #fff0df;
   color: #e77a1d;
 }
+
+.stat-icon.red { background: #ffe4e6; color: #be123c; }
 
 .stat-card div:last-child {
   display: flex;

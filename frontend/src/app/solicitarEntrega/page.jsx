@@ -1,7 +1,8 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   MapPin,
@@ -22,12 +23,13 @@ import {
 import { QRCodeSVG } from "qrcode.react";
 
 import Header from "../components/Header-usuarios";
+import { useIdentificacao } from "../lib/identificacao";
 import "../Main-usuario/pagemain.css";
 import "./SolicitarEntrega.css";
 
 // URL da API
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 // Dados iniciais do formulário
 const initialForm = {
@@ -67,6 +69,8 @@ function PixDemoQr({ seed }) {
 }
 
 export default function SolicitarEntrega() {
+  const router = useRouter();
+  const cliente = useIdentificacao("cliente");
   const [formData, setFormData] = useState(initialForm);
   const [etapa, setEtapa] = useState(1);
   const [orcamento, setOrcamento] = useState(null);
@@ -75,6 +79,50 @@ export default function SolicitarEntrega() {
   const [solicitacaoEnviada, setSolicitacaoEnviada] = useState(false);
   const [pixEmExibicao, setPixEmExibicao] = useState(false);
   const [pixSeed, setPixSeed] = useState("");
+  const [pedidoCriado, setPedidoCriado] = useState(null);
+
+  const finalizarPedido = useCallback(async () => {
+    if (carregando || pedidoCriado) return;
+    if (!cliente.id) {
+      setErro(cliente.erro || "Não foi possível identificar o cliente. Confira se o backend está disponível.");
+      setPixEmExibicao(false);
+      return;
+    }
+    setCarregando(true);
+    setErro("");
+    try {
+      const response = await fetch(`${API_URL}/deliveries`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId: cliente.id,
+          coleta: formData.coleta,
+          destino: formData.destino,
+          dataColeta: formData.data,
+          servico: formData.servico,
+          tamanho: formData.tamanho,
+          pesoKg: Number(formData.pesoKg),
+          urgencia: formData.urgencia,
+          observacoes: formData.observacoes,
+          valorFrete: orcamento?.total,
+          distanciaKm: orcamento?.distanciaKm,
+          pagamento: formData.pagamento,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Não foi possível registrar o pedido pago.");
+      setPedidoCriado(data.data);
+      setPixEmExibicao(false);
+      setSolicitacaoEnviada(true);
+    } catch (error) {
+      console.log(error);
+      
+      setErro(error.message || "Falha ao registrar o pedido. Tente novamente.");
+      setPixEmExibicao(false);
+    } finally {
+      setCarregando(false);
+    }
+  }, [carregando, pedidoCriado, cliente.id, cliente.erro, formData, orcamento]);
 
   // Simulação de confirmação do Pix após 5 segundos
   useEffect(() => {
@@ -89,13 +137,14 @@ export default function SolicitarEntrega() {
       );
 
       if (restante === 0) {
+        clearInterval(atualizador);
         setPixEmExibicao(false);
-        setSolicitacaoEnviada(true);
+        finalizarPedido();
       }
     }, 150);
 
     return () => clearInterval(atualizador);
-  }, [pixEmExibicao]);
+  }, [pixEmExibicao, finalizarPedido]);
 
   // Atualização dos campos
   const handleChange = (event) => {
@@ -163,11 +212,11 @@ export default function SolicitarEntrega() {
       return;
     }
 
-    setSolicitacaoEnviada(true);
+    finalizarPedido();
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container request-page">
 
       <Header />
 
@@ -203,6 +252,12 @@ export default function SolicitarEntrega() {
               {formData.pagamento === "pix" ? "Pix" : "cartão"}.
             </p>
 
+            {pedidoCriado && (
+              <p className="request-tracking-code">
+                Código de rastreamento: <strong>{pedidoCriado.codigoRastreio}</strong>
+              </p>
+            )}
+
             <p className="request-demo-note">
               Esta confirmação é uma simulação. Nenhuma cobrança real foi realizada.
             </p>
@@ -211,12 +266,17 @@ export default function SolicitarEntrega() {
               className="btn-submit"
               type="button"
               onClick={() => {
+                if (pedidoCriado?.codigoRastreio) {
+                  router.push(`/acompanharEntrega?codigo=${encodeURIComponent(pedidoCriado.codigoRastreio)}`);
+                  return;
+                }
                 setSolicitacaoEnviada(false);
                 setPixSeed("");
+                setPedidoCriado(null);
                 setEtapa(1);
               }}
             >
-              Voltar às solicitações
+              {pedidoCriado ? "Acompanhar entrega" : "Voltar às solicitações"}
             </button>
 
           </section>
@@ -741,6 +801,8 @@ export default function SolicitarEntrega() {
 
               )}
 
+              {erro && <p className="request-error" role="alert">{erro}</p>}
+
               <p className="request-demo-note">
                 Ambiente demonstrativo: não use dados reais do cartão. Nenhuma cobrança será realizada.
               </p>
@@ -762,12 +824,13 @@ export default function SolicitarEntrega() {
                 <button
                   type="submit"
                   className="btn-submit"
+                  disabled={carregando}
                 >
-                  <Send size={16} />
+                  {carregando ? "Registrando pedido..." : <Send size={16} />}
 
-                  {formData.pagamento === "pix"
+                  {!carregando && (formData.pagamento === "pix"
                     ? "Gerar QR Code Pix"
-                    : "Confirmar pagamento"}
+                    : "Confirmar pagamento")}
 
                 </button>
 
