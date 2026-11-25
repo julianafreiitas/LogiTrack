@@ -72,11 +72,9 @@ export async function listarEntregasDoMotorista(request, response) {
 export async function mapaDoMotorista(request, response) {
   const { motorista } = request;
   const params = [motorista.id];
-  let filtroCodigo = "";
-  if (request.query.codigo) { filtroCodigo = " OR e.codigo = ?"; params.push(String(request.query.codigo)); }
   const [linhas] = await pool.query(`SELECT ${CAMPOS_ENTREGA}, ST_Y(e.coordenadas_destino) AS lat, ST_X(e.coordenadas_destino) AS lng
-    ${ORIGEM_ENTREGAS} WHERE e.id_motorista = ? AND ((e.status IN ('Pendente', 'A Caminho') OR
-    (e.status = 'Entregue' AND DATE(e.atualizado_em) = CURDATE()))${filtroCodigo}) ORDER BY e.previsao, e.id_entregas`, params);
+    ${ORIGEM_ENTREGAS} WHERE e.id_motorista = ? AND e.status IN ('Pendente', 'A Caminho')
+    ORDER BY e.previsao, e.id_entregas`, params);
   response.json({ origem: { nome: motorista.nome, lat: Number(motorista.lat), lng: Number(motorista.lng) },
     entregas: linhas.map((linha) => ({ ...paraTela(linha), lat: Number(linha.lat), lng: Number(linha.lng) })) });
 }
