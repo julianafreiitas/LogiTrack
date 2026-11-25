@@ -1,16 +1,26 @@
+import "dotenv/config";
 import mysql from "mysql2/promise";
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || "database",
-    port: Number(process.env.DB_PORT || 3306),
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "app_db",
-    charset: "utf8mb4",
-    decimalNumbers: true,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
+export const pool = mysql.createPool({
+  host: process.env.DB_HOST || "localhost",
+  port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  charset: "utf8mb4",
 });
+
+export async function checkDatabaseConnection() {
+  try {
+    await pool.query("SELECT 1");
+    return true;
+  } catch (error) {
+    console.error("Falha ao conectar no banco de dados:", error.message);
+    return false;
+  }
+}
 
 export default pool;

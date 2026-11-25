@@ -1,74 +1,124 @@
 SET NAMES utf8mb4;
-USE app_db;
+USE logi_track_db;
 
+-- Senha de todos os registros de teste abaixo: Admin@123
+-- ---------------------------------------------------------------
+-- Motoristas (10)
+-- ---------------------------------------------------------------
 INSERT INTO motoristas (nome, cidade_base, veiculo, entregas_hoje, status, localizacao_atual) VALUES
-('João Pereira', 'São Paulo', 'Fiorino Branca', 4, 'Em rota', ST_GeomFromText('POINT(-46.6400 -23.5500)')),
-('Pedro Alves', 'São Paulo', 'Van Sprinter', 3, 'Em rota', ST_GeomFromText('POINT(-46.6700 -23.5600)')),
-('Diego Ramos', 'São Paulo', 'Moto Honda CG 160', 6, 'Em rota', ST_GeomFromText('POINT(-46.6250 -23.5450)')),
-('Carlos Souza', 'Campinas', 'Fiorino Prata', 2, 'Disponível', ST_GeomFromText('POINT(-47.0500 -22.9100)')),
-('Ana Lima', 'Santos', 'Van Master', 5, 'Em rota', ST_GeomFromText('POINT(-46.3300 -23.9500)')),
-('Marcos Silva', 'Sorocaba', 'Caminhão VUC', 1, 'Disponível', ST_GeomFromText('POINT(-47.4400 -23.5100)')),
-('Rafaela Costa', 'Guarulhos', 'Moto Yamaha Fazer', 7, 'Em rota', ST_GeomFromText('POINT(-46.5300 -23.4600)')),
-('Bruno Martins', 'Santo André', 'Fiorino Branca', 0, 'Disponível', ST_GeomFromText('POINT(-46.5400 -23.6600)')),
-('Fernanda Rocha', 'São Bernardo do Campo', 'Van Sprinter', 0, 'Indisponível', ST_GeomFromText('POINT(-46.5600 -23.6900)')),
-('Lucas Teixeira', 'Osasco', 'Moto Honda Biz', 3, 'Em rota', ST_GeomFromText('POINT(-46.7900 -23.5300)'));
+('Carlos Henrique',  'São Paulo',            'LT-2048', 3, 'Em rota',       ST_GeomFromText('POINT(-46.6333 -23.5505)')),
+('João Pereira',     'Campinas',             'LT-2051', 2, 'Em rota',       ST_GeomFromText('POINT(-47.0626 -22.9099)')),
+('Pedro Alves',      'Santos',               'LT-2063', 0, 'Disponível',    ST_GeomFromText('POINT(-46.3336 -23.9608)')),
+('Diego Ramos',      'Sorocaba',             'LT-2077', 1, 'Em rota',       ST_GeomFromText('POINT(-47.4526 -23.5015)')),
+('Marcelo Barros',   'Santo André',          'LT-2082', 0, 'Disponível',    ST_GeomFromText('POINT(-46.5383 -23.6737)')),
+('Aline Souza',      'Guarulhos',            'LT-2094', 4, 'Em rota',       ST_GeomFromText('POINT(-46.5333 -23.4543)')),
+('Rodrigo Faria',    'Osasco',               'LT-2105', 0, 'Indisponível',  ST_GeomFromText('POINT(-46.7917 -23.5325)')),
+('Vanessa Cardoso',  'São Bernardo do Campo','LT-2118', 2, 'Disponível',    ST_GeomFromText('POINT(-46.5650 -23.6914)')),
+('Felipe Moura',     'Jundiaí',              'LT-2126', 1, 'Em rota',       ST_GeomFromText('POINT(-46.8842 -23.1857)')),
+('Tatiane Lopes',    'Mauá',                 'LT-2139', 0, 'Disponível',    ST_GeomFromText('POINT(-46.4613 -23.6677)'));
 
-INSERT INTO usuarios (nome, email, senha, telefone, tipo, status) VALUES
-('Matheus Paz', 'matheus@logitrack.com', 'senha_exemplo_01', '(11) 91111-0001', 'admin', 'ativo'),
-('Samuel Godinho', 'samuel@logitrack.com', 'senha_exemplo_02', '(11) 91111-0002', 'admin', 'ativo'),
-('Gustavo Paiva', 'gustavo@logitrack.com', 'senha_exemplo_03', '(11) 91111-0003', 'operador', 'ativo'),
-('Juliana Mendes', 'juliana@logitrack.com', 'senha_exemplo_04', '(11) 91111-0004', 'operador', 'ativo'),
-('Ricardo Nunes', 'ricardo@logitrack.com', 'senha_exemplo_05', '(11) 91111-0005', 'operador', 'ativo'),
-('Patrícia Gomes', 'patricia@logitrack.com', 'senha_exemplo_06', '(11) 91111-0006', 'operador', 'inativo'),
-('Eduardo Farias', 'eduardo@logitrack.com', 'senha_exemplo_07', '(11) 91111-0007', 'operador', 'ativo'),
-('Camila Duarte', 'camila@logitrack.com', 'senha_exemplo_08', '(11) 91111-0008', 'operador', 'ativo'),
-('Thiago Barros', 'thiago@logitrack.com', 'senha_exemplo_09', '(11) 91111-0009', 'operador', 'inativo'),
-('Larissa Pires', 'larissa@logitrack.com', 'senha_exemplo_10', '(11) 91111-0010', 'admin', 'ativo');
+-- ---------------------------------------------------------------
+-- Administradores e operadores (10: 6 administradores + 4 operadores)
+-- ---------------------------------------------------------------
+INSERT IGNORE INTO usuarios (nome, email, senha, telefone, tipo, status, ultimo_acesso) VALUES
+('Equipe de operações', 'operacoes@logitrack.com', 'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 4000-1000', 'admin',    'ativo',   '2026-11-14 12:30:00'),
+('Mariana Almeida',     'mariana@logitrack.com',   'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1001', 'admin',    'ativo',   '2026-11-12 14:10:00'),
+('Gabriel Martins',     'gabriel@logitrack.com',   'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1002', 'admin',    'ativo',   '2026-11-08 13:45:00'),
+('Fernanda Dias',       'fernanda@logitrack.com',  'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1003', 'admin',    'ativo',   '2026-11-02 15:20:00'),
+('Ricardo Alves',       'ricardo@logitrack.com',   'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1004', 'admin',    'ativo',   '2026-10-28 12:05:00'),
+('Helena Duarte',       'helena@logitrack.com',    'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1005', 'admin',    'inativo', '2026-10-15 16:40:00'),
+('Bruno Teixeira',      'bruno@logitrack.com',     'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1006', 'operador', 'ativo',   '2026-11-13 12:15:00'),
+('Paula Ribeiro',       'paula@logitrack.com',     'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1007', 'operador', 'ativo',   '2026-11-11 13:00:00'),
+('Diego Lima',          'diego@logitrack.com',     'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1008', 'operador', 'ativo',   '2026-11-09 17:30:00'),
+('Sandra Moreira',      'sandra@logitrack.com',    'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 97777-1009', 'operador', 'inativo', NULL);
 
-INSERT INTO cadastro (nome, email, senha, telefone) VALUES
-('Mercado Boa Compra', 'contato@boacompra.com.br', 'senha_exemplo_c01', '(19) 3201-0001'),
-('Farmácia Vida Plena', 'pedidos@vidaplena.com.br', 'senha_exemplo_c02', '(13) 3202-0002'),
-('Loja Tech Sorocaba', 'vendas@techsorocaba.com.br', 'senha_exemplo_c03', '(15) 3203-0003'),
-('Padaria Pão Quente', 'padaria@paoquente.com.br', 'senha_exemplo_c04', '(11) 2404-0004'),
-('Casa & Cia Móveis', 'sac@casaecia.com.br', 'senha_exemplo_c05', '(11) 4405-0005'),
-('Auto Peças Rápido', 'atendimento@autopecasrapido.com.br', 'senha_exemplo_c06', '(11) 4306-0006'),
-('Livraria Página Viva', 'contato@paginaviva.com.br', 'senha_exemplo_c07', '(11) 3607-0007'),
-('Distribuidora Jundiaí Bebidas', 'comercial@jundiaibebidas.com.br', 'senha_exemplo_c08', '(11) 4608-0008'),
-('Ótica Visão Clara', 'loja@visaoclara.com.br', 'senha_exemplo_c09', '(11) 4709-0009'),
-('Escritório Paulista Advocacia', 'adm@paulistaadv.com.br', 'senha_exemplo_c10', '(11) 3010-0010');
+-- ---------------------------------------------------------------
+-- Clientes (12)
+-- ---------------------------------------------------------------
+INSERT IGNORE INTO cadastro (nome, email, senha, telefone, cpf) VALUES
+('Marcos Oliveira', 'marcos@email.com',   'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 99999-9999', '11122233301'),
+('Ana Carolina',    'ana@email.com',      'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0002', '11122233302'),
+('Pedro Santos',    'pedro@email.com',    'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0003', '11122233303'),
+('Juliana Lima',    'juliana@email.com',  'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0004', '11122233304'),
+('Rafael Costa',    'rafael@email.com',   'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0005', '11122233305'),
+('Beatriz Souza',   'beatriz@email.com',  'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0006', '11122233306'),
+('Lucas Ferreira',  'lucas@email.com',    'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0007', '11122233307'),
+('Camila Rocha',    'camila@email.com',   'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0008', '11122233308'),
+('Thiago Mendes',   'thiago@email.com',   'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0009', '11122233309'),
+('Larissa Prado',   'larissa@email.com',  'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0010', '11122233310'),
+('Eduardo Nunes',   'eduardo@email.com',  'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0011', '11122233311'),
+('Patrícia Gomes',  'patricia@email.com', 'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea', '(11) 98888-0012', '11122233312');
 
-INSERT INTO enderecos_entrega (cadast_id, rua, numero, bairro, cidade, coordenadas) VALUES
-(1, 'Avenida Francisco Glicério', '1200', 'Centro', 'Campinas', ST_GeomFromText('POINT(-47.0608 -22.9056)')),
-(2, 'Avenida Ana Costa', '350', 'Gonzaga', 'Santos', ST_GeomFromText('POINT(-46.3336 -23.9608)')),
-(3, 'Rua XV de Novembro', '480', 'Centro', 'Sorocaba', ST_GeomFromText('POINT(-47.4526 -23.5015)')),
-(4, 'Avenida Tiradentes', '900', 'Centro', 'Guarulhos', ST_GeomFromText('POINT(-46.5333 -23.4543)')),
-(5, 'Avenida Kennedy', '700', 'Centro', 'Santo André', ST_GeomFromText('POINT(-46.5383 -23.6639)')),
-(6, 'Rua Marechal Deodoro', '620', 'Centro', 'São Bernardo do Campo', ST_GeomFromText('POINT(-46.5650 -23.6914)')),
-(7, 'Avenida dos Autonomistas', '1500', 'Vila Yara', 'Osasco', ST_GeomFromText('POINT(-46.7917 -23.5325)')),
-(8, 'Avenida Jundiaí', '300', 'Anhangabaú', 'Jundiaí', ST_GeomFromText('POINT(-46.8842 -23.1857)')),
-(9, 'Avenida Voluntário Fernando Braga', '210', 'Centro', 'Mogi das Cruzes', ST_GeomFromText('POINT(-46.1884 -23.5229)')),
-(10, 'Avenida Paulista', '1578', 'Bela Vista', 'São Paulo', ST_GeomFromText('POINT(-46.6560 -23.5614)'));
+-- ---------------------------------------------------------------
+-- Entregas (14). Pedro e Lucas ficam sem solicitação de propósito.
+-- ---------------------------------------------------------------
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20001', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Santo André, SP', ST_GeomFromText('POINT(-46.5383 -23.6737)'), 'Entrega expressa',
+       'Solicitação de entrega criada em 14/11/2026. Acompanhamento ativo.', '2026-11-14 18:00:00', 'A Caminho', '2026-11-14 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Carlos Henrique' WHERE c.email = 'marcos@email.com';
 
-INSERT INTO localizacao_entregadores (entregador_id, coordenadas) VALUES
-(1, ST_GeomFromText('POINT(-46.6400 -23.5500)')),
-(2, ST_GeomFromText('POINT(-46.6700 -23.5600)')),
-(3, ST_GeomFromText('POINT(-46.6250 -23.5450)')),
-(4, ST_GeomFromText('POINT(-47.0500 -22.9100)')),
-(5, ST_GeomFromText('POINT(-46.3300 -23.9500)')),
-(6, ST_GeomFromText('POINT(-47.4400 -23.5100)')),
-(7, ST_GeomFromText('POINT(-46.5300 -23.4600)')),
-(8, ST_GeomFromText('POINT(-46.5400 -23.6600)')),
-(9, ST_GeomFromText('POINT(-46.5600 -23.6900)')),
-(10, ST_GeomFromText('POINT(-46.7900 -23.5300)'));
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20002', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Osasco, SP', ST_GeomFromText('POINT(-46.7917 -23.5325)'), 'Entrega padrão',
+       NULL, '2026-11-03 17:00:00', 'Entregue', '2026-11-02 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Rodrigo Faria' WHERE c.email = 'marcos@email.com';
 
-INSERT INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_destino, coordenadas_destino, previsao, status) VALUES
-('ENT-10001', 1, 1, 'Avenida Francisco Glicério, 1200 - Centro, Campinas - SP', ST_GeomFromText('POINT(-47.0608 -22.9056)'), '2026-11-12 14:00:00', 'A Caminho'),
-('ENT-10002', 2, 2, 'Avenida Ana Costa, 350 - Gonzaga, Santos - SP', ST_GeomFromText('POINT(-46.3336 -23.9608)'), '2026-11-12 15:30:00', 'A Caminho'),
-('ENT-10003', 3, 3, 'Rua XV de Novembro, 480 - Centro, Sorocaba - SP', ST_GeomFromText('POINT(-47.4526 -23.5015)'), '2026-11-12 16:00:00', 'A Caminho'),
-('ENT-10004', 4, 7, 'Avenida Tiradentes, 900 - Centro, Guarulhos - SP', ST_GeomFromText('POINT(-46.5333 -23.4543)'), '2026-11-12 10:00:00', 'Entregue'),
-('ENT-10005', 5, 8, 'Avenida Kennedy, 700 - Centro, Santo André - SP', ST_GeomFromText('POINT(-46.5383 -23.6639)'), '2026-11-13 09:00:00', 'Pendente'),
-('ENT-10006', 6, NULL, 'Rua Marechal Deodoro, 620 - Centro, São Bernardo do Campo - SP', ST_GeomFromText('POINT(-46.5650 -23.6914)'), '2026-11-13 11:00:00', 'Pendente'),
-('ENT-10007', 7, 10, 'Avenida dos Autonomistas, 1500 - Vila Yara, Osasco - SP', ST_GeomFromText('POINT(-46.7917 -23.5325)'), '2026-11-12 13:00:00', 'A Caminho'),
-('ENT-10008', 8, 4, 'Avenida Jundiaí, 300 - Anhangabaú, Jundiaí - SP', ST_GeomFromText('POINT(-46.8842 -23.1857)'), '2026-11-11 17:00:00', 'Entregue'),
-('ENT-10009', 9, 6, 'Avenida Voluntário Fernando Braga, 210 - Centro, Mogi das Cruzes - SP', ST_GeomFromText('POINT(-46.1884 -23.5229)'), '2026-11-11 12:00:00', 'Cancelado'),
-('ENT-10010', 10, 5, 'Avenida Paulista, 1578 - Bela Vista, São Paulo - SP', ST_GeomFromText('POINT(-46.6560 -23.5614)'), '2026-11-12 18:00:00', 'A Caminho');
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20003', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Campinas, SP', ST_GeomFromText('POINT(-47.0626 -22.9099)'), 'Entrega agendada',
+       'Entrega concluída em 10/11/2026.', '2026-11-10 16:00:00', 'Entregue', '2026-11-10 13:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'João Pereira' WHERE c.email = 'ana@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20004', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Santos, SP', ST_GeomFromText('POINT(-46.3336 -23.9608)'), 'Entrega padrão',
+       NULL, '2026-10-21 18:00:00', 'Entregue', '2026-10-20 12:30:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Pedro Alves' WHERE c.email = 'ana@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20005', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Guarulhos, SP', ST_GeomFromText('POINT(-46.5333 -23.4543)'), 'Entrega expressa',
+       'Entrega concluída em 05/11/2026.', '2026-11-05 15:00:00', 'Entregue', '2026-11-05 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Aline Souza' WHERE c.email = 'juliana@email.com';
+
+-- Rafael: pendente e ainda sem motorista atribuído
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20006', c.id_cadastro, NULL, 'São Paulo, SP', 'São Bernardo do Campo, SP', ST_GeomFromText('POINT(-46.5650 -23.6914)'), 'Entrega padrão',
+       NULL, '2026-11-19 18:00:00', 'Pendente', '2026-11-01 13:00:00'
+FROM cadastro c WHERE c.email = 'rafael@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20007', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Mauá, SP', ST_GeomFromText('POINT(-46.4613 -23.6677)'), 'Entrega padrão',
+       'Entrega concluída em 30/10/2026.', '2026-10-30 17:00:00', 'Entregue', '2026-10-30 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Tatiane Lopes' WHERE c.email = 'beatriz@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20008', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Jundiaí, SP', ST_GeomFromText('POINT(-46.8842 -23.1857)'), 'Entrega agendada',
+       NULL, '2026-10-26 18:00:00', 'A Caminho', '2026-10-24 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Felipe Moura' WHERE c.email = 'camila@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20009', c.id_cadastro, NULL, 'São Paulo, SP', 'Sorocaba, SP', ST_GeomFromText('POINT(-47.4526 -23.5015)'), 'Entrega padrão',
+       'Cliente cancelou antes da coleta.', '2026-11-14 18:00:00', 'Cancelado', '2026-11-12 14:00:00'
+FROM cadastro c WHERE c.email = 'thiago@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20010', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Santo André, SP', ST_GeomFromText('POINT(-46.5383 -23.6737)'), 'Entrega expressa',
+       NULL, '2026-11-08 16:00:00', 'Entregue', '2026-11-08 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Marcelo Barros' WHERE c.email = 'larissa@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20011', c.id_cadastro, NULL, 'São Paulo, SP', 'Guarulhos, SP', ST_GeomFromText('POINT(-46.5333 -23.4543)'), 'Entrega padrão',
+       NULL, '2026-11-18 18:00:00', 'Pendente', '2026-11-13 15:00:00'
+FROM cadastro c WHERE c.email = 'eduardo@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20012', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Campinas, SP', ST_GeomFromText('POINT(-47.0626 -22.9099)'), 'Entrega agendada',
+       'Entrega concluída em 03/11/2026.', '2026-11-03 17:00:00', 'Entregue', '2026-11-03 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'João Pereira' WHERE c.email = 'patricia@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20013', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Osasco, SP', ST_GeomFromText('POINT(-46.7917 -23.5325)'), 'Entrega padrão',
+       NULL, '2026-10-12 17:00:00', 'Entregue', '2026-10-11 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Vanessa Cardoso' WHERE c.email = 'juliana@email.com';
+
+INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20014', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Sorocaba, SP', ST_GeomFromText('POINT(-47.4526 -23.5015)'), 'Entrega expressa',
+       NULL, '2026-10-05 16:00:00', 'Entregue', '2026-10-05 12:00:00'
+FROM cadastro c JOIN motoristas m ON m.nome = 'Diego Ramos' WHERE c.email = 'camila@email.com';
