@@ -82,18 +82,17 @@ function AjustarMapa({ origem, selecionada, rota, chaveSelecao }) {
   return null;
 }
 
-export default function TrackingMap({ layer, origem, entregas, selecionadaId, onSelecionar }) {
+export default function TrackingMap({ layer, origem, entrega }) {
   const [rota, setRota] = useState(null);
   const tiles = TILES[layer] || TILES.mapa;
   const posicaoOrigem = useMemo(() => origem ? coordenadasValidas(origem.lat, origem.lng) : null, [origem?.lat, origem?.lng]);
-  const entregaSelecionada = entregas.find((entrega) => entrega.id === selecionadaId) ?? null;
   const selecao = useMemo(() => {
-    if (!entregaSelecionada) return null;
-    const coordenada = coordenadasValidas(entregaSelecionada.lat, entregaSelecionada.lng);
+    if (!entrega) return null;
+    const coordenada = coordenadasValidas(entrega.lat, entrega.lng);
     return coordenada
-      ? { id: entregaSelecionada.id, status: entregaSelecionada.status, coordenada }
+      ? { id: entrega.id, status: entrega.status, coordenada }
       : null;
-  }, [entregaSelecionada?.id, entregaSelecionada?.status, entregaSelecionada?.lat, entregaSelecionada?.lng]);
+  }, [entrega?.id, entrega?.status, entrega?.lat, entrega?.lng]);
   const chaveSelecao = selecao ? JSON.stringify([selecao.id, selecao.status, selecao.coordenada]) : '';
 
   useEffect(() => {
@@ -160,21 +159,15 @@ export default function TrackingMap({ layer, origem, entregas, selecionadaId, on
       {posicaoOrigem && (
         <Marker position={posicaoOrigem} icon={icons.origin}><Popup>Sua localização</Popup></Marker>
       )}
-      {entregas.map((entrega) => {
-        const coordenada = coordenadasValidas(entrega.lat, entrega.lng);
-        if (!coordenada) return null;
-        return (
-          <Marker
-            key={entrega.id}
-            position={coordenada}
-            icon={ICONE_POR_STATUS[entrega.status] ?? icons.pending}
-            zIndexOffset={entrega.id === selecionadaId ? 1000 : 0}
-            eventHandlers={{ click: () => onSelecionar(entrega.id) }}
-          >
-            <Popup>{entrega.codigo} · {LEGENDA_POR_STATUS[entrega.status]}</Popup>
-          </Marker>
-        );
-      })}
+      {selecao && entrega && (
+        <Marker
+          position={selecao.coordenada}
+          icon={ICONE_POR_STATUS[entrega.status] ?? icons.pending}
+          zIndexOffset={1000}
+        >
+          <Popup>{entrega.codigo} · {LEGENDA_POR_STATUS[entrega.status]}</Popup>
+        </Marker>
+      )}
     </MapContainer>
   );
 }
