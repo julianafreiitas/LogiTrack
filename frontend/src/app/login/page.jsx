@@ -1,26 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { chamarApi, salvarSessaoCliente } from "../lib/identificacao";
 import "./page.css";
 
 export default function Login() {
-
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
+  const [cadastroCriado, setCadastroCriado] = useState(false);
 
-  function entrar(e) {
-    e.preventDefault();
+  useEffect(() => {
+    const parametros = new URLSearchParams(window.location.search);
+    const emailCadastrado = parametros.get("email");
+    if (emailCadastrado) setEmail(emailCadastrado);
+    setCadastroCriado(parametros.get("cadastro") === "sucesso");
+  }, []);
 
-    alert("Login será conectado ao backend!");
+  async function entrar(event) {
+    event.preventDefault();
+    setErro("");
+    setCarregando(true);
+    try {
+      const resultado = await chamarApi("/auth/cliente/login", {
+        method: "POST",
+        body: JSON.stringify({ email, senha }),
+      });
+      salvarSessaoCliente(resultado.cliente, resultado.token);
+      router.replace("/Main-usuario");
+    } catch (falha) {
+      setErro(falha.message || "Não foi possível entrar. Tente novamente.");
+    } finally {
+      setCarregando(false);
+    }
   }
 
   return (
     <main className="login-page">
       <section className="login" aria-label="Acesso à conta">
         <div className="centro">
-          <img className="login-brand" src="/imagens/logotipo.png" alt="" />
+          <img className="login-brand" src="/imagens/Logotipo.png" alt="LogiTrack" />
         </div>
         <h1>Bem-vindo!</h1>
         <p className="login-subtitle">Faça login para continuar.</p>
@@ -35,7 +59,7 @@ export default function Login() {
               autoComplete="email"
               placeholder="Digite seu e-mail"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
           </div>
@@ -49,7 +73,7 @@ export default function Login() {
               autoComplete="current-password"
               placeholder="Digite sua senha"
               value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              onChange={(event) => setSenha(event.target.value)}
               required
             />
             <button
@@ -66,7 +90,11 @@ export default function Login() {
             <a href="/RecuperarSenha">Esqueceu a senha?</a>
           </div>
 
-          <button className="login-submit" type="submit">Entrar</button>
+          {cadastroCriado && <p className="login-success" role="status">Cadastro salvo. Entre com seu e-mail e senha.</p>}
+          {erro && <p className="login-error" role="alert">{erro}</p>}
+          <button className="login-submit" type="submit" disabled={carregando}>
+            {carregando ? "Entrando..." : "Entrar"}
+          </button>
           <div className="cadastro">
             <p>Não possui uma conta? <a href="/Cadastro">Cadastre-se</a></p>
           </div>

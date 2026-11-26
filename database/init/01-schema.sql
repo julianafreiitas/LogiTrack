@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     imagem VARCHAR(100) DEFAULT NULL,
     tipo ENUM('admin', 'operador') DEFAULT 'operador',
     status ENUM('ativo', 'inativo') DEFAULT 'ativo',
+    ultimo_acesso TIMESTAMP NULL DEFAULT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

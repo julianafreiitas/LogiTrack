@@ -108,7 +108,8 @@ FRONTEND_PORT=3000
 BACKEND_PORT=8080
 
 FRONTEND_URL=http://localhost:3000
-NEXT_PUBLIC_API_URL=http://localhost:8080/api
+API_INTERNAL_URL=http://backend:8080/api
+JWT_SECRET=change-this-to-a-long-random-secret
 
 MYSQL_ROOT_PASSWORD=root_password
 MYSQL_DATABASE=app_db
@@ -129,7 +130,7 @@ FRONTEND_HOST_PORT=3001
 BACKEND_HOST_PORT=8081
 DATABASE_HOST_PORT=3307
 FRONTEND_URL=http://localhost:3001
-NEXT_PUBLIC_API_URL=http://localhost:8081/api
+API_INTERNAL_URL=http://backend:8080/api
 ```
 
 As portas internas podem continuar nos defaults (`FRONTEND_PORT=3000` e `BACKEND_PORT=8080`) na maioria dos casos. Altere as portas internas apenas se o Coolify ou a arquitetura escolhida exigirem.
@@ -140,6 +141,7 @@ Backend (`backend/.env`):
 PORT=8080
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
+JWT_SECRET=change-this-to-a-long-random-secret
 
 DB_HOST=localhost
 DB_PORT=3306
@@ -151,7 +153,7 @@ DB_NAME=app_db
 Frontend (`frontend/.env.local`):
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8080/api
+API_INTERNAL_URL=http://localhost:8080/api
 ```
 
 No Docker Compose, o backend usa `DB_HOST=database`, porque esse e o nome do servico MySQL na rede Docker.
@@ -217,9 +219,9 @@ Para cada grupo, configure valores diferentes para:
 - `BACKEND_HOST_PORT`
 - `DATABASE_HOST_PORT`, se estiver publicando MySQL no host
 - `FRONTEND_URL`
-- `NEXT_PUBLIC_API_URL`
+- `API_INTERNAL_URL`
 
-Em deploy com dominio/reverse proxy, `NEXT_PUBLIC_API_URL` deve apontar para a URL publica real do backend, por exemplo `https://api-grupo-01.seudominio.com/api`.
+As chamadas do navegador usam `/api` no mesmo domínio do frontend e o Next as encaminha para `API_INTERNAL_URL`. No Compose, use `http://backend:8080/api`. Em serviços separados no Coolify, configure `API_INTERNAL_URL` como argumento de build do frontend com o endereço interno do serviço backend. `FRONTEND_URL` no backend deve corresponder ao domínio público do frontend.
 
 ## Observacoes Para Alunos
 

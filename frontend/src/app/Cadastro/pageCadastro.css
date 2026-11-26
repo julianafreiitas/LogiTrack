@@ -35,8 +35,8 @@
 }
 
 .register-brand img {
-  width: 58px;
-  height: 64px;
+  width: min(100%, 400px);
+  height: auto;
   object-fit: contain;
 }
 
@@ -224,6 +224,8 @@
   box-shadow: 0 5px 13px rgba(255, 105, 0, .18);
   transition: filter .18s, transform .18s;
 }
+
+.register-submit:disabled { cursor: wait; opacity: .75; }
 
 .register-submit:hover {
   transform: translateY(-1px);

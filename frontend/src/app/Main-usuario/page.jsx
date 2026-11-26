@@ -4,7 +4,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header-usuarios";
-import SeletorIdentificacao from "../components/SeletorIdentificacao";
 import { chamarApi, useIdentificacao } from "../lib/identificacao";
 import "./pagemain.css";
 import {Truck, Package, Check, Clock4, Info, PackageX } from "lucide-react";
@@ -58,9 +57,6 @@ export default function MainUsuario() {
 
       <main className="main-content">
 
-        <div className="seletor-faixa">
-          <SeletorIdentificacao rotulo="Testando como" lista={cliente.lista} id={cliente.id} onChange={(novo) => { cliente.escolher(novo); setResumo(null); }} />
-        </div>
         {(erro || cliente.erro) && <p className="aviso-erro" role="alert">{erro || cliente.erro}</p>}
 
         {/* BANNER PRINCIPAL */}

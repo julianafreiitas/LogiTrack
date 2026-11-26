@@ -23,13 +23,10 @@ import {
 import { QRCodeSVG } from "qrcode.react";
 
 import Header from "../components/Header-usuarios";
+import { API_URL } from "../lib/api";
 import { useIdentificacao } from "../lib/identificacao";
 import "../Main-usuario/pagemain.css";
 import "./SolicitarEntrega.css";
-
-// URL da API
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 // Dados iniciais do formulário
 const initialForm = {

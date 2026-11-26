@@ -51,13 +51,13 @@ INSERT IGNORE INTO cadastro (nome, email, senha, telefone, cpf) VALUES
 -- ---------------------------------------------------------------
 -- Entregas (14). Pedro e Lucas ficam sem solicitação de propósito.
 -- ---------------------------------------------------------------
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20001', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Santo André, SP', ST_GeomFromText('POINT(-46.5383 -23.6737)'), 'Entrega expressa',
+INSERT IGNORE INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_coleta, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20001', c.id, m.id_motoristas, 'São Paulo, SP', 'Santo André, SP', ST_GeomFromText('POINT(-46.5383 -23.6737)'), 'Entrega expressa',
        'Solicitação de entrega criada em 14/11/2026. Acompanhamento ativo.', '2026-11-14 18:00:00', 'A Caminho', '2026-11-14 12:00:00'
 FROM cadastro c JOIN motoristas m ON m.nome = 'Carlos Henrique' WHERE c.email = 'marcos@email.com';
 
-INSERT IGNORE INTO entregas (codigo, id_cliente, id_motorista, endereco_origem, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
-SELECT 'ENT-20002', c.id_cadastro, m.id_motoristas, 'São Paulo, SP', 'Osasco, SP', ST_GeomFromText('POINT(-46.7917 -23.5325)'), 'Entrega padrão',
+INSERT IGNORE INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_coleta, endereco_destino, coordenadas_destino, tipo_servico, observacoes, previsao, status, checked_at)
+SELECT 'ENT-20002', c.id, m.id_motoristas, 'São Paulo, SP', 'Osasco, SP', ST_GeomFromText('POINT(-46.7917 -23.5325)'), 'Entrega padrão',
        NULL, '2026-11-03 17:00:00', 'Entregue', '2026-11-02 12:00:00'
 FROM cadastro c JOIN motoristas m ON m.nome = 'Rodrigo Faria' WHERE c.email = 'marcos@email.com';
 
@@ -80,7 +80,7 @@ INSERT INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_destin
 -- e histórico dos últimos dias, em qualquer dia que o banco for recriado.
 -- Motoristas 1 (João Pereira), 2 (Pedro Alves) e 3 (Diego Ramos); cliente 1 tem vários pedidos.
 -- ---------------------------------------------------------------------------
-INSERT INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_destino, coordenadas_destino, previsao, status, checked_at, atualizado_em) VALUES
+INSERT IGNORE INTO entregas (codigo_rastreio, id_cliente, id_motorista, endereco_destino, coordenadas_destino, previsao, status, checked_at, atualizado_em) VALUES
 -- João Pereira: em andamento, pendentes e concluídas hoje
 ('ENT-20001', 1, 1, 'Avenida Paulista, 1578 - Bela Vista, São Paulo - SP', ST_GeomFromText('POINT(-46.6560 -23.5614)'), DATE_ADD(NOW(), INTERVAL 2 HOUR), 'A Caminho', NOW(), NOW()),
 ('ENT-20002', 4, 1, 'Rua Augusta, 900 - Consolação, São Paulo - SP', ST_GeomFromText('POINT(-46.6562 -23.5531)'), DATE_ADD(NOW(), INTERVAL 3 HOUR), 'A Caminho', NOW(), NOW()),

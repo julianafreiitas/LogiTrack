@@ -9,8 +9,8 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ARG API_INTERNAL_URL=http://localhost:8080/api
+ENV API_INTERNAL_URL=$API_INTERNAL_URL
 
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .

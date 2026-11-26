@@ -1,3 +1,4 @@
+import { randomBytes, scryptSync } from "node:crypto";
 import pool from "../config/database.js";
 import { cidadeDoEndereco, iniciais } from "../utils/endereco.js";
 
@@ -13,6 +14,36 @@ const validarId = (valor) => Number.isInteger(Number(valor)) && Number(valor) > 
 export async function listarClientes(request, response) {
   const [linhas] = await pool.query("SELECT id, nome FROM cadastro ORDER BY id");
   response.json(linhas.map((linha) => ({ id: linha.id, nome: linha.nome, iniciais: iniciais(linha.nome) })));
+}
+
+export async function criarPerfil(request, response) {
+  const dados = request.body ?? {};
+  const nome = String(dados.nome ?? "").trim();
+  const email = String(dados.email ?? "").trim();
+  const telefone = String(dados.telefone ?? "").trim();
+  const nascimento = String(dados.nascimento ?? "").trim() || null;
+  if (!nome || nome.length > 100 || !/^\S+@\S+\.\S+$/.test(email) || email.length > 100 || !telefone || telefone.length > 40) {
+    return response.status(400).json({ message: "Informe nome, e-mail válido e telefone." });
+  }
+  if (nascimento && !/^\d{4}-\d{2}-\d{2}$/.test(nascimento)) {
+    return response.status(400).json({ message: "Informe uma data de nascimento válida." });
+  }
+
+  const opcional = (chave, limite) => String(dados[chave] ?? "").trim().slice(0, limite) || null;
+  const salt = randomBytes(16);
+  const senhaTemporaria = randomBytes(32);
+  const senhaHash = `scrypt$${salt.toString("hex")}$${scryptSync(senhaTemporaria, salt, 64).toString("hex")}`;
+  try {
+    const [resultado] = await pool.execute(`INSERT INTO cadastro
+      (nome, email, senha, telefone, cpf, nascimento, cep, rua, numero, bairro, cidade, estado)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [nome, email, senhaHash, telefone, opcional("cpf", 20), nascimento, opcional("cep", 12), opcional("rua", 150), opcional("numero", 20), opcional("bairro", 100), opcional("cidade", 100), opcional("estado", 50)]);
+    const perfil = { ...dados, id: resultado.insertId, nome, email, telefone, nascimento };
+    response.status(201).json({ message: "Perfil criado e salvo.", id: resultado.insertId, perfil });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") return response.status(409).json({ message: "Este e-mail ou CPF já está cadastrado." });
+    throw error;
+  }
 }
 
 export async function resumoDoCliente(request, response) {
@@ -103,7 +134,10 @@ export async function salvarPerfil(request, response) {
     const [resultado] = await pool.execute(`UPDATE cadastro SET nome = ?, email = ?, telefone = ?, cpf = ?,
       nascimento = ?, cep = ?, rua = ?, numero = ?, bairro = ?, cidade = ?, estado = ? WHERE id = ?`,
     [nome, email, telefone, opcional("cpf", 20), dados.nascimento || null, opcional("cep", 12), opcional("rua", 150), opcional("numero", 20), opcional("bairro", 100), opcional("cidade", 100), opcional("estado", 50), id]);
-    if (!resultado.affectedRows) return response.status(404).json({ message: "Cliente não encontrado." });
+    if (!resultado.affectedRows) {
+      const [[cliente]] = await pool.query("SELECT id FROM cadastro WHERE id = ?", [id]);
+      if (!cliente) return response.status(404).json({ message: "Cliente não encontrado." });
+    }
     response.json({ message: "Perfil salvo.", perfil: { ...dados, nome, email, telefone } });
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") return response.status(409).json({ message: "Este e-mail já está sendo usado por outro cliente." });

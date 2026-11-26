@@ -19,30 +19,16 @@
 }
 
 .login-brand {
-  /* display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 13px;
-  margin: 0 auto 25px;
-  color: #f5f8ff;
-  font-size: 30px;
-  font-weight: 800; */
+  display: block;
+  width: 150px;
   height: 150px;
-}
-
-.login-brand img {
-  width: 58px;
-  height: 64px;
+  margin: 0 auto 22px;
   object-fit: contain;
 }
 
 .centro{
   display: flex;
   justify-content: center;
-}
-
-.login-brand strong {
-  color: #ff7814;
 }
 
 .login h1 {
@@ -168,6 +154,10 @@
   transform: translateY(-1px);
   filter: brightness(1.08);
 }
+
+.login-submit:disabled { cursor: wait; opacity: .75; }
+.login-error { margin: 0 0 14px; color: #fecaca; font-size: 14px; line-height: 1.45; }
+.login-success { margin: 0 0 14px; color: #bbf7d0; font-size: 14px; line-height: 1.45; }
 
 .cadastro {
   width: 100%;

@@ -9,6 +9,7 @@ import motoristasRoutes from "./routes/motoristasRoutes.js";
 import rotasRoutes from "./routes/rotasRoutes.js";
 import motoristaPortalRoutes from "./routes/motoristaPortalRoutes.js";
 import clientePortalRoutes from "./routes/clientePortalRoutes.js";
+import clienteAuthRoutes from "./routes/clienteAuthRoutes.js";
 
 const app = express();
 const normalizarOrigem = (url) => url.trim().replace(/\/+$/, "");
@@ -51,6 +52,7 @@ app.use("/api/motoristas", motoristasRoutes);
 app.use("/api/rotas", rotasRoutes);
 app.use("/api/portal/motorista", motoristaPortalRoutes);
 app.use("/api/portal/cliente", clientePortalRoutes);
+app.use("/api/auth/cliente", clienteAuthRoutes);
 // Regista as rotas de entregas (o endpoint será /api/deliveries)
 app.use("/api", healthRoutes);
 app.use("/api/deliveries", deliveryRoutes);

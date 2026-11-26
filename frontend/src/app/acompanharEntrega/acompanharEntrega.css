@@ -10,6 +10,70 @@
   padding: 14px 0 26px;
 }
 
+.tracking-empty-state {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 760px;
+  margin: 22px auto;
+  padding: 22px 24px;
+  border: 1px solid #fed7aa;
+  border-left: 5px solid #f97316;
+  border-radius: 14px;
+  background: #fff7ed;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+}
+
+.tracking-empty-icon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.tracking-empty-copy h2 {
+  margin: 0 0 6px;
+  color: #10243d;
+  font-size: 19px;
+}
+
+.tracking-empty-copy p {
+  margin: 0;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.tracking-empty-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  border-radius: 8px;
+  background: #f97316;
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tracking-empty-link:hover { background: #ea580c; }
+.tracking-empty-link:focus-visible { outline: 3px solid #fdba74; outline-offset: 3px; }
+
+@media (max-width: 600px) {
+  .tracking-empty-state { align-items: flex-start; gap: 12px; margin: 16px auto; padding: 16px; }
+  .tracking-empty-icon { width: 42px; height: 42px; flex-basis: 42px; }
+  .tracking-empty-icon svg { width: 22px; height: 22px; }
+  .tracking-empty-copy h2 { font-size: 16px; }
+  .tracking-empty-copy p { font-size: 13px; }
+  .tracking-empty-link { margin-top: 12px; }
+}
+
 .tracking-hero-banner {
   position: relative;
   display: flex;

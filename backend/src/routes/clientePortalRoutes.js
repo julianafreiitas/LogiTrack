@@ -1,10 +1,11 @@
 import { Router } from "express";
 
-import { cancelarPedido, consultarRastreio, listarClientes, listarPedidos, obterPerfil, resumoDoCliente, salvarPerfil } from "../controllers/clientePortalController.js";
+import { cancelarPedido, consultarRastreio, criarPerfil, listarClientes, listarPedidos, obterPerfil, resumoDoCliente, salvarPerfil } from "../controllers/clientePortalController.js";
 
 const router = Router();
 
 router.get("/", listarClientes);
+router.post("/perfil", criarPerfil);
 router.get("/rastreio/:codigo", consultarRastreio);
 router.patch("/rastreio/:codigo/cancelar", cancelarPedido);
 router.get("/:id/pedidos", listarPedidos);

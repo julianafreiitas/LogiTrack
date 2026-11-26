@@ -1,1 +1,3 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+// Chamadas relativas passam pelo proxy do Next e funcionam no navegador
+// tanto em desenvolvimento quanto em produção, sem depender do localhost do usuário.
+export const API_URL = "/api";

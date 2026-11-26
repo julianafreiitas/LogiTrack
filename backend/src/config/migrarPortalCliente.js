@@ -1,6 +1,9 @@
 import pool from "./database.js";
 
 const CAMPOS = {
+  usuarios: {
+    ultimo_acesso: "TIMESTAMP NULL DEFAULT NULL",
+  },
   cadastro: {
     nascimento: "DATE DEFAULT NULL",
     cep: "VARCHAR(12) DEFAULT NULL",
@@ -25,17 +28,38 @@ const CAMPOS = {
   },
 };
 
+async function colunaExiste(tabela, coluna) {
+  const [[existente]] = await pool.query(
+    `SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+    [tabela, coluna],
+  );
+  return Boolean(existente);
+}
+
 export async function migrarPortalCliente() {
+  // Bases antigas usavam nomes diferentes. Renomear preserva os registros.
+  if (!(await colunaExiste("cadastro", "id")) && await colunaExiste("cadastro", "id_cadastro")) {
+    await pool.query("ALTER TABLE cadastro RENAME COLUMN id_cadastro TO id");
+  }
+  if (!(await colunaExiste("entregas", "codigo_rastreio")) && await colunaExiste("entregas", "codigo")) {
+    await pool.query("ALTER TABLE entregas RENAME COLUMN codigo TO codigo_rastreio");
+  }
+  if (!(await colunaExiste("entregas", "endereco_coleta")) && await colunaExiste("entregas", "endereco_origem")) {
+    await pool.query("ALTER TABLE entregas RENAME COLUMN endereco_origem TO endereco_coleta");
+  }
+
   for (const [tabela, campos] of Object.entries(CAMPOS)) {
     for (const [coluna, definicao] of Object.entries(campos)) {
-      const [[existente]] = await pool.query(
-        `SELECT 1 AS existe FROM INFORMATION_SCHEMA.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
-        [tabela, coluna],
-      );
-      if (!existente) {
+      if (!(await colunaExiste(tabela, coluna))) {
         await pool.query(`ALTER TABLE \`${tabela}\` ADD COLUMN \`${coluna}\` ${definicao}`);
       }
+    }
+  }
+
+  for (const [tabela, coluna] of [["cadastro", "id"], ["entregas", "codigo_rastreio"], ["entregas", "id_cliente"], ["entregas", "coordenadas_destino"], ["entregas", "previsao"]]) {
+    if (!(await colunaExiste(tabela, coluna))) {
+      throw new Error(`Schema incompatível: coluna ${tabela}.${coluna} não encontrada.`);
     }
   }
 }

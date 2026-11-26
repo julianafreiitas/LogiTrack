@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Eye,
   EyeOff,
@@ -10,6 +11,7 @@ import {
   User,
   Phone,
 } from "lucide-react";
+import { chamarApi, limparSessaoCliente } from "../lib/identificacao";
 import "./pageCadastro.css";
 
 function mascaraTelefone(v) {
@@ -21,6 +23,7 @@ function mascaraTelefone(v) {
 }
 
 export default function Cadastro() {
+  const router = useRouter();
   const [form, setForm] = useState({
     nome: "",
     email: "",
@@ -32,12 +35,13 @@ export default function Cadastro() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
   const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
   function atualizar(campo, valor) {
     setForm((f) => ({ ...f, [campo]: valor }));
   }
 
-  function cadastrar(e) {
+  async function cadastrar(e) {
     e.preventDefault();
     setErro("");
 
@@ -45,27 +49,35 @@ export default function Cadastro() {
       setErro("A senha precisa ter pelo menos 6 caracteres.");
       return;
     }
-
     if (form.senha !== form.confirmar) {
       setErro("As senhas não são iguais.");
       return;
     }
 
-    const { confirmar, ...dados } = form;
-    const payload = { tipo: "cliente", ...dados };
-
-    console.log("Enviar para o backend:", payload);
-    alert("Cadastro será conectado ao backend!");
+    setCarregando(true);
+    try {
+      const resultado = await chamarApi("/auth/cliente/cadastro", {
+        method: "POST",
+        body: JSON.stringify({
+          nome: form.nome,
+          email: form.email,
+          telefone: form.telefone,
+          senha: form.senha,
+        }),
+      });
+      limparSessaoCliente();
+      router.replace(`/login?cadastro=sucesso&email=${encodeURIComponent(resultado.cliente.email)}`);
+    } catch (falha) {
+      setErro(falha.message || "Não foi possível criar sua conta. Tente novamente.");
+    } finally {
+      setCarregando(false);
+    }
   }
-
   return (
     <main className="register-page">
       <section className="register" aria-label="Criar conta">
         <div className="register-brand">
-          <img src="/imagens/logo2.png" alt="" />
-          <span>
-            Logi<strong>Track</strong>
-          </span>
+          <img src="/imagens/CAPA.png" alt="LogiTrack" />
         </div>
 
         <h1>Crie sua conta</h1>
@@ -182,8 +194,8 @@ export default function Cadastro() {
             </p>
           )}
 
-          <button className="register-submit" type="submit">
-            Criar conta
+          <button className="register-submit" type="submit" disabled={carregando}>
+            {carregando ? "Criando conta..." : "Criar conta"}
           </button>
 
           <div className="register-login">

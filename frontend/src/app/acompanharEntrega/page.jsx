@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { AlertCircle, Box, Check, CheckCircle2, Clock3, MapPin, Package, PackageX, Truck, UserRound, X } from "lucide-react";
+import Link from "next/link";
+import { AlertCircle, ArrowRight, Box, Check, CheckCircle2, Clock3, MapPin, Package, PackageX, Truck, UserRound, X } from "lucide-react";
 import Header from "../components/Header-usuarios";
 import { chamarApi } from "../lib/identificacao";
 import "../Main-usuario/pagemain.css";
@@ -86,7 +87,16 @@ export default function AcompanharEntrega() {
 
         {erro && <p className="aviso-erro" role="alert">{erro}</p>}
         {carregando && <p>Carregando pedido...</p>}
-        {!carregando && !pedido && !erro && <p>Abra esta página pelo código de rastreamento do seu pedido.</p>}
+        {!carregando && !pedido && !erro && (
+          <section className="tracking-empty-state" role="status" aria-labelledby="tracking-empty-title">
+            <div className="tracking-empty-icon" aria-hidden="true"><Package size={28} /></div>
+            <div className="tracking-empty-copy">
+              <h2 id="tracking-empty-title">Selecione um pedido para acompanhar</h2>
+              <p>Para ver o andamento da entrega, abra esta página pelo código de rastreamento ou escolha um pedido em <strong>Últimos pedidos</strong>.</p>
+              <Link href="/Meus-Pedidos" className="tracking-empty-link">Abrir Últimos pedidos <ArrowRight size={17} /></Link>
+            </div>
+          </section>
+        )}
 
         {pedido && <>
           <section className="tracking-overview">

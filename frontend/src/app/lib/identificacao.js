@@ -1,8 +1,6 @@
 "use client";
 
-// Identificação PROVISÓRIA enquanto o login de verdade não existe.
-// Guarda no navegador (localStorage) o id do motorista ou do cliente "logado".
-// Quando o login existir, basta trocar este arquivo para ler o id do usuário autenticado.
+// Guarda o id selecionado do motorista e o id autenticado do cliente no navegador.
 
 import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "./api";
@@ -11,6 +9,16 @@ const CONFIG = {
   motorista: { chave: "logitrack:motoristaId", lista: "/portal/motorista" },
   cliente: { chave: "logitrack:clienteId", lista: "/portal/cliente" },
 };
+
+export function salvarSessaoCliente(cliente, token) {
+  window.localStorage.setItem(CONFIG.cliente.chave, String(cliente.id));
+  window.localStorage.setItem("logitrack:clienteToken", token);
+}
+
+export function limparSessaoCliente() {
+  window.localStorage.removeItem(CONFIG.cliente.chave);
+  window.localStorage.removeItem("logitrack:clienteToken");
+}
 
 // GET/PATCH na API devolvendo JSON; lança Error com a mensagem do servidor quando falha
 export async function chamarApi(caminho, opcoes) {

@@ -58,7 +58,10 @@ export default function PerfilCliente() {
 
   useEffect(() => {
     if (!cliente.id) {
-      if (cliente.erro) { setErro(cliente.erro); setCarregando(false); }
+      if (cliente.pronto) {
+        if (cliente.erro) setErro(cliente.erro);
+        setCarregando(false);
+      }
       return;
     }
     let cancelado = false;
@@ -68,7 +71,7 @@ export default function PerfilCliente() {
       .catch((falha) => { if (!cancelado) setErro(falha.message); })
       .finally(() => { if (!cancelado) setCarregando(false); });
     return () => { cancelado = true; };
-  }, [cliente.id, cliente.erro]);
+  }, [cliente.id, cliente.erro, cliente.pronto]);
 
   function atualizarCampo(event) {
     const { name, value } = event.target;
@@ -81,11 +84,12 @@ export default function PerfilCliente() {
     setSalvando(true);
     setErro("");
     try {
-      const resultado = await chamarApi(`/portal/cliente/${cliente.id}/perfil`, {
-        method: "PUT",
+      const resultado = await chamarApi(cliente.id ? `/portal/cliente/${cliente.id}/perfil` : "/portal/cliente/perfil", {
+        method: cliente.id ? "PUT" : "POST",
         body: JSON.stringify(dados),
       });
       setDados({ ...DADOS_INICIAIS, ...resultado.perfil });
+      if (!cliente.id && resultado.id) cliente.escolher(resultado.id);
       setSalvo(true);
     } catch (falha) {
       setErro(falha.message);
@@ -165,7 +169,7 @@ export default function PerfilCliente() {
 
             <div className="client-profile-form-footer">
               <p>Suas informações ficam salvas na sua conta.</p>
-              <button type="submit" disabled={salvando || carregando || !cliente.id}><Save size={17} /> {salvando ? "Salvando..." : "Salvar alterações"}</button>
+              <button type="submit" disabled={salvando || carregando || !cliente.pronto}><Save size={17} /> {salvando ? "Salvando..." : "Salvar alterações"}</button>
             </div>
           </form>
         </section>
