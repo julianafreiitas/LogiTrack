@@ -1,79 +1,17 @@
 
 "use client";
 
-<<<<<<< HEAD
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-
 import {
-  MapPin,
-  Flag,
-  Calendar,
-  Box,
-  MessageSquare,
-  ArrowLeft,
-  ArrowRight,
-  Send,
-  CheckCircle2,
-  Wallet,
-  Truck,
-  Package,
-  CreditCard
+  MapPin, Flag, Calendar, Box, MessageSquare, ArrowLeft, ArrowRight,
+  Send, CheckCircle2, Wallet, Truck, Package, CreditCard
 } from "lucide-react";
-
-import { QRCodeSVG } from "qrcode.react";
-
 import Header from "../components/Header-usuarios";
 import { API_URL } from "../lib/api";
 import { useIdentificacao } from "../lib/identificacao";
 import "../Main-usuario/pagemain.css";
 import "./SolicitarEntrega.css";
-
-// Dados iniciais do formulário
-const initialForm = {
-  coleta: "",
-  destino: "",
-  data: "",
-  servico: "",
-  tamanho: "pequeno",
-  pesoKg: "",
-  urgencia: "normal",
-  observacoes: "",
-  pagamento: "pix",
-  nomeCartao: "",
-  numeroCartao: "",
-  validadeCartao: "",
-  cvvCartao: ""
-};
-
-// Formatação de valores em reais
-function moeda(valor) {
-  return Number(valor || 0).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
-}
-
-// QR Code demonstrativo
-function PixDemoQr({ seed }) {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-      <QRCodeSVG
-        value={seed || "LOGITRACK-DEMO"}
-        size={200}
-      />
-    </div>
-  );
-}
-=======
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Box, Calendar, CheckCircle2, CreditCard, Flag, MapPin, MessageSquare, Package, Send, Truck, Wallet } from 'lucide-react';
-import Header from '../components/Header-usuarios';
-import { API_URL } from '../lib/api';
-import '../Main-usuario/pagemain.css';
-import './SolicitarEntrega.css';
->>>>>>> Matheus
-
 const initialForm = {
   coleta: "", destino: "", data: "", servico: "", observacoes: "",
   tamanho: "medio", pesoKg: "1", urgencia: "normal", pagamento: "pix",
@@ -273,10 +211,6 @@ export default function SolicitarEntrega() {
       </section>
 
       <main className="request-main-content">
-<<<<<<< HEAD
-
-=======
->>>>>>> Matheus
         {solicitacaoEnviada ? (
 
           // TELA DE PAGAMENTO CONCLUÍDO
