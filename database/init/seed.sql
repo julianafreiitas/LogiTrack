@@ -2,7 +2,7 @@ SET NAMES utf8mb4;
 -- Senha dos registros de teste: Admin@123
 SET @senha = 'scrypt$0e9413067239d500d4609215e8d67177$d57cef9bae3ad3c941e06f64277128da930f99818264545015cc40b4ca696eb3263a60751e941f4ac19d267faf297429e7d35365ae4d67a19d4a39fb5772f8ea';
 
-INSERT INTO usuarios (nome,email,senha,telefone,tipo,status,ultimo_acesso) VALUES
+INSERT IGNORE INTO usuarios (nome,email,senha,telefone,tipo,status,ultimo_acesso) VALUES
 ('Equipe de operações','operacoes@logitrack.com',@senha,'(11) 4000-1000','admin','ativo',NOW()),
 ('Mariana Almeida','mariana@logitrack.com',@senha,'(11) 97777-1001','admin','ativo',NOW()),
 ('Gabriel Martins','gabriel@logitrack.com',@senha,'(11) 97777-1002','admin','ativo',NOW()),
@@ -14,7 +14,7 @@ INSERT INTO usuarios (nome,email,senha,telefone,tipo,status,ultimo_acesso) VALUE
 ('Diego Lima','diego@logitrack.com',@senha,'(11) 97777-1008','operador','ativo',NOW()),
 ('Sandra Moreira','sandra@logitrack.com',@senha,'(11) 97777-1009','operador','inativo',NULL);
 
-INSERT INTO cadastro (nome,email,senha,telefone,cpf) VALUES
+INSERT IGNORE INTO cadastro (nome,email,senha,telefone,cpf) VALUES
 ('Marcos Oliveira','marcos@email.com',@senha,'(11) 99999-9999','11122233301'),('Ana Carolina','ana@email.com',@senha,'(11) 98888-0002','11122233302'),
 ('Pedro Santos','pedro@email.com',@senha,'(11) 98888-0003','11122233303'),('Juliana Lima','juliana@email.com',@senha,'(11) 98888-0004','11122233304'),
 ('Rafael Costa','rafael@email.com',@senha,'(11) 98888-0005','11122233305'),('Beatriz Souza','beatriz@email.com',@senha,'(11) 98888-0006','11122233306'),
@@ -23,7 +23,7 @@ INSERT INTO cadastro (nome,email,senha,telefone,cpf) VALUES
 ('Eduardo Nunes','eduardo@email.com',@senha,'(11) 98888-0011','11122233311'),('Patrícia Gomes','patricia@email.com',@senha,'(11) 98888-0012','11122233312'),
 ('Mercado Souza','mercado.souza@email.com',@senha,'(11) 98888-0013','11122233313'),('Tech Solutions','tech.solutions@email.com',@senha,'(11) 98888-0014','11122233314');
 
-INSERT INTO motoristas (nome,cpf,telefone,email,cnh,categoria_cnh,cidade_base,veiculo,entregas_hoje,situacao,status,matricula,data_nascimento,endereco,contato_emergencia,validade_cnh,localizacao_atual) VALUES
+INSERT IGNORE INTO motoristas (nome,cpf,telefone,email,cnh,categoria_cnh,cidade_base,veiculo,entregas_hoje,situacao,status,matricula,data_nascimento,endereco,contato_emergencia,validade_cnh,localizacao_atual) VALUES
 ('João Silva','12121212121','(11) 98765-4321','joao.silva@logitrack.com','12121212121','AB','São Caetano do Sul, SP','Van 03 - Fiat Ducato',0,'Ativo','Em rota','MOT-00428','1990-05-18','Rua das Flores, 123 - São Caetano do Sul, SP','(11) 90000-0000','2028-11-20',ST_GeomFromText('POINT(-46.5548 -23.6229)')),
 ('Carlos Henrique','11111111111','(11) 90000-0001','carlos@logitrack.com','11111111111','B','São Paulo','LT-2048',0,'Ativo','Disponível','MOT-00101',NULL,NULL,NULL,NULL,ST_GeomFromText('POINT(-46.6333 -23.5505)')),
 ('João Pereira','22222222222','(19) 90000-0002','joao.pereira@logitrack.com','22222222222','AB','Campinas','LT-2051',0,'Ativo','Disponível','MOT-00102',NULL,NULL,NULL,NULL,ST_GeomFromText('POINT(-47.0626 -22.9099)')),
@@ -37,8 +37,8 @@ INSERT INTO motoristas (nome,cpf,telefone,email,cnh,categoria_cnh,cidade_base,ve
 ('Tatiane Lopes','10101010101','(11) 90000-0010','tatiane@logitrack.com','10101010101','B','Mauá','LT-2139',0,'Ativo','Disponível','MOT-00110',NULL,NULL,NULL,NULL,ST_GeomFromText('POINT(-46.4613 -23.6677)'));
 
 -- Entregas do portal: duas em andamento, uma pendente, três entregues hoje e histórico.
-INSERT INTO entregas (codigo,id_cliente,nome_cliente,id_motorista,endereco_origem,endereco_destino,coordenadas_destino,tipo_servico,observacoes,previsao,status,checked_at,atualizado_em)
-SELECT v.codigo,c.id_cadastro,c.nome,m.id_motoristas,'São Caetano do Sul, SP',v.endereco,ST_GeomFromText(v.ponto),'Entrega padrão',NULL,v.previsao,v.status,v.criado,v.atualizado
+INSERT IGNORE INTO entregas (codigo,id_cliente,nome_cliente,id_motorista,endereco_origem,endereco_destino,coordenadas_destino,tipo_servico,observacoes,previsao,status,checked_at,atualizado_em)
+SELECT v.codigo,c.id,c.nome,m.id_motoristas,'São Caetano do Sul, SP',v.endereco,ST_GeomFromText(v.ponto),'Entrega padrão',NULL,v.previsao,v.status,v.criado,v.atualizado
 FROM (SELECT 'LT78452' codigo,'mercado.souza@email.com' email,'Rua das Flores, 123 - São Caetano do Sul, SP' endereco,'POINT(-46.5580 -23.6229)' ponto,TIMESTAMP(CURDATE(),'14:30:00') previsao,'A Caminho' status,NOW() criado,NOW() atualizado UNION ALL
 SELECT 'LT78453','tech.solutions@email.com','Av. Goiás, 456 - Santo André, SP','POINT(-46.5383 -23.6639)',TIMESTAMP(CURDATE(),'15:15:00'),'A Caminho',NOW(),NOW() UNION ALL
 SELECT 'LT78454','marcos@email.com','Rua Pará, 321 - São Caetano do Sul, SP','POINT(-46.5760 -23.6300)',DATE_ADD(NOW(),INTERVAL 3 HOUR),'Pendente',NOW(),NOW() UNION ALL
@@ -51,8 +51,8 @@ SELECT 'LT78460','lucas@email.com','Rua Marechal Deodoro, 620 - São Bernardo do
 JOIN cadastro c ON c.email=v.email JOIN motoristas m ON m.email='joao.silva@logitrack.com';
 
 -- Entregas para os demais motoristas do seletor, com as três situações de hoje.
-INSERT INTO entregas (codigo,id_cliente,nome_cliente,id_motorista,endereco_origem,endereco_destino,coordenadas_destino,tipo_servico,previsao,status,checked_at,atualizado_em)
-SELECT v.codigo,c.id_cadastro,c.nome,m.id_motoristas,v.cidade,v.endereco,ST_GeomFromText(v.ponto),'Entrega padrão',v.previsao,v.status,NOW(),v.atualizado
+INSERT IGNORE INTO entregas (codigo,id_cliente,nome_cliente,id_motorista,endereco_origem,endereco_destino,coordenadas_destino,tipo_servico,previsao,status,checked_at,atualizado_em)
+SELECT v.codigo,c.id,c.nome,m.id_motoristas,v.cidade,v.endereco,ST_GeomFromText(v.ponto),'Entrega padrão',v.previsao,v.status,NOW(),v.atualizado
 FROM (
   SELECT 'CH001' codigo,'carlos@logitrack.com' motorista,'marcos@email.com' cliente,'São Paulo, SP' cidade,'Rua Augusta, 900 - Consolação, São Paulo, SP' endereco,'POINT(-46.6360 -23.5520)' ponto,DATE_ADD(NOW(),INTERVAL 2 HOUR) previsao,'A Caminho' status,NOW() atualizado UNION ALL
   SELECT 'CH002','carlos@logitrack.com','ana@email.com','São Paulo, SP','Rua Vergueiro, 1800 - Vila Mariana, São Paulo, SP','POINT(-46.6380 -23.5800)',DATE_ADD(NOW(),INTERVAL 4 HOUR),'Pendente',NOW() UNION ALL
@@ -70,20 +70,20 @@ FROM (
 JOIN cadastro c ON c.email=v.cliente
 JOIN motoristas m ON m.email=v.motorista;
 
-INSERT INTO entregas (codigo,id_cliente,nome_cliente,endereco_destino,coordenadas_destino,previsao,status)
-SELECT CONCAT('DEMO-',LPAD(c.id_cadastro,5,'0')),c.id_cadastro,c.nome,'Avenida Paulista, 1000 - São Paulo, SP',ST_GeomFromText('POINT(-46.6550 -23.5610)'),DATE_ADD(NOW(),INTERVAL 1 DAY),'Pendente'
+INSERT IGNORE INTO entregas (codigo,id_cliente,nome_cliente,endereco_destino,coordenadas_destino,previsao,status)
+SELECT CONCAT('DEMO-',LPAD(c.id,5,'0')),c.id,c.nome,'Avenida Paulista, 1000 - São Paulo, SP',ST_GeomFromText('POINT(-46.6550 -23.5610)'),DATE_ADD(NOW(),INTERVAL 1 DAY),'Pendente'
 FROM cadastro c WHERE c.email NOT IN ('marcos@email.com','ana@email.com','pedro@email.com','juliana@email.com','rafael@email.com','beatriz@email.com','lucas@email.com');
 
-INSERT INTO enderecos_entrega (cadastro_id,rua,numero,bairro,cidade,coordenadas)
-SELECT id_cadastro,'Rua das Flores','123','Centro','São Caetano do Sul',ST_GeomFromText('POINT(-46.5548 -23.6229)') FROM cadastro ORDER BY id_cadastro LIMIT 10;
+INSERT IGNORE INTO enderecos_entrega (cadastro_id,rua,numero,bairro,cidade,coordenadas)
+SELECT id,'Rua das Flores','123','Centro','São Caetano do Sul',ST_GeomFromText('POINT(-46.5548 -23.6229)') FROM cadastro ORDER BY id LIMIT 10;
 
-INSERT INTO localizacao_entregadores (entregador_id,coordenadas)
+INSERT IGNORE INTO localizacao_entregadores (entregador_id,coordenadas)
 SELECT id_motoristas,localizacao_atual FROM motoristas ORDER BY id_motoristas LIMIT 10;
 
-INSERT INTO rotas (nome,id_motorista,distancia_km,origem,destino,status)
+INSERT IGNORE INTO rotas (nome,id_motorista,distancia_km,origem,destino,status)
 SELECT CONCAT('Rota ',m.nome),m.id_motoristas,12.5,m.cidade_base,'São Paulo','Ativa' FROM motoristas m ORDER BY m.id_motoristas LIMIT 10;
 
-INSERT INTO rotas_pontos (id_rota,ordem,coordenadas)
+INSERT IGNORE INTO rotas_pontos (id_rota,ordem,coordenadas)
 SELECT r.id_rotas,p.ordem,ST_GeomFromText(p.ponto)
 FROM rotas r JOIN motoristas m ON r.id_motorista=m.id_motoristas
 JOIN (SELECT 1 ordem,'POINT(-46.6333 -23.5505)' ponto UNION ALL SELECT 2,'POINT(-46.6200 -23.5700)' UNION ALL SELECT 3,'POINT(-46.5548 -23.6229)') p

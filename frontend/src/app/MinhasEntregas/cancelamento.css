@@ -1,0 +1,64 @@
+.driver-cancel-overlay {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(2 10 20 / 72%);
+}
+
+.driver-cancel-modal {
+  position: relative;
+  width: min(100%, 480px);
+  padding: 30px;
+  border: 1px solid #304860;
+  border-radius: 18px;
+  background: #102238;
+  color: #f6f8fc;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 40%);
+}
+
+.driver-cancel-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #1c344d;
+  color: #d8e2ef;
+  cursor: pointer;
+}
+
+.driver-cancel-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: #542d20;
+  color: #ff914d;
+}
+
+.driver-cancel-modal h2 { margin: 0 38px 8px 0; font-size: 22px; }
+.driver-cancel-modal > p { color: #c2cedd; }
+
+.driver-return-instruction {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid #8b4a21;
+  border-radius: 12px;
+  background: #2d241f;
+  color: #fff0e7;
+}
+
+.driver-return-instruction span,
+.driver-cancel-destination { overflow-wrap: anywhere; }
+.driver-cancel-confirm { width: 100%; min-height: 44px; border: 0; border-radius: 10px; background: #ff751f; color: #fff; font: inherit; font-weight: 750; cursor: pointer; }

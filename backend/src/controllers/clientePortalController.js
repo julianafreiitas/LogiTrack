@@ -112,7 +112,7 @@ export async function listarPedidos(request, response) {
 
 export async function cancelarPedido(request, response) {
   const codigo = String(request.params.codigo ?? "").trim();
-  const [resultado] = await pool.query(`UPDATE entregas SET status = 'Cancelado'
+  const [resultado] = await pool.query(`UPDATE entregas SET status_antes_cancelamento = status, status = 'Cancelado'
     WHERE codigo_rastreio = ? AND status IN ('Pendente', 'A Caminho')`, [codigo]);
   if (!resultado.affectedRows) {
     const [[pedido]] = await pool.query("SELECT status FROM entregas WHERE codigo_rastreio = ?", [codigo]);
@@ -120,14 +120,33 @@ export async function cancelarPedido(request, response) {
     if (pedido.status === "Cancelado") return response.json({ codigo, status: "Cancelado", taxaAplicavel: false });
     return response.status(409).json({ message: "Este pedido não pode mais ser cancelado." });
   }
-  const [[pedido]] = await pool.query("SELECT status, id_motorista FROM entregas WHERE codigo_rastreio = ?", [codigo]);
-  response.json({ codigo, status: pedido.status, taxaAplicavel: pedido.status === "Cancelado" && Boolean(pedido.id_motorista) });
+  const [[pedido]] = await pool.query("SELECT status_antes_cancelamento, id_motorista FROM entregas WHERE codigo_rastreio = ?", [codigo]);
+  if (pedido.id_motorista) {
+    await pool.query(`UPDATE motoristas SET
+      status = CASE WHEN status = 'IndisponÃ­vel' THEN status
+        WHEN EXISTS (SELECT 1 FROM entregas WHERE id_motorista = ? AND status = 'A Caminho') THEN 'Em rota'
+        ELSE 'DisponÃ­vel' END,
+      entregas_hoje = (SELECT COUNT(*) FROM entregas WHERE id_motorista = ? AND status <> 'Cancelado'
+        AND (status IN ('Pendente', 'A Caminho') OR (status = 'Entregue' AND DATE(atualizado_em) = CURDATE())))
+      WHERE id_motoristas = ?`, [pedido.id_motorista, pedido.id_motorista, pedido.id_motorista]);
+  }
+  response.json({ codigo, status: "Cancelado", precisaDevolucao: pedido.status_antes_cancelamento === "A Caminho" });
 }
 
-  const [[entrega]] = await pool.query(
-    "SELECT codigo_rastreio AS codigo, endereco_destino AS endereco, status FROM entregas WHERE codigo_rastreio = ?",
-    [codigo],
+export async function obterPerfil(request, response) {
+  const id = Number(request.params.id);
+  if (!validarId(id)) return response.status(400).json({ message: "Id de cliente inválido." });
+
+  const [[perfil]] = await pool.query(
+    `SELECT id, nome, email, telefone, cpf,
+       DATE_FORMAT(nascimento, '%Y-%m-%d') AS nascimento,
+       cep, rua, numero, bairro, cidade, estado
+     FROM cadastro WHERE id = ?`,
+    [id],
   );
+  if (!perfil) return response.status(404).json({ message: "Cliente não encontrado." });
+  return response.json(perfil);
+}
 
 export async function salvarPerfil(request, response) {
   const id = Number(request.params.id);

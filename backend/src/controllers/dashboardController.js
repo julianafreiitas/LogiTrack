@@ -49,7 +49,7 @@ export async function resumoDashboard(request, response) {
 
   const [recentes] = await pool.query(
     `SELECT
-       codigo AS codigo,
+       codigo_rastreio AS codigo,
        SUBSTRING_INDEX(endereco_destino, ' - ', -1) AS cidade,
        TIMESTAMPDIFF(MINUTE, atualizado_em, NOW()) AS minutos,
        CASE

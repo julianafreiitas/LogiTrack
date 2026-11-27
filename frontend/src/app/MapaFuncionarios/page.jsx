@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { Check, Clock3, Map as MapIcon, MapPin, Navigation, Package, Satellite, UserRound } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Check, Clock3, Map as MapIcon, MapPin, Navigation, Package, PackageX, Satellite, UserRound, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Aside from "../components/aside";
@@ -10,6 +11,7 @@ import SeletorIdentificacao from "../components/SeletorIdentificacao";
 import { chamarApi, useIdentificacao } from "../lib/identificacao";
 import "../Dash/pageDash.css";
 import "./mapa.css";
+import "../MinhasEntregas/cancelamento.css";
 
 const TrackingMap = dynamic(() => import("./TrackingMap"), {
   ssr: false,
@@ -19,6 +21,7 @@ const TrackingMap = dynamic(() => import("./TrackingMap"), {
 const ROTULO_STATUS = { "A Caminho": "Entrega em Andamento", Pendente: "Entrega Pendente" };
 
 export default function MapaFuncionarios() {
+  const router = useRouter();
   const motorista = useIdentificacao("motorista");
   const [camada, setCamada] = useState("mapa");
   const [dados, setDados] = useState({ origem: null, entregas: [] });
@@ -27,6 +30,8 @@ export default function MapaFuncionarios() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
   const [entregaConcluida, setEntregaConcluida] = useState(null);
+  const [avisoCancelamento, setAvisoCancelamento] = useState(null);
+  const cancelamentosVistos = useRef({ motoristaId: null, codigos: new Set() });
 
   const carregar = useCallback(async (idMotorista, codigoPreferido) => {
     try {
@@ -65,6 +70,26 @@ export default function MapaFuncionarios() {
     setCarregando(true);
     carregar(motorista.id, codigo);
   }, [motorista.id, motorista.pronto, motorista.erro, carregar]);
+
+  useEffect(() => {
+    if (!motorista.id) return undefined;
+    if (cancelamentosVistos.current.motoristaId !== motorista.id) {
+      cancelamentosVistos.current = { motoristaId: motorista.id, codigos: new Set() };
+    }
+    let ativo = true;
+    const verificar = async () => {
+      try {
+        const resultado = await chamarApi(`/portal/motorista/${motorista.id}/entregas?status=Cancelado&limite=50`);
+        if (!ativo) return;
+        const novas = resultado.itens.filter((item) => !cancelamentosVistos.current.codigos.has(item.codigo));
+        for (const item of novas) cancelamentosVistos.current.codigos.add(item.codigo);
+        if (novas.length) setAvisoCancelamento((atual) => atual ?? novas[0]);
+      } catch { /* a tela do mapa continua disponível quando a consulta de avisos falha */ }
+    };
+    verificar();
+    const intervalo = window.setInterval(verificar, 10000);
+    return () => { ativo = false; window.clearInterval(intervalo); };
+  }, [motorista.id]);
 
   const entregasAbertas = dados.entregas.filter((entrega) => ["Pendente", "A Caminho"].includes(entrega.status));
   const selecionada = entregasAbertas.find((entrega) => entrega.id === selecionadaId) ?? null;
@@ -106,6 +131,7 @@ export default function MapaFuncionarios() {
       }));
       setSelecionadaId(null);
       setEntregaConcluida({ codigo });
+      router.push("/Funcionarios");
     } catch (falha) {
       setErro(falha.message);
     } finally {
@@ -178,6 +204,7 @@ export default function MapaFuncionarios() {
               layer={camada}
               origem={dados.origem}
               entrega={entregaConcluida ? null : selecionada}
+              motoristaId={motorista.id}
             />
           )}
           {!dados.origem && !carregando && (erro || motorista.erro) && (
@@ -228,6 +255,9 @@ export default function MapaFuncionarios() {
                   <UserRound size={21} />
                   <p><span>Cliente</span><strong>{selecionada.cliente}</strong></p>
                 </div>
+                {selecionada.coleta && <div className="delivery-detail-row"><MapPin size={21} /><p><span>Ponto de coleta</span><strong>{selecionada.coleta}</strong></p></div>}
+                {(selecionada.servico || selecionada.tamanho || selecionada.pesoKg != null) && <div className="delivery-detail-row"><Package size={21} /><p><span>Pacote</span><strong>{selecionada.servico || "Entrega"} · {selecionada.tamanho || "Tamanho não informado"}{selecionada.pesoKg != null ? ` · ${selecionada.pesoKg} kg` : ""}</strong></p></div>}
+                {selecionada.valorFrete != null && <div className="delivery-detail-row"><Package size={21} /><p><span>Frete</span><strong>{Number(selecionada.valorFrete).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</strong></p></div>}
               </div>
 
               <div className="delivery-eta-section">
@@ -265,6 +295,23 @@ export default function MapaFuncionarios() {
         </aside>
       </section>
       </main>
+      {avisoCancelamento && (
+        <div className="driver-cancel-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setAvisoCancelamento(null); }}>
+          <section className="driver-cancel-modal" role="dialog" aria-modal="true" aria-labelledby="map-driver-cancel-title">
+            <button type="button" className="driver-cancel-close" aria-label="Fechar aviso" onClick={() => setAvisoCancelamento(null)}><X size={19} /></button>
+            <span className="driver-cancel-icon"><PackageX size={25} /></span>
+            <h2 id="map-driver-cancel-title">Pedido cancelado pelo cliente</h2>
+            <p><strong>{avisoCancelamento.codigo}</strong> · {avisoCancelamento.cliente}</p>
+            {avisoCancelamento.precisaDevolucao ? (
+              <div className="driver-return-instruction"><strong>Devolva o produto ao ponto de coleta.</strong><span>{avisoCancelamento.coleta || "Confira o endereço de coleta nos detalhes do pedido."}</span></div>
+            ) : (
+              <div className="driver-return-instruction"><strong>A entrega foi cancelada antes de iniciar.</strong><span>Nenhum produto foi registrado como retirado. Confira com a central caso já esteja com o pacote.</span></div>
+            )}
+            <p className="driver-cancel-destination">Destino do pedido: {avisoCancelamento.endereco}</p>
+            <button type="button" className="driver-cancel-confirm" onClick={() => setAvisoCancelamento(null)}>Entendi</button>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

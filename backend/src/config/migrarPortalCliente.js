@@ -26,6 +26,7 @@ const CAMPOS = {
     distancia_km: "DECIMAL(8,1) DEFAULT NULL",
     forma_pagamento: "VARCHAR(20) DEFAULT NULL",
     pago_em: "DATETIME DEFAULT NULL",
+    status_antes_cancelamento: "VARCHAR(20) DEFAULT NULL",
   },
 };
 
@@ -88,6 +89,7 @@ export async function migrarPortalCliente() {
       distancia_km DECIMAL(8,1) DEFAULT NULL,
       forma_pagamento VARCHAR(20) DEFAULT NULL,
       pago_em DATETIME DEFAULT NULL,
+      status_antes_cancelamento VARCHAR(20) DEFAULT NULL,
       previsao DATETIME NOT NULL,
       status ENUM('Pendente', 'A Caminho', 'Entregue', 'Cancelado') NOT NULL DEFAULT 'Pendente',
       checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

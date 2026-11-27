@@ -35,6 +35,19 @@ export async function createDelivery(req, res, next) {
       const [[cliente]] = await db.query('SELECT id, nome FROM cadastro WHERE id = ?', [clienteId]);
       if (!cliente) return res.status(404).json({ error: 'Cliente não encontrado.' });
 
+      const [[motorista]] = await db.query(`
+        SELECT m.id_motoristas AS id, m.nome
+        FROM motoristas m
+        LEFT JOIN (
+          SELECT id_motorista, COUNT(*) AS abertas
+          FROM entregas WHERE status IN ('Pendente', 'A Caminho')
+          GROUP BY id_motorista
+        ) e ON e.id_motorista = m.id_motoristas
+        WHERE m.situacao = 'Ativo' AND m.status <> 'Indisponível'
+        ORDER BY (m.status = 'Disponível') DESC, COALESCE(e.abertas, 0), m.id_motoristas
+        LIMIT 1`);
+      if (!motorista) return res.status(503).json({ error: 'Não há motorista disponível para receber o pedido.' });
+
       const coordenadas = await getCoordinates(enderecoDestino);
       const codigoRastreio = gerarCodigoRastreio();
       const pointWKT = `POINT(${coordenadas.longitude.toFixed(7)} ${coordenadas.latitude.toFixed(7)})`;
@@ -42,17 +55,17 @@ export async function createDelivery(req, res, next) {
       const dataDesejada = /^\d{4}-\d{2}-\d{2}$/.test(String(dataColeta ?? '')) ? dataColeta : null;
       const [result] = await db.execute(`
         INSERT INTO entregas
-          (codigo_rastreio, id_cliente, nome_cliente, endereco_coleta, endereco_destino,
+          (codigo_rastreio, id_cliente, nome_cliente, id_motorista, endereco_coleta, endereco_destino,
            coordenadas_destino, data_coleta, tipo_servico, tamanho_pacote, peso_kg,
            urgencia, observacoes, valor_frete, distancia_km, forma_pagamento,
            pago_em, previsao, status)
-        VALUES (?, ?, ?, ?, ?, ST_GeomFromText(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),
+        VALUES (?, ?, ?, ?, ?, ?, ST_GeomFromText(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(),
           DATE_ADD(GREATEST(NOW(), COALESCE(TIMESTAMP(?, '09:00:00'), NOW())), INTERVAL ? MINUTE), 'Pendente')
-      `, [codigoRastreio, clienteId, cliente.nome, origem, enderecoDestino, pointWKT, dataDesejada, servico, tamanho, peso, urgencia, String(observacoes ?? '').slice(0, 2000), total, distancia, pagamento, dataDesejada, minutosEstimados]);
+      `, [codigoRastreio, clienteId, cliente.nome, motorista.id, origem, enderecoDestino, pointWKT, dataDesejada, servico, tamanho, peso, urgencia, String(observacoes ?? '').slice(0, 2000), total, distancia, pagamento, dataDesejada, minutosEstimados]);
 
       return res.status(201).json({
         message: 'Pagamento demonstrativo confirmado e entrega criada.',
-        data: { id: result.insertId, codigoRastreio, clientId: clienteId, clientName: cliente.nome, coleta: origem, destino: enderecoDestino, previsaoMinutos: minutosEstimados, valorFrete: total, status: 'Pendente' },
+        data: { id: result.insertId, codigoRastreio, clientId: clienteId, clientName: cliente.nome, motoristaId: motorista.id, motoristaNome: motorista.nome, coleta: origem, destino: enderecoDestino, previsaoMinutos: minutosEstimados, valorFrete: total, status: 'Pendente' },
       });
     }
 
@@ -79,7 +92,7 @@ export async function createDelivery(req, res, next) {
 
     const query = `
       INSERT INTO entregas
-        (codigo, id_cliente, nome_cliente, endereco_destino, coordenadas_destino, previsao, status)
+        (codigo_rastreio, id_cliente, nome_cliente, endereco_destino, coordenadas_destino, previsao, status)
       VALUES
         (?, 1, ?, ?, ST_GeomFromText(?), DATE_ADD(NOW(), INTERVAL 1 DAY), 'Pendente')
     `;
@@ -113,7 +126,7 @@ export async function getDeliveries(req, res, next) {
     const [rows] = await db.query(`
       SELECT
         e.id_entregas AS id,
-        e.codigo AS titulo,
+        e.codigo_rastreio AS titulo,
         COALESCE(m.nome, 'Sem motorista') AS motorista,
         COALESCE(e.nome_cliente, c.nome) AS cliente,
         e.status,
@@ -125,7 +138,7 @@ export async function getDeliveries(req, res, next) {
         -46.633308 AS origem_lng
       FROM entregas e
       LEFT JOIN motoristas m ON m.id_motoristas = e.id_motorista
-      LEFT JOIN cadastro c ON c.id_cadastro = e.id_cliente
+      LEFT JOIN cadastro c ON c.id = e.id_cliente
       ORDER BY e.id_entregas DESC
     `);
 

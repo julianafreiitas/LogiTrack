@@ -6,6 +6,7 @@ const CABECALHOS_PULAR = new Set([
   "connection",
   "content-length",
   "host",
+  "expect",
   "keep-alive",
   "transfer-encoding",
 ]);

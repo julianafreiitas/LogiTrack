@@ -86,7 +86,7 @@ export default function SolicitarEntrega() {
         }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || "Não foi possível registrar o pedido pago.");
+      if (!response.ok) throw new Error(data.error || data.message || "Não foi possível registrar o pedido pago.");
       setPedidoCriado(data.data);
       setPixEmExibicao(false);
       setSolicitacaoEnviada(true);
@@ -98,7 +98,7 @@ export default function SolicitarEntrega() {
     } finally {
       setCarregando(false);
     }
-  }, [carregando, pedidoCriado, cliente.id, cliente.erro, formData, orcamento]);
+  }, [carregando, pedidoCriado, cliente.id, cliente.erro, formData, orcamento, router]);
 
   // Simulação de confirmação do Pix após 5 segundos
   useEffect(() => {
@@ -232,6 +232,8 @@ export default function SolicitarEntrega() {
                 Código de rastreamento: <strong>{pedidoCriado.codigoRastreio}</strong>
               </p>
             )}
+
+            {pedidoCriado?.motoristaNome && <p className="request-tracking-code">Motorista responsável: <strong>{pedidoCriado.motoristaNome}</strong> · pedido aguardando início na aba Pendentes.</p>}
 
             <p className="request-demo-note">
               Esta confirmação é uma simulação. Nenhuma cobrança real foi realizada.

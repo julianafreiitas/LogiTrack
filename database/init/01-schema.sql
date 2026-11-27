@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS entregas (
   status ENUM('Pendente', 'A Caminho', 'Entregue', 'Cancelado') NOT NULL DEFAULT 'Pendente',
   checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  status_antes_cancelamento VARCHAR(20) DEFAULT NULL,
   FOREIGN KEY (id_cliente) REFERENCES cadastro(id),
   FOREIGN KEY (id_motorista) REFERENCES motoristas(id_motoristas) ON DELETE SET NULL,
   SPATIAL INDEX idx_coordenadas_destino (coordenadas_destino)

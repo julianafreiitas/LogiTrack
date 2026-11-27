@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { chamarApi } from "../lib/identificacao";
 
 const CENTRO_PADRAO = [-23.55, -46.64];
 const TILES = {
@@ -82,7 +83,7 @@ function AjustarMapa({ origem, selecionada, rota, chaveSelecao }) {
   return null;
 }
 
-export default function TrackingMap({ layer, origem, entrega }) {
+export default function TrackingMap({ layer, origem, entrega, motoristaId }) {
   const [rota, setRota] = useState(null);
   const tiles = TILES[layer] || TILES.mapa;
   const posicaoOrigem = useMemo(() => origem ? coordenadasValidas(origem.lat, origem.lng) : null, [origem?.lat, origem?.lng]);
@@ -93,10 +94,10 @@ export default function TrackingMap({ layer, origem, entrega }) {
       ? { id: entrega.id, status: entrega.status, coordenada }
       : null;
   }, [entrega?.id, entrega?.status, entrega?.lat, entrega?.lng]);
-  const chaveSelecao = selecao ? JSON.stringify([selecao.id, selecao.status, selecao.coordenada]) : '';
+  const chaveSelecao = selecao ? JSON.stringify([motoristaId, entrega?.codigo, selecao.id, selecao.status, selecao.coordenada]) : '';
 
   useEffect(() => {
-    if (!posicaoOrigem || !selecao) {
+    if (!posicaoOrigem || !selecao || !motoristaId || !entrega?.codigo) {
       setRota(null);
       return undefined;
     }
@@ -113,16 +114,13 @@ export default function TrackingMap({ layer, origem, entrega }) {
       controller.abort();
       usarLinhaReta();
     }, 8000);
-    const coordenadas = pontosRetos.map(([lat, lng]) => `${lng},${lat}`).join(';');
-    const url = `https://router.project-osrm.org/route/v1/driving/${coordenadas}?overview=full&geometries=geojson`;
+    const url = `/portal/motorista/${motoristaId}/entregas/${encodeURIComponent(entrega.codigo)}/rota`;
 
     setRota(null);
-    fetch(url, { signal: controller.signal })
-      .then((resposta) => (resposta.ok ? resposta.json() : Promise.reject(new Error(`OSRM ${resposta.status}`))))
+    chamarApi(url, { signal: controller.signal })
       .then((dados) => {
-        const coordenadasRota = dados?.routes?.[0]?.geometry?.coordinates;
-        if (!Array.isArray(coordenadasRota) || coordenadasRota.length < 2) throw new Error('Rota indisponível');
-        const pontosRota = coordenadasRota.map(([lng, lat]) => coordenadasValidas(lat, lng));
+        const pontosRota = dados?.pontos?.map(([lat, lng]) => coordenadasValidas(lat, lng));
+        if (!Array.isArray(pontosRota) || pontosRota.length < 2) throw new Error("Rota indisponível");
         if (pontosRota.some((ponto) => !ponto)) throw new Error('Coordenadas da rota inválidas');
         if (!finalizada) {
           finalizada = true;
@@ -140,7 +138,7 @@ export default function TrackingMap({ layer, origem, entrega }) {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [posicaoOrigem, selecao, chaveSelecao]);
+  }, [posicaoOrigem, selecao, chaveSelecao, motoristaId, entrega?.codigo]);
 
   const rotaAtual = rota?.chave === chaveSelecao ? rota : null;
 

@@ -9,7 +9,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ULTIMA_ENTREGA_ID = `(
   SELECT e2.id_entregas
   FROM entregas e2
-  WHERE e2.id_cliente = c.id_cadastro
+  WHERE e2.id_cliente = c.id
   ORDER BY e2.checked_at DESC, e2.id_entregas DESC
   LIMIT 1
 )`;
@@ -98,7 +98,7 @@ export async function listarClientes(request, response, next) {
     const [linhas] = await pool.query(
       `
       SELECT
-        c.id_cadastro AS id,
+        c.id AS id,
         c.nome,
         c.email,
         DATE_FORMAT(e.checked_at, '%d/%m/%Y') AS ultimaSolicitacao,
@@ -137,12 +137,12 @@ export async function obterSolicitacaoCliente(request, response, next) {
     const [linhas] = await pool.query(
       `
       SELECT
-        c.id_cadastro AS id,
+        c.id AS id,
         c.nome,
         c.email,
         c.telefone,
-        e.codigo,
-        e.endereco_origem AS origem,
+        e.codigo_rastreio AS codigo,
+        e.endereco_coleta AS origem,
         e.endereco_destino AS destino,
         e.tipo_servico AS servico,
         e.observacoes,
@@ -154,7 +154,7 @@ export async function obterSolicitacaoCliente(request, response, next) {
       FROM cadastro c
       LEFT JOIN entregas e ON e.id_entregas = ${ULTIMA_ENTREGA_ID}
       LEFT JOIN motoristas m ON m.id_motoristas = e.id_motorista
-      WHERE c.id_cadastro = ?
+      WHERE c.id = ?
       LIMIT 1
       `,
       [idCliente]

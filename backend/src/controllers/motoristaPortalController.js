@@ -3,17 +3,23 @@ import { iniciais, localidade, ruaNumero } from "../utils/endereco.js";
 
 const STATUS_VALIDOS = ["Pendente", "A Caminho", "Entregue", "Cancelado"];
 const TRANSICOES = { Pendente: ["A Caminho"], "A Caminho": ["Entregue"], Entregue: ["A Caminho"] };
-const CAMPOS_ENTREGA = `e.id_entregas AS id, e.codigo AS codigo,
+const CAMPOS_ENTREGA = `e.id_entregas AS id, e.codigo_rastreio AS codigo,
   COALESCE(e.nome_cliente, c.nome, 'Cliente') AS cliente, e.endereco_destino AS endereco,
+  e.endereco_coleta AS coleta, e.tipo_servico AS servico, e.tamanho_pacote AS tamanho,
+  e.peso_kg AS pesoKg, e.valor_frete AS valorFrete, e.distancia_km AS distanciaKm,
+  e.status_antes_cancelamento AS statusAntesCancelamento,
   e.status, DATE_FORMAT(e.previsao, '%H:%i') AS previsaoHora,
   DATE_FORMAT(e.previsao, '%d/%m/%Y') AS previsaoData,
   DATE_FORMAT(e.atualizado_em, '%d/%m/%Y') AS dataEntrega,
   (e.status IN ('Pendente', 'A Caminho') AND e.previsao < NOW()) AS atrasada`;
-const ORIGEM_ENTREGAS = "FROM entregas e LEFT JOIN cadastro c ON c.id_cadastro = e.id_cliente";
+const ORIGEM_ENTREGAS = "FROM entregas e LEFT JOIN cadastro c ON c.id = e.id_cliente";
 
 function paraTela(linha) {
   return { id: linha.id, codigo: linha.codigo, cliente: linha.cliente, endereco: linha.endereco,
-    ruaNumero: ruaNumero(linha.endereco), localidade: localidade(linha.endereco), status: linha.status,
+    ruaNumero: ruaNumero(linha.endereco), localidade: localidade(linha.endereco), coleta: linha.coleta,
+    servico: linha.servico, tamanho: linha.tamanho, pesoKg: linha.pesoKg, valorFrete: linha.valorFrete,
+    distanciaKm: linha.distanciaKm, statusAntesCancelamento: linha.statusAntesCancelamento,
+    precisaDevolucao: linha.status === "Cancelado" && linha.statusAntesCancelamento === "A Caminho", status: linha.status,
     previsaoHora: linha.previsaoHora, previsaoData: linha.previsaoData,
     dataEntrega: linha.dataEntrega, atrasada: Boolean(linha.atrasada) };
 }
@@ -46,11 +52,12 @@ export async function resumoDoMotorista(request, response) {
     COALESCE(SUM(status = 'Entregue'), 0) AS entregues,
     COALESCE(SUM(status = 'A Caminho'), 0) AS emAndamento,
     COALESCE(SUM(status = 'Pendente'), 0) AS pendentes,
-    COALESCE(SUM(status = 'Entregue' AND DATE(atualizado_em) = CURDATE()), 0) AS concluidasHoje
-    FROM entregas WHERE id_motorista = ? AND status <> 'Cancelado'`, [motorista.id]);
+    COALESCE(SUM(status = 'Entregue' AND DATE(atualizado_em) = CURDATE()), 0) AS concluidasHoje,
+    COALESCE(SUM(status = 'Cancelado'), 0) AS canceladas
+    FROM entregas WHERE id_motorista = ?`, [motorista.id]);
   const emAndamento = Number(c.emAndamento), pendentes = Number(c.pendentes), concluidas = Number(c.concluidasHoje);
   response.json({ motorista: { id: motorista.id, nome: motorista.nome, iniciais: iniciais(motorista.nome), cidade: motorista.cidade, veiculo: motorista.veiculo },
-    total: Number(c.total), entregues: Number(c.entregues), emAndamento, pendentes,
+    total: Number(c.total), entregues: Number(c.entregues), emAndamento, pendentes, canceladas: Number(c.canceladas),
     hoje: { total: emAndamento + pendentes + concluidas, concluidas, abertas: emAndamento + pendentes } });
 }
 
@@ -61,7 +68,7 @@ export async function listarEntregasDoMotorista(request, response) {
   const condicoes = ["e.id_motorista = ?"], parametros = [motorista.id];
   if (STATUS_VALIDOS.includes(status)) { condicoes.push("e.status = ?"); parametros.push(status); }
   const termo = String(busca ?? "").trim();
-  if (termo) { condicoes.push("(e.codigo LIKE ? OR COALESCE(e.nome_cliente, c.nome) LIKE ? OR e.endereco_destino LIKE ?)"); parametros.push(`%${termo}%`, `%${termo}%`, `%${termo}%`); }
+  if (termo) { condicoes.push("(e.codigo_rastreio LIKE ? OR COALESCE(e.nome_cliente, c.nome) LIKE ? OR e.endereco_destino LIKE ?)"); parametros.push(`%${termo}%`, `%${termo}%`, `%${termo}%`); }
   if (dias !== undefined) { condicoes.push("e.atualizado_em >= DATE_SUB(CURDATE(), INTERVAL ? DAY)"); parametros.push(inteiro(dias, 30, 1, 365) - 1); }
   const where = condicoes.join(" AND "), ordem = status === "Entregue" ? "e.atualizado_em DESC" : "e.previsao ASC";
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total ${ORIGEM_ENTREGAS} WHERE ${where}`, parametros);
@@ -79,13 +86,55 @@ export async function mapaDoMotorista(request, response) {
     entregas: linhas.map((linha) => ({ ...paraTela(linha), lat: Number(linha.lat), lng: Number(linha.lng) })) });
 }
 
+export async function obterRotaDaEntrega(request, response) {
+  const { motorista } = request;
+  const codigo = String(request.params.codigo ?? "").trim();
+  const [[entrega]] = await pool.query(`SELECT id_entregas AS id,
+      ST_Y(coordenadas_destino) AS lat, ST_X(coordenadas_destino) AS lng
+    FROM entregas
+    WHERE codigo_rastreio = ? AND id_motorista = ? AND status IN ('Pendente', 'A Caminho')`,
+  [codigo, motorista.id]);
+  if (!entrega) return response.status(404).json({ message: "Entrega ativa não encontrada para este motorista." });
+
+  const origemLat = Number(motorista.lat), origemLng = Number(motorista.lng);
+  const destinoLat = Number(entrega.lat), destinoLng = Number(entrega.lng);
+  if (![origemLat, origemLng, destinoLat, destinoLng].every(Number.isFinite)) {
+    return response.status(422).json({ message: "Não há coordenadas válidas para montar a rota." });
+  }
+
+  const url = new URL(`https://router.project-osrm.org/route/v1/driving/${origemLng},${origemLat};${destinoLng},${destinoLat}`);
+  url.searchParams.set("overview", "full");
+  url.searchParams.set("geometries", "geojson");
+  let resposta;
+  try {
+    resposta = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  } catch {
+    return response.status(502).json({ message: "O serviço de rotas está indisponível no momento." });
+  }
+  if (!resposta.ok) return response.status(502).json({ message: "Não foi possível carregar a rota viária." });
+
+  const dados = await resposta.json();
+  const rota = dados?.routes?.[0];
+  const coordenadas = rota?.geometry?.coordinates;
+  if (!Array.isArray(coordenadas) || coordenadas.length < 2) {
+    return response.status(422).json({ message: "Não foi encontrada uma rota entre o motorista e a entrega." });
+  }
+
+  return response.json({
+    codigo,
+    distanciaKm: Number((rota.distance / 1000).toFixed(1)),
+    duracaoSegundos: rota.duration,
+    pontos: coordenadas.map(([lng, lat]) => [Number(lat), Number(lng)]),
+  });
+}
+
 export async function atualizarStatusDaEntrega(request, response) {
   const { motorista } = request, codigo = String(request.params.codigo ?? "").trim(), novoStatus = request.body?.status;
   if (!STATUS_VALIDOS.includes(novoStatus)) return response.status(400).json({ message: "Status inválido." });
   const conexao = await pool.getConnection();
   try {
     await conexao.beginTransaction();
-    const [linhas] = await conexao.query("SELECT id_entregas AS id, status FROM entregas WHERE codigo = ? AND id_motorista = ? FOR UPDATE", [codigo, motorista.id]);
+    const [linhas] = await conexao.query("SELECT id_entregas AS id, status FROM entregas WHERE codigo_rastreio = ? AND id_motorista = ? FOR UPDATE", [codigo, motorista.id]);
     const entrega = linhas[0];
     if (!entrega) { await conexao.rollback(); return response.status(404).json({ message: "Entrega não encontrada para este motorista." }); }
     if (!(TRANSICOES[entrega.status] ?? []).includes(novoStatus)) { await conexao.rollback(); return response.status(409).json({ message: `Não é possível mudar de \"${entrega.status}\" para \"${novoStatus}\".` }); }
