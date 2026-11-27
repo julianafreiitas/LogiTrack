@@ -16,6 +16,21 @@
 
 .container_mapa .area_botoes { gap: 14px; }
 
+/* A barra lateral é fixa e ocupa a largura declarada mais o padding lateral. */
+.container_mapa > .delivery-map-page {
+  margin-left: 164px;
+  width: calc(100% - 164px);
+}
+
+.container_mapa .delivery-hero-banner {
+  min-height: 148px;
+  margin-top: 0;
+  border-radius: 15px;
+  background-image:
+    linear-gradient(90deg, #07172a 0%, rgba(7, 23, 42, .94) 36%, rgba(7, 23, 42, .42) 68%, rgba(7, 23, 42, .08) 100%),
+    url('/imagens/img-caminhao2.png');
+}
+
 .container_mapa .sidebar {
   height: 100vh;
   height: 100dvh;
@@ -428,6 +443,7 @@
 }
 
 @media (max-width: 640px) {
+  .container_mapa > .delivery-map-page { margin-left: 0; width: 100%; }
   .container_mapa .area_botoes { gap: 8px; }
   .delivery-map-page { padding: 0 14px 20px; }
   .map-topbar { height: 56px; }

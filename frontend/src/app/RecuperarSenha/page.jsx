@@ -1,20 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-  MailCheck,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, CheckCircle2, Eye, EyeOff, Fingerprint, LockKeyhole } from "lucide-react";
+import { chamarApi } from "../lib/identificacao";
 import "./pageRecuperarSenha.css";
-
-const ESPERA_REENVIO = 30; // segundos
 
 function Marca() {
   return (
@@ -24,104 +15,47 @@ function Marca() {
   );
 }
 
-/* Etapa 1: o usuário informa o e-mail e recebe o link */
-function PedirLink() {
-  const [email, setEmail] = useState("");
-  const [enviado, setEnviado] = useState(false);
-  const [espera, setEspera] = useState(0);
-
-  useEffect(() => {
-    if (espera <= 0) return;
-    const t = setTimeout(() => setEspera((s) => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [espera]);
-
-  function enviar(e) {
-    e?.preventDefault();
-
-    
-    console.log("Enviar link para:", email);
-
-    setEnviado(true);
-    setEspera(ESPERA_REENVIO);
-  }
-
-  if (enviado) {
-    return (
-      <>
-        <div className="recover-icon" aria-hidden="true">
-          <MailCheck size={30} />
-        </div>
-        <h1>Verifique seu e-mail</h1>
-        <p className="recover-subtitle">
-          Se <strong>{email}</strong> estiver cadastrado, você vai receber um link para
-          criar uma nova senha. O link vale por 1 hora.
-        </p>
-
-        <button
-          className="recover-secondary"
-          type="button"
-          onClick={enviar}
-          disabled={espera > 0}
-        >
-          {espera > 0 ? `Reenviar e-mail em ${espera}s` : "Reenviar e-mail"}
-        </button>
-
-        <button
-          className="recover-link-button"
-          type="button"
-          onClick={() => setEnviado(false)}
-        >
-          Usar outro e-mail
-        </button>
-
-        <p className="recover-hint">Não achou? Olhe também a caixa de spam.</p>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <h1>Esqueceu a senha?</h1>
-      <p className="recover-subtitle">
-        Digite seu e-mail e enviaremos um link para você criar uma nova senha.
-      </p>
-
-      <form onSubmit={enviar}>
-        <label htmlFor="recover-email">E-mail</label>
-        <div className="recover-field">
-          <Mail size={15} aria-hidden="true" />
-          <input
-            id="recover-email"
-            type="email"
-            autoComplete="email"
-            placeholder="Digite seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <button className="recover-submit" type="submit">
-          Enviar link
-        </button>
-      </form>
-    </>
-  );
+function formatarCpf(valor) {
+  const digitos = valor.replace(/\D/g, "").slice(0, 11);
+  if (digitos.length <= 3) return digitos;
+  if (digitos.length <= 6) return `${digitos.slice(0, 3)}.${digitos.slice(3)}`;
+  if (digitos.length <= 9) return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6)}`;
+  return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9)}`;
 }
 
-function NovaSenha({ token }) {
+export default function RecuperarSenha() {
+  const router = useRouter();
+  const [cpf, setCpf] = useState("");
+  const [token, setToken] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
+  const [etapa, setEtapa] = useState("cpf");
   const [erro, setErro] = useState("");
-  const [concluido, setConcluido] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
-  function redefinir(e) {
-    e.preventDefault();
+  async function validarCpf(evento) {
+    evento.preventDefault();
     setErro("");
+    setCarregando(true);
+    try {
+      const resposta = await chamarApi("/auth/cliente/recuperar-senha/cpf", {
+        method: "POST",
+        body: JSON.stringify({ cpf: cpf.replace(/\D/g, "") }),
+      });
+      setToken(resposta.token);
+      setEtapa("senha");
+    } catch (falha) {
+      setErro(falha.message || "Não foi possível validar o CPF.");
+    } finally {
+      setCarregando(false);
+    }
+  }
 
+  async function redefinirSenha(evento) {
+    evento.preventDefault();
+    setErro("");
     if (senha.length < 6) {
       setErro("A senha precisa ter pelo menos 6 caracteres.");
       return;
@@ -131,119 +65,118 @@ function NovaSenha({ token }) {
       return;
     }
 
-  
-    console.log("Redefinir senha com token:", token);
-
-    setConcluido(true);
+    setCarregando(true);
+    try {
+      await chamarApi("/auth/cliente/recuperar-senha/redefinir", {
+        method: "POST",
+        body: JSON.stringify({ token, senha }),
+      });
+      setEtapa("concluido");
+    } catch (falha) {
+      setErro(falha.message || "Não foi possível alterar a senha.");
+      if (falha.status === 401) {
+        setToken("");
+        setEtapa("cpf");
+      }
+    } finally {
+      setCarregando(false);
+    }
   }
-
-  if (concluido) {
-    return (
-      <>
-        <div className="recover-icon sucesso" aria-hidden="true">
-          <CheckCircle2 size={30} />
-        </div>
-        <h1>Senha atualizada</h1>
-        <p className="recover-subtitle">
-          Sua senha foi alterada. Entre com a nova senha para continuar.
-        </p>
-        <Link className="recover-submit recover-submit-link" href="/login">
-          Ir para o login
-        </Link>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <h1>Crie uma nova senha</h1>
-      <p className="recover-subtitle">Escolha uma senha com pelo menos 6 caracteres.</p>
-
-      <form onSubmit={redefinir}>
-        <label htmlFor="recover-senha">Nova senha</label>
-        <div className="recover-field">
-          <LockKeyhole size={15} aria-hidden="true" />
-          <input
-            id="recover-senha"
-            type={mostrarSenha ? "text" : "password"}
-            autoComplete="new-password"
-            placeholder="Digite a nova senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-          />
-          <button
-            className="password-toggle"
-            type="button"
-            onClick={() => setMostrarSenha((v) => !v)}
-            aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
-          >
-            {mostrarSenha ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
-        </div>
-
-        <label htmlFor="recover-confirmar">Confirmar nova senha</label>
-        <div className="recover-field">
-          <LockKeyhole size={15} aria-hidden="true" />
-          <input
-            id="recover-confirmar"
-            type={mostrarConfirmar ? "text" : "password"}
-            autoComplete="new-password"
-            placeholder="Repita a nova senha"
-            value={confirmar}
-            onChange={(e) => setConfirmar(e.target.value)}
-            required
-          />
-          <button
-            className="password-toggle"
-            type="button"
-            onClick={() => setMostrarConfirmar((v) => !v)}
-            aria-label={mostrarConfirmar ? "Ocultar senha" : "Mostrar senha"}
-          >
-            {mostrarConfirmar ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
-        </div>
-
-        {erro && (
-          <p className="recover-erro" role="alert">
-            {erro}
-          </p>
-        )}
-
-        <button className="recover-submit" type="submit">
-          Salvar nova senha
-        </button>
-      </form>
-    </>
-  );
-}
-
-function RecuperarSenha() {
-  const params = useSearchParams();
-  const token = params.get("token");
 
   return (
     <main className="recover-page">
       <section className="recover" aria-label="Recuperar senha">
         <Marca />
 
-        {token ? <NovaSenha token={token} /> : <PedirLink />}
+        {etapa === "cpf" && (
+          <>
+            <h1>Esqueceu a senha?</h1>
+            <p className="recover-subtitle">
+              Informe o CPF cadastrado para criar uma nova senha.
+            </p>
+            <form onSubmit={validarCpf}>
+              <label htmlFor="recover-cpf">CPF</label>
+              <div className="recover-field">
+                <Fingerprint size={16} aria-hidden="true" />
+                <input
+                  id="recover-cpf"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  placeholder="Digite seu CPF"
+                  value={cpf}
+                  onChange={(evento) => setCpf(formatarCpf(evento.target.value))}
+                  required
+                />
+              </div>
+              {erro && <p className="recover-erro" role="alert">{erro}</p>}
+              <button className="recover-submit" type="submit" disabled={carregando}>
+                {carregando ? "Verificando CPF..." : "Continuar"}
+              </button>
+            </form>
+          </>
+        )}
 
-        <div className="recover-back">
-          <Link href="/login">
-            <ArrowLeft size={14} aria-hidden="true" />
-            Voltar para o login
-          </Link>
-        </div>
+        {etapa === "senha" && (
+          <>
+            <h1>Crie uma nova senha</h1>
+            <p className="recover-subtitle">CPF validado. Escolha uma senha com pelo menos 6 caracteres.</p>
+            <form onSubmit={redefinirSenha}>
+              <label htmlFor="recover-senha">Nova senha</label>
+              <div className="recover-field">
+                <LockKeyhole size={15} aria-hidden="true" />
+                <input
+                  id="recover-senha"
+                  type={mostrarSenha ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="Digite a nova senha"
+                  value={senha}
+                  onChange={(evento) => setSenha(evento.target.value)}
+                  required
+                />
+                <button className="password-toggle" type="button" onClick={() => setMostrarSenha((valor) => !valor)} aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}>
+                  {mostrarSenha ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+              <label htmlFor="recover-confirmar">Confirmar nova senha</label>
+              <div className="recover-field">
+                <LockKeyhole size={15} aria-hidden="true" />
+                <input
+                  id="recover-confirmar"
+                  type={mostrarConfirmar ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="Repita a nova senha"
+                  value={confirmar}
+                  onChange={(evento) => setConfirmar(evento.target.value)}
+                  required
+                />
+                <button className="password-toggle" type="button" onClick={() => setMostrarConfirmar((valor) => !valor)} aria-label={mostrarConfirmar ? "Ocultar senha" : "Mostrar senha"}>
+                  {mostrarConfirmar ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+              {erro && <p className="recover-erro" role="alert">{erro}</p>}
+              <button className="recover-submit" type="submit" disabled={carregando}>
+                {carregando ? "Salvando..." : "Salvar nova senha"}
+              </button>
+            </form>
+          </>
+        )}
+
+        {etapa === "concluido" && (
+          <>
+            <div className="recover-icon sucesso" aria-hidden="true"><CheckCircle2 size={30} /></div>
+            <h1>Senha atualizada</h1>
+            <p className="recover-subtitle">Sua senha foi alterada. Entre com a nova senha para continuar.</p>
+            <button className="recover-submit" type="button" onClick={() => router.push("/login")}>Ir para o login</button>
+          </>
+        )}
+
+        {etapa !== "concluido" && (
+          <div className="recover-back">
+            <Link href="/login"><ArrowLeft size={14} aria-hidden="true" />Voltar para o login</Link>
+          </div>
+        )}
       </section>
     </main>
-  );
-}
-
-export default function Page() {
-  return (
-    <Suspense fallback={null}>
-      <RecuperarSenha />
-    </Suspense>
   );
 }

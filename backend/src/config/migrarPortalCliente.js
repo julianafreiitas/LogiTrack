@@ -37,6 +37,15 @@ async function colunaExiste(tabela, coluna) {
   return Boolean(existente);
 }
 
+async function indiceExiste(tabela, indice) {
+  const [[existente]] = await pool.query(
+    `SELECT 1 AS existe FROM INFORMATION_SCHEMA.STATISTICS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND INDEX_NAME = ?`,
+    [tabela, indice],
+  );
+  return Boolean(existente);
+}
+
 export async function migrarPortalCliente() {
   // Bases antigas usavam nomes diferentes. Renomear preserva os registros.
   if (!(await colunaExiste("cadastro", "id")) && await colunaExiste("cadastro", "id_cadastro")) {
@@ -55,6 +64,10 @@ export async function migrarPortalCliente() {
         await pool.query(`ALTER TABLE \`${tabela}\` ADD COLUMN \`${coluna}\` ${definicao}`);
       }
     }
+  }
+
+  if (!(await indiceExiste("cadastro", "uq_cadastro_cpf"))) {
+    await pool.query("ALTER TABLE cadastro ADD UNIQUE INDEX uq_cadastro_cpf (cpf)");
   }
 
   for (const [tabela, coluna] of [["cadastro", "id"], ["entregas", "codigo_rastreio"], ["entregas", "id_cliente"], ["entregas", "coordenadas_destino"], ["entregas", "previsao"]]) {
