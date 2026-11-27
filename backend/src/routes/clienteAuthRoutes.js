@@ -45,6 +45,14 @@ router.post("/cadastro", async (request, response, next) => {
       return response.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres." });
     }
 
+    const [[existente]] = await pool.execute(
+      "SELECT id FROM cadastro WHERE email = ? OR cpf = ? LIMIT 1",
+      [email, cpf],
+    );
+    if (existente) {
+      return response.status(409).json({ message: "Este e-mail ou CPF já possui uma conta." });
+    }
+
     const senhaHash = await hashPassword(senha);
     const [resultado] = await pool.execute(
       "INSERT INTO cadastro (nome, email, senha, telefone, cpf) VALUES (?, ?, ?, ?, ?)",
@@ -58,56 +66,6 @@ router.post("/cadastro", async (request, response, next) => {
     if (error.code === "ER_DUP_ENTRY") {
       return response.status(409).json({ message: "Este e-mail ou CPF já possui uma conta." });
     }
-    return next(error);
-  }
-});
-
-router.post("/recuperar-senha/cpf", async (request, response, next) => {
-  try {
-    const cpf = normalizarCpf(request.body?.cpf);
-    if (!/^\d{11}$/.test(cpf)) {
-      return response.status(400).json({ message: "Informe os 11 dígitos do CPF cadastrado." });
-    }
-
-    const [[cliente]] = await pool.execute("SELECT id FROM cadastro WHERE cpf = ? LIMIT 1", [cpf]);
-    if (!cliente) {
-      return response.status(404).json({ message: "Não encontramos uma conta cadastrada com esse CPF." });
-    }
-
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET precisa estar configurado.");
-    const token = jwt.sign({ id: cliente.id, tipo: "recuperacao-cliente" }, secret, { expiresIn: "10m" });
-    return response.json({ token });
-  } catch (error) {
-    return next(error);
-  }
-});
-
-router.post("/recuperar-senha/redefinir", async (request, response, next) => {
-  try {
-    const token = String(request.body?.token ?? "");
-    const senha = String(request.body?.senha ?? "");
-    if (senha.length < 6 || senha.length > 128) {
-      return response.status(400).json({ message: "A senha deve ter entre 6 e 128 caracteres." });
-    }
-
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET precisa estar configurado.");
-    let dados;
-    try {
-      dados = jwt.verify(token, secret);
-    } catch {
-      return response.status(401).json({ message: "A validação do CPF expirou. Informe o CPF novamente." });
-    }
-    if (dados.tipo !== "recuperacao-cliente" || !Number.isInteger(dados.id)) {
-      return response.status(401).json({ message: "Token de recuperação inválido." });
-    }
-
-    const senhaHash = await hashPassword(senha);
-    const [resultado] = await pool.execute("UPDATE cadastro SET senha = ? WHERE id = ?", [senhaHash, dados.id]);
-    if (!resultado.affectedRows) return response.status(404).json({ message: "Conta não encontrada." });
-    return response.json({ message: "Senha alterada com sucesso." });
-  } catch (error) {
     return next(error);
   }
 });

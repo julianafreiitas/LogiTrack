@@ -54,12 +54,17 @@ export default function MapaFuncionarios() {
   }, []);
 
   useEffect(() => {
-    if (!motorista.id) return;
+    if (!motorista.pronto) return;
+    if (!motorista.id) {
+      setCarregando(false);
+      if (motorista.erro) setErro(motorista.erro);
+      return;
+    }
     // "Ver rota" na tela Minhas Entregas manda ?codigo=... para abrir já nessa entrega
     const codigo = new URLSearchParams(window.location.search).get("codigo");
     setCarregando(true);
     carregar(motorista.id, codigo);
-  }, [motorista.id, carregar]);
+  }, [motorista.id, motorista.pronto, motorista.erro, carregar]);
 
   const entregasAbertas = dados.entregas.filter((entrega) => ["Pendente", "A Caminho"].includes(entrega.status));
   const selecionada = entregasAbertas.find((entrega) => entrega.id === selecionadaId) ?? null;
@@ -175,6 +180,13 @@ export default function MapaFuncionarios() {
               entrega={entregaConcluida ? null : selecionada}
             />
           )}
+          {!dados.origem && !carregando && (erro || motorista.erro) && (
+            <div className="map-unavailable-state" role="status">
+              <MapPin size={34} aria-hidden="true" />
+              <strong>Mapa indisponível</strong>
+              <span>Confira a conexão com o servidor e tente novamente.</span>
+            </div>
+          )}
           <div className="map-legend">
             <span><i className="legend-location"><Navigation size={11} fill="currentColor" /></i>Sua localização</span>
             {!entregaConcluida && selecionada && (
@@ -244,8 +256,10 @@ export default function MapaFuncionarios() {
             </>
           ) : (
             <div className="delivery-card-heading">
-              <h2>{carregando ? "Carregando..." : "Sem entregas para mostrar"}</h2>
-              {!carregando && <p className="delivery-section-label">Você não tem entregas abertas no momento.</p>}
+              <h2>{carregando ? "Carregando..." : (erro || motorista.erro) ? "Não foi possível carregar o mapa" : "Sem entregas para mostrar"}</h2>
+              {!carregando && (erro || motorista.erro)
+                ? <p className="delivery-section-label">Verifique a conexão e tente novamente.</p>
+                : !carregando && <p className="delivery-section-label">Você não tem entregas abertas no momento.</p>}
             </div>
           )}
         </aside>

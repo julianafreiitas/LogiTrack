@@ -20,18 +20,50 @@
     overflow: hidden;
 }
 
-/* Mantém a navegação do mapa visível e sem rolagem própria. */
+/* Mantém a navegação do mapa ao lado do conteúdo sem sobreposição. */
 .container_mapa .sidebar {
-    position: fixed;
+    position: sticky;
     left: 0;
+    top: 0;
+    width: 138px;
+    flex: 0 0 138px;
     height: 100vh;
     height: 100dvh;
     min-height: 0;
     overflow: hidden;
 }
 
+@media (min-width: 1100px) {
+    .container_mapa .sidebar {
+        width: 210px;
+        flex-basis: 210px;
+        padding: 22px 14px 16px;
+    }
+}
+
+@media (max-width: 700px) {
+    .container_mapa .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        border-right: 0;
+        border-bottom: 1px solid #142e45;
+        padding: 10px 12px;
+    }
+}
+
 .container_mapa > .delivery-map-page {
-    margin-left: 138px;
+    box-sizing: border-box;
+    flex: 1 1 0;
+    min-width: 0;
+    margin-left: 0;
+    width: auto;
 }
 
 .logo {

@@ -5,6 +5,7 @@ const CAMPOS = {
     ultimo_acesso: "TIMESTAMP NULL DEFAULT NULL",
   },
   cadastro: {
+    cpf: "VARCHAR(11) DEFAULT NULL",
     nascimento: "DATE DEFAULT NULL",
     cep: "VARCHAR(12) DEFAULT NULL",
     rua: "VARCHAR(150) DEFAULT NULL",
@@ -67,7 +68,16 @@ export async function migrarPortalCliente() {
   }
 
   if (!(await indiceExiste("cadastro", "uq_cadastro_cpf"))) {
-    await pool.query("ALTER TABLE cadastro ADD UNIQUE INDEX uq_cadastro_cpf (cpf)");
+    const [[duplicados]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM (
+         SELECT cpf FROM cadastro
+         WHERE cpf IS NOT NULL AND TRIM(cpf) <> ''
+         GROUP BY cpf HAVING COUNT(*) > 1
+       ) AS cpfs_duplicados`,
+    );
+    if (Number(duplicados.total) === 0) {
+      await pool.query("ALTER TABLE cadastro ADD UNIQUE INDEX uq_cadastro_cpf (cpf)");
+    }
   }
 
   for (const [tabela, coluna] of [["cadastro", "id"], ["entregas", "codigo_rastreio"], ["entregas", "id_cliente"], ["entregas", "coordenadas_destino"], ["entregas", "previsao"]]) {

@@ -22,13 +22,24 @@ export function limparSessaoCliente() {
 
 // GET/PATCH na API devolvendo JSON; lança Error com a mensagem do servidor quando falha
 export async function chamarApi(caminho, opcoes) {
-  const resposta = await fetch(`${API_URL}${caminho}`, {
-    ...opcoes,
-    headers: { "Content-Type": "application/json", ...(opcoes?.headers ?? {}) },
-  });
-  const dados = await resposta.json().catch(() => ({}));
+  let resposta;
+  try {
+    resposta = await fetch(`${API_URL}${caminho}`, {
+      ...opcoes,
+      headers: { "Content-Type": "application/json", ...(opcoes?.headers ?? {}) },
+    });
+  } catch {
+    throw new Error("Não foi possível conectar à API. Verifique se o backend está disponível.");
+  }
+  const texto = await resposta.text();
+  let dados = {};
+  try {
+    dados = texto ? JSON.parse(texto) : {};
+  } catch {
+    // Proxies podem devolver HTML quando a API está inacessível.
+  }
   if (!resposta.ok) {
-    const erro = new Error(dados.message || "Não foi possível completar a operação.");
+    const erro = new Error(dados.message || `A API respondeu com erro (HTTP ${resposta.status}).`);
     erro.status = resposta.status;
     throw erro;
   }
