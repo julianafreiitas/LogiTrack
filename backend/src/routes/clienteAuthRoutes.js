@@ -1,24 +1,10 @@
+import { createHash } from "node:crypto";
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import pool from "../config/database.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
 
 const router = Router();
-
-function normalizarCpf(valor) {
-  return String(valor ?? "").replace(/\D/g, "");
-}
-
-function cpfValido(cpf) {
-  if (!/^\d{11}$/.test(cpf) || /^([\d])\1{10}$/.test(cpf)) return false;
-  const digito = (base, peso) => {
-    const soma = [...base].reduce((total, numero, indice) => total + Number(numero) * (peso - indice), 0);
-    const resto = (soma * 10) % 11;
-    return resto === 10 ? 0 : resto;
-  };
-  return digito(cpf.slice(0, 9), 10) === Number(cpf[9])
-    && digito(cpf.slice(0, 10), 11) === Number(cpf[10]);
-}
 
 function gerarToken(cliente) {
   const secret = process.env.JWT_SECRET;
@@ -30,41 +16,39 @@ function gerarToken(cliente) {
   );
 }
 
+const soDigitos = (valor) => String(valor ?? "").replace(/\D/g, "");
+
+// Assinatura da senha atual: o token de redefinição deixa de valer assim que a senha muda.
+const assinaturaSenha = (hash) => createHash("sha256").update(String(hash)).digest("hex").slice(0, 16);
+
+const SESSAO_EXPIRADA = "Sessão de recuperação expirada. Digite o CPF novamente.";
+
 router.post("/cadastro", async (request, response, next) => {
   try {
     const nome = String(request.body?.nome ?? "").trim();
     const email = String(request.body?.email ?? "").trim().toLowerCase();
     const telefone = String(request.body?.telefone ?? "").trim();
-    const cpf = normalizarCpf(request.body?.cpf);
     const senha = String(request.body?.senha ?? "");
 
-    if (!nome || nome.length > 100 || !/^\S+@\S+\.\S+$/.test(email) || email.length > 100 || !telefone || telefone.length > 40 || !cpfValido(cpf)) {
-      return response.status(400).json({ message: "Informe nome, e-mail, telefone e um CPF válido." });
+    if (!nome || nome.length > 100 || !/^\S+@\S+\.\S+$/.test(email) || email.length > 100 || !telefone || telefone.length > 40) {
+      return response.status(400).json({ message: "Informe nome, e-mail válido e telefone." });
     }
     if (senha.length < 6) {
       return response.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres." });
     }
 
-    const [[existente]] = await pool.execute(
-      "SELECT id FROM cadastro WHERE email = ? OR cpf = ? LIMIT 1",
-      [email, cpf],
-    );
-    if (existente) {
-      return response.status(409).json({ message: "Este e-mail ou CPF já possui uma conta." });
-    }
-
     const senhaHash = await hashPassword(senha);
     const [resultado] = await pool.execute(
-      "INSERT INTO cadastro (nome, email, senha, telefone, cpf) VALUES (?, ?, ?, ?, ?)",
-      [nome, email, senhaHash, telefone, cpf],
+      "INSERT INTO cadastro (nome, email, senha, telefone) VALUES (?, ?, ?, ?)",
+      [nome, email, senhaHash, telefone],
     );
     return response.status(201).json({
       message: "Cadastro criado. Entre com seu e-mail e senha.",
-      cliente: { id: resultado.insertId, nome, email, telefone, cpf },
+      cliente: { id: resultado.insertId, nome, email, telefone },
     });
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
-      return response.status(409).json({ message: "Este e-mail ou CPF já possui uma conta." });
+      return response.status(409).json({ message: "Este e-mail já possui uma conta." });
     }
     return next(error);
   }
@@ -93,6 +77,70 @@ router.post("/login", async (request, response, next) => {
       telefone: cliente.telefone,
     };
     return response.json({ token: gerarToken(dadosCliente), cliente: dadosCliente });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// Esqueceu a senha, etapa 1: confere o CPF no banco e libera a troca de senha.
+router.post("/recuperar/verificar", async (request, response, next) => {
+  try {
+    const cpf = soDigitos(request.body?.cpf);
+    if (cpf.length !== 11) {
+      return response.status(400).json({ message: "Informe um CPF com 11 dígitos." });
+    }
+
+    // O CPF pode estar salvo com ou sem máscara; compara só os dígitos.
+    const [contas] = await pool.execute(
+      "SELECT id, senha FROM cadastro WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ? LIMIT 2",
+      [cpf],
+    );
+    if (contas.length === 0) {
+      return response.status(404).json({ message: "CPF não encontrado." });
+    }
+    if (contas.length > 1) {
+      return response.status(409).json({ message: "Este CPF está ligado a mais de uma conta. Procure o suporte." });
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error("JWT_SECRET precisa estar configurado.");
+    const token = jwt.sign(
+      { id: contas[0].id, tipo: "reset", v: assinaturaSenha(contas[0].senha) },
+      secret,
+      { expiresIn: "10m" },
+    );
+    return response.json({ token });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// Esqueceu a senha, etapa 2: grava a nova senha usando o token da etapa 1.
+router.post("/recuperar/redefinir", async (request, response, next) => {
+  try {
+    const token = String(request.body?.token ?? "");
+    const senha = String(request.body?.senha ?? "");
+    if (senha.length < 6) {
+      return response.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres." });
+    }
+
+    let dados;
+    try {
+      dados = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      return response.status(401).json({ message: SESSAO_EXPIRADA });
+    }
+    if (dados.tipo !== "reset") {
+      return response.status(401).json({ message: SESSAO_EXPIRADA });
+    }
+
+    const [[conta]] = await pool.execute("SELECT senha FROM cadastro WHERE id = ?", [dados.id]);
+    if (!conta || assinaturaSenha(conta.senha) !== dados.v) {
+      return response.status(401).json({ message: SESSAO_EXPIRADA });
+    }
+
+    await pool.execute("UPDATE cadastro SET senha = ? WHERE id = ?", [await hashPassword(senha), dados.id]);
+    return response.json({ message: "Senha atualizada." });
   } catch (error) {
     return next(error);
   }

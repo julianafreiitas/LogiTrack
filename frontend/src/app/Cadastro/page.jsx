@@ -10,7 +10,6 @@ import {
   Mail,
   User,
   Phone,
-  Fingerprint,
 } from "lucide-react";
 import { chamarApi, limparSessaoCliente } from "../lib/identificacao";
 import "./pageCadastro.css";
@@ -23,21 +22,12 @@ function mascaraTelefone(v) {
   return `(${n.slice(0, 2)}) ${n.slice(2, 7)}-${n.slice(7)}`;
 }
 
-function mascaraCpf(v) {
-  const n = v.replace(/\D/g, "").slice(0, 11);
-  if (n.length <= 3) return n;
-  if (n.length <= 6) return `${n.slice(0, 3)}.${n.slice(3)}`;
-  if (n.length <= 9) return `${n.slice(0, 3)}.${n.slice(3, 6)}.${n.slice(6)}`;
-  return `${n.slice(0, 3)}.${n.slice(3, 6)}.${n.slice(6, 9)}-${n.slice(9)}`;
-}
-
 export default function Cadastro() {
   const router = useRouter();
   const [form, setForm] = useState({
     nome: "",
     email: "",
     telefone: "",
-    cpf: "",
     senha: "",
     confirmar: "",
   });
@@ -72,7 +62,6 @@ export default function Cadastro() {
           nome: form.nome,
           email: form.email,
           telefone: form.telefone,
-          cpf: form.cpf.replace(/\D/g, ""),
           senha: form.senha,
         }),
       });
@@ -143,23 +132,6 @@ export default function Cadastro() {
                   onChange={(e) =>
                     atualizar("telefone", mascaraTelefone(e.target.value))
                   }
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="register-group full">
-              <label htmlFor="reg-cpf">CPF</label>
-              <div className="register-field">
-                <Fingerprint size={15} aria-hidden="true" />
-                <input
-                  id="reg-cpf"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  placeholder="000.000.000-00"
-                  value={form.cpf}
-                  onChange={(e) => atualizar("cpf", mascaraCpf(e.target.value))}
                   required
                 />
               </div>

@@ -34,12 +34,6 @@
   font-size: 11px;
 }
 
-.profile-top-actions { display: flex; align-items: center; gap: 14px; }
-.profile-feedback, .profile-success { margin: 8px 0; color: #a9bfd3; font-size: 12px; }
-.profile-success { color: #56d9aa; }
-.profile-online.is-inactive { border-color: rgba(239, 68, 68, .25); background: rgba(239, 68, 68, .1); color: #f87171; }
-.profile-online.is-inactive i { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, .4); }
-
 .profile-top-user span {
   display: grid;
   width: 30px;

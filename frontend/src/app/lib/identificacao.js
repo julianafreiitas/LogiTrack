@@ -15,6 +15,12 @@ export function salvarSessaoCliente(cliente, token) {
   window.localStorage.setItem("logitrack:clienteToken", token);
 }
 
+export function salvarSessaoAdmin(usuario, token) {
+  window.localStorage.setItem("logitrack:adminId", String(usuario.id));
+  window.localStorage.setItem("logitrack:adminToken", token);
+  window.localStorage.setItem("logitrack:admin", JSON.stringify(usuario));
+}
+
 export function limparSessaoCliente() {
   window.localStorage.removeItem(CONFIG.cliente.chave);
   window.localStorage.removeItem("logitrack:clienteToken");
@@ -22,24 +28,13 @@ export function limparSessaoCliente() {
 
 // GET/PATCH na API devolvendo JSON; lança Error com a mensagem do servidor quando falha
 export async function chamarApi(caminho, opcoes) {
-  let resposta;
-  try {
-    resposta = await fetch(`${API_URL}${caminho}`, {
-      ...opcoes,
-      headers: { "Content-Type": "application/json", ...(opcoes?.headers ?? {}) },
-    });
-  } catch {
-    throw new Error("Não foi possível conectar à API. Verifique se o backend está disponível.");
-  }
-  const texto = await resposta.text();
-  let dados = {};
-  try {
-    dados = texto ? JSON.parse(texto) : {};
-  } catch {
-    // Proxies podem devolver HTML quando a API está inacessível.
-  }
+  const resposta = await fetch(`${API_URL}${caminho}`, {
+    ...opcoes,
+    headers: { "Content-Type": "application/json", ...(opcoes?.headers ?? {}) },
+  });
+  const dados = await resposta.json().catch(() => ({}));
   if (!resposta.ok) {
-    const erro = new Error(dados.message || `A API respondeu com erro (HTTP ${resposta.status}).`);
+    const erro = new Error(dados.message || "Não foi possível completar a operação.");
     erro.status = resposta.status;
     throw erro;
   }

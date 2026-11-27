@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 import pool from "../config/database.js";
 import { autenticar } from "../middlewares/authMiddleware.js";
+import { verifyPassword } from "../utils/password.js";
 
 const router = Router();
 
@@ -42,7 +43,6 @@ router.post("/login", async (req, res, next) => {
   try {
     const { email, senha } = req.body;
 
-    
     if (!email || !senha) {
       return res.status(400).json({ erro: "Informe e-mail e senha." });
     }
@@ -54,7 +54,13 @@ router.post("/login", async (req, res, next) => {
     const usuario = rows[0];
 
     // Mesma mensagem para e-mail inexistente ou senha errada
-    if (!usuario || !(await bcrypt.compare(senha, usuario.senha))) {
+    const senhaValida = usuario
+      ? (usuario.senha.startsWith("scrypt$")
+        ? await verifyPassword(senha, usuario.senha)
+        : await bcrypt.compare(senha, usuario.senha))
+      : false;
+
+    if (!senhaValida) {
       return res.status(401).json({ erro: "E-mail ou senha inválidos." });
     }
 

@@ -1,20 +1,25 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   CheckCircle2,
   Eye,
   EyeOff,
+  IdCard,
   LockKeyhole,
-  Mail,
-  MailCheck,
 } from "lucide-react";
+import { chamarApi } from "../lib/identificacao";
 import "./pageRecuperarSenha.css";
 
-const ESPERA_REENVIO = 30; // segundos
+function mascaraCpf(valor) {
+  const n = valor.replace(/\D/g, "").slice(0, 11);
+  if (n.length <= 3) return n;
+  if (n.length <= 6) return `${n.slice(0, 3)}.${n.slice(3)}`;
+  if (n.length <= 9) return `${n.slice(0, 3)}.${n.slice(3, 6)}.${n.slice(6)}`;
+  return `${n.slice(0, 3)}.${n.slice(3, 6)}.${n.slice(6, 9)}-${n.slice(9)}`;
+}
 
 function Marca() {
   return (
@@ -24,101 +29,77 @@ function Marca() {
   );
 }
 
-/* Etapa 1: o usuário informa o e-mail e recebe o link */
-function PedirLink() {
-  const [email, setEmail] = useState("");
-  const [enviado, setEnviado] = useState(false);
-  const [espera, setEspera] = useState(0);
+/* Etapa 1: o usuário informa o CPF; se existir no banco, segue para a troca de senha */
+function PedirCpf({ onVerificado }) {
+  const [cpf, setCpf] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  useEffect(() => {
-    if (espera <= 0) return;
-    const t = setTimeout(() => setEspera((s) => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [espera]);
-
-  function enviar(e) {
-    e?.preventDefault();
-
-
-    console.log("Enviar link para:", email);
-
-    setEnviado(true);
-    setEspera(ESPERA_REENVIO);
-  }
-
-  if (enviado) {
-    return (
-      <>
-        <div className="recover-icon" aria-hidden="true">
-          <MailCheck size={30} />
-        </div>
-        <h1>Verifique seu e-mail</h1>
-        <p className="recover-subtitle">
-          Se <strong>{email}</strong> estiver cadastrado, você vai receber um link para
-          criar uma nova senha. O link vale por 1 hora.
-        </p>
-
-        <button
-          className="recover-secondary"
-          type="button"
-          onClick={enviar}
-          disabled={espera > 0}
-        >
-          {espera > 0 ? `Reenviar e-mail em ${espera}s` : "Reenviar e-mail"}
-        </button>
-
-        <button
-          className="recover-link-button"
-          type="button"
-          onClick={() => setEnviado(false)}
-        >
-          Usar outro e-mail
-        </button>
-
-        <p className="recover-hint">Não achou? Olhe também a caixa de spam.</p>
-      </>
-    );
+  async function verificar(e) {
+    e.preventDefault();
+    setErro("");
+    setCarregando(true);
+    try {
+      const { token } = await chamarApi("/auth/cliente/recuperar/verificar", {
+        method: "POST",
+        body: JSON.stringify({ cpf }),
+      });
+      onVerificado(token);
+    } catch (falha) {
+      setErro(falha.message || "Não foi possível verificar o CPF.");
+    } finally {
+      setCarregando(false);
+    }
   }
 
   return (
     <>
       <h1>Esqueceu a senha?</h1>
       <p className="recover-subtitle">
-        Digite seu e-mail e enviaremos um link para você criar uma nova senha.
+        Digite o CPF da sua conta para criar uma nova senha.
       </p>
 
-      <form onSubmit={enviar}>
-        <label htmlFor="recover-email">E-mail</label>
+      <form onSubmit={verificar}>
+        <label htmlFor="recover-cpf">CPF</label>
         <div className="recover-field">
-          <Mail size={15} aria-hidden="true" />
+          <IdCard size={15} aria-hidden="true" />
           <input
-            id="recover-email"
-            type="email"
-            autoComplete="email"
-            placeholder="Digite seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="recover-cpf"
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="000.000.000-00"
+            value={cpf}
+            onChange={(e) => setCpf(mascaraCpf(e.target.value))}
             required
           />
         </div>
 
-        <button className="recover-submit" type="submit">
-          Enviar link
+        {erro && (
+          <p className="recover-erro" role="alert">
+            {erro}
+          </p>
+        )}
+
+        <button className="recover-submit" type="submit" disabled={carregando}>
+          {carregando ? "Verificando..." : "Continuar"}
         </button>
       </form>
     </>
   );
 }
 
-function NovaSenha({ token }) {
+function NovaSenha({ token, onVoltar }) {
   const [senha, setSenha] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
   const [erro, setErro] = useState("");
+  const [expirou, setExpirou] = useState(false);
+  const [carregando, setCarregando] = useState(false);
   const [concluido, setConcluido] = useState(false);
 
-  function redefinir(e) {
+  async function redefinir(e) {
     e.preventDefault();
     setErro("");
 
@@ -131,10 +112,19 @@ function NovaSenha({ token }) {
       return;
     }
 
-
-    console.log("Redefinir senha com token:", token);
-
-    setConcluido(true);
+    setCarregando(true);
+    try {
+      await chamarApi("/auth/cliente/recuperar/redefinir", {
+        method: "POST",
+        body: JSON.stringify({ token, senha }),
+      });
+      setConcluido(true);
+    } catch (falha) {
+      setErro(falha.message || "Não foi possível salvar a nova senha.");
+      setExpirou(falha.status === 401);
+    } finally {
+      setCarregando(false);
+    }
   }
 
   if (concluido) {
@@ -210,24 +200,33 @@ function NovaSenha({ token }) {
           </p>
         )}
 
-        <button className="recover-submit" type="submit">
-          Salvar nova senha
+        {expirou && (
+          <button className="recover-link-button" type="button" onClick={onVoltar}>
+            Digitar o CPF novamente
+          </button>
+        )}
+
+        <button className="recover-submit" type="submit" disabled={carregando}>
+          {carregando ? "Salvando..." : "Salvar nova senha"}
         </button>
       </form>
     </>
   );
 }
 
-function RecuperarSenha() {
-  const params = useSearchParams();
-  const token = params.get("token");
+export default function Page() {
+  const [token, setToken] = useState(null);
 
   return (
     <main className="recover-page">
       <section className="recover" aria-label="Recuperar senha">
         <Marca />
 
-        {token ? <NovaSenha token={token} /> : <PedirLink />}
+        {token ? (
+          <NovaSenha token={token} onVoltar={() => setToken(null)} />
+        ) : (
+          <PedirCpf onVerificado={setToken} />
+        )}
 
         <div className="recover-back">
           <Link href="/login">
@@ -237,13 +236,5 @@ function RecuperarSenha() {
         </div>
       </section>
     </main>
-  );
-}
-
-export default function Page() {
-  return (
-    <Suspense fallback={null}>
-      <RecuperarSenha />
-    </Suspense>
   );
 }

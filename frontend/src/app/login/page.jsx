@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
-import { chamarApi, salvarSessaoCliente } from "../lib/identificacao";
+import { chamarApi, salvarSessaoAdmin, salvarSessaoCliente } from "../lib/identificacao";
 import "./page.css";
 
 export default function Login() {
@@ -27,12 +27,22 @@ export default function Login() {
     setErro("");
     setCarregando(true);
     try {
-      const resultado = await chamarApi("/auth/cliente/login", {
-        method: "POST",
-        body: JSON.stringify({ email, senha }),
-      });
-      salvarSessaoCliente(resultado.cliente, resultado.token);
-      router.replace("/Main-usuario");
+      const opcoes = { method: "POST", body: JSON.stringify({ email, senha }) };
+      let resultadoAdmin = null;
+      try {
+        resultadoAdmin = await chamarApi("/auth/login", opcoes);
+      } catch (falhaAdmin) {
+        if (falhaAdmin.status !== 401) throw falhaAdmin;
+      }
+
+      if (resultadoAdmin?.usuario) {
+        salvarSessaoAdmin(resultadoAdmin.usuario, resultadoAdmin.token);
+        router.replace("/Dash");
+      } else {
+        const resultadoCliente = await chamarApi("/auth/cliente/login", opcoes);
+        salvarSessaoCliente(resultadoCliente.cliente, resultadoCliente.token);
+        router.replace("/Main-usuario");
+      }
     } catch (falha) {
       setErro(falha.message || "Não foi possível entrar. Tente novamente.");
     } finally {
