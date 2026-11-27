@@ -28,6 +28,10 @@ function paraTela(linha) {
   };
 }
 
+function formatarCpf(digitos) {
+  return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9)}`;
+}
+
 // Valida o corpo da requisição e devolve os valores prontos para gravar
 function lerCorpo(corpo, { criando }) {
   const nome = String(corpo.nome ?? "").trim();
@@ -56,7 +60,7 @@ function lerCorpo(corpo, { criando }) {
   return {
     valores: {
       nome,
-      cpf: digitosCpf || null,
+      cpf: digitosCpf ? formatarCpf(digitosCpf) : null,
       telefone: String(corpo.telefone ?? "").trim() || null,
       email: email || null,
       cnh: cnh || null,

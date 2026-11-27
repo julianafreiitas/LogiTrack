@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -9,23 +9,14 @@ import { chamarApi } from "../lib/identificacao";
 const CENTRO_PADRAO = [-23.55, -46.64];
 const TILES = {
   mapa: {
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
   },
   satelite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+    attribution: 'Tiles &copy; Esri',
   },
 };
-
-function coordenadasValidas(lat, lng) {
-  const latitude = Number(lat);
-  const longitude = Number(lng);
-  return Number.isFinite(latitude) && Number.isFinite(longitude)
-    && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180
-    ? [latitude, longitude]
-    : null;
-}
 
 function markerIcon(kind) {
   return L.divIcon({
@@ -41,131 +32,59 @@ const icons = {
   origin: markerIcon('location'),
   package: markerIcon('package'),
   pending: markerIcon('pin'),
+  done: markerIcon('done'),
 };
 
-const ICONE_POR_STATUS = { 'A Caminho': icons.package, Pendente: icons.pending };
-const LEGENDA_POR_STATUS = { 'A Caminho': 'Entrega em andamento', Pendente: 'Entrega pendente' };
+const ICONE_POR_STATUS = { 'A Caminho': icons.package, Pendente: icons.pending, Entregue: icons.done };
+const LEGENDA_POR_STATUS = { 'A Caminho': 'Entrega em andamento', Pendente: 'Entrega pendente', Entregue: 'Entrega concluída' };
 
-function AjustarMapa({ origem, selecionada, rota, chaveSelecao }) {
+function AjustarMapa({ pontos }) {
   const map = useMap();
 
   useEffect(() => {
-    if (!selecionada) {
-      if (origem) map.setView(origem, 13);
-      return;
-    }
-    if (!origem) {
-      map.setView(selecionada.coordenada ?? origem ?? CENTRO_PADRAO, 15);
-      return;
-    }
-    const pontos = rota?.chave === chaveSelecao && rota.pontos.length > 1
-      ? rota.pontos
-      : [origem, selecionada.coordenada];
-    map.fitBounds(pontos, { padding: [50, 50], maxZoom: 15 });
-  }, [map, origem, selecionada, rota, chaveSelecao]);
-
-  useEffect(() => {
-    const reenquadrar = () => {
-      if (!selecionada) return;
-      if (!origem) {
-        map.setView(selecionada.coordenada ?? origem ?? CENTRO_PADRAO, 15);
-        return;
-      }
-      const pontos = rota?.chave === chaveSelecao && rota.pontos.length > 1
-        ? rota.pontos
-        : [origem, selecionada.coordenada];
-      map.fitBounds(pontos, { padding: [50, 50], maxZoom: 15 });
+    const ajustar = () => {
+      if (pontos.length > 1) map.fitBounds(pontos, { padding: [50, 50] });
+      else if (pontos.length === 1) map.setView(pontos[0], 14);
     };
-    window.addEventListener('tracking-map-focus', reenquadrar);
-    return () => window.removeEventListener('tracking-map-focus', reenquadrar);
-  }, [map, origem, selecionada, rota, chaveSelecao]);
+    ajustar();
+    window.addEventListener('tracking-map-focus', ajustar);
+    return () => window.removeEventListener('tracking-map-focus', ajustar);
+  }, [map, pontos]);
 
   return null;
 }
 
-export default function TrackingMap({ layer, origem, entrega, motoristaId }) {
-  const [rota, setRota] = useState(null);
+export default function TrackingMap({ layer, origem, entregas, selecionadaId, onSelecionar }) {
   const tiles = TILES[layer] || TILES.mapa;
-  const posicaoOrigem = useMemo(() => origem ? coordenadasValidas(origem.lat, origem.lng) : null, [origem?.lat, origem?.lng]);
-  const selecao = useMemo(() => {
-    if (!entrega) return null;
-    const coordenada = coordenadasValidas(entrega.lat, entrega.lng);
-    return coordenada
-      ? { id: entrega.id, status: entrega.status, coordenada }
-      : null;
-  }, [entrega?.id, entrega?.status, entrega?.lat, entrega?.lng]);
-  const chaveSelecao = selecao ? JSON.stringify([motoristaId, entrega?.codigo, selecao.id, selecao.status, selecao.coordenada]) : '';
-
-  useEffect(() => {
-    if (!posicaoOrigem || !selecao || !motoristaId || !entrega?.codigo) {
-      setRota(null);
-      return undefined;
-    }
-
-    const controller = new AbortController();
-    const pontosRetos = [posicaoOrigem, selecao.coordenada];
-    let finalizada = false;
-    const usarLinhaReta = () => {
-      if (finalizada) return;
-      finalizada = true;
-      setRota({ chave: chaveSelecao, pontos: pontosRetos, contingencia: true });
-    };
-    const timeout = window.setTimeout(() => {
-      controller.abort();
-      usarLinhaReta();
-    }, 8000);
-    const url = `/portal/motorista/${motoristaId}/entregas/${encodeURIComponent(entrega.codigo)}/rota`;
-
-    setRota(null);
-    chamarApi(url, { signal: controller.signal })
-      .then((dados) => {
-        const pontosRota = dados?.pontos?.map(([lat, lng]) => coordenadasValidas(lat, lng));
-        if (!Array.isArray(pontosRota) || pontosRota.length < 2) throw new Error("Rota indisponível");
-        if (pontosRota.some((ponto) => !ponto)) throw new Error('Coordenadas da rota inválidas');
-        if (!finalizada) {
-          finalizada = true;
-          window.clearTimeout(timeout);
-          setRota({ chave: chaveSelecao, pontos: pontosRota, contingencia: false });
-        }
-      })
-      .catch((falha) => {
-        if (falha.name !== 'AbortError') console.warn('Rota viária indisponível; usando linha reta.', falha.message);
-        usarLinhaReta();
-      });
-
-    return () => {
-      finalizada = true;
-      window.clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [posicaoOrigem, selecao, chaveSelecao, motoristaId, entrega?.codigo]);
-
-  const rotaAtual = rota?.chave === chaveSelecao ? rota : null;
+  const posicaoOrigem = origem ? [origem.lat, origem.lng] : null;
+  const abertas = entregas.filter((entrega) => entrega.status !== 'Entregue');
+  // trajeto: posição do motorista -> entregas abertas na ordem da previsão (linhas retas, sem serviço de rotas)
+  const trajeto = [...(posicaoOrigem ? [posicaoOrigem] : []), ...abertas.map((entrega) => [entrega.lat, entrega.lng])];
+  const todosOsPontos = [...(posicaoOrigem ? [posicaoOrigem] : []), ...entregas.map((entrega) => [entrega.lat, entrega.lng])];
+  // referência estável para o efeito do AjustarMapa só rodar quando os pontos mudarem de verdade
+  const chavePontos = JSON.stringify(todosOsPontos);
 
   return (
     <MapContainer center={posicaoOrigem ?? CENTRO_PADRAO} zoom={13} zoomControl className="tracking-leaflet-map">
       <TileLayer key={layer} attribution={tiles.attribution} url={tiles.url} />
-      <AjustarMapa origem={posicaoOrigem} selecionada={selecao} rota={rotaAtual} chaveSelecao={chaveSelecao} />
+      <AjustarMapa key={chavePontos} pontos={todosOsPontos} />
 
-      {rotaAtual?.pontos.length > 1 && (
-        <Polyline
-          positions={rotaAtual.pontos}
-          pathOptions={{ color: '#ff710f', weight: 4, opacity: 0.98, dashArray: rotaAtual.contingencia ? '8 8' : undefined }}
-        />
-      )}
+      {trajeto.length > 1 && <Polyline positions={trajeto} pathOptions={{ color: '#ff710f', weight: 4, opacity: 0.98 }} />}
 
       {posicaoOrigem && (
         <Marker position={posicaoOrigem} icon={icons.origin}><Popup>Sua localização</Popup></Marker>
       )}
-      {selecao && entrega && (
+      {entregas.map((entrega) => (
         <Marker
-          position={selecao.coordenada}
+          key={entrega.id}
+          position={[entrega.lat, entrega.lng]}
           icon={ICONE_POR_STATUS[entrega.status] ?? icons.pending}
-          zIndexOffset={1000}
+          zIndexOffset={entrega.id === selecionadaId ? 1000 : 0}
+          eventHandlers={{ click: () => onSelecionar(entrega.id) }}
         >
           <Popup>{entrega.codigo} · {LEGENDA_POR_STATUS[entrega.status]}</Popup>
         </Marker>
-      )}
+      ))}
     </MapContainer>
   );
 }

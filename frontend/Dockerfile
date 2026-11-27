@@ -9,7 +9,7 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-ARG API_INTERNAL_URL=http://backend:8080/api
+ARG API_INTERNAL_URL=http://localhost:8080/api
 ENV API_INTERNAL_URL=$API_INTERNAL_URL
 
 COPY --from=dependencies /app/node_modules ./node_modules
@@ -23,7 +23,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
-ENV API_INTERNAL_URL=http://backend:8080/api
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./

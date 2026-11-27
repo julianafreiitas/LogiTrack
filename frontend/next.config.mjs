@@ -7,6 +7,10 @@ const nextConfig = {
   turbopack: {
     root: dirname(fileURLToPath(import.meta.url)),
   },
+  async rewrites() {
+    const apiInterna = process.env.API_INTERNAL_URL || "http://localhost:8080/api";
+    return [{ source: "/api/:path*", destination: `${apiInterna}/:path*` }];
+  },
 };
 
 export default nextConfig;
