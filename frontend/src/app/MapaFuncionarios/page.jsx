@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, Clock3, Map as MapIcon, MapPin, Navigation, Package, RotateCcw, Satellite, UserRound } from "lucide-react";
+import { Check, Clock3, Map as MapIcon, MapPin, Navigation, Package, Satellite, UserRound } from "lucide-react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import Aside from "../components/aside";
 import DeliveryBanner from "../components/DeliveryBanner";
 import SeletorIdentificacao from "../components/SeletorIdentificacao";
@@ -15,7 +16,7 @@ const TrackingMap = dynamic(() => import("./TrackingMap"), {
   loading: () => <div className="tracking-map-loading">Carregando mapa...</div>,
 });
 
-const ROTULO_STATUS = { "A Caminho": "Entrega em Andamento", Pendente: "Entrega Pendente", Entregue: "Entrega Concluída" };
+const ROTULO_STATUS = { "A Caminho": "Entrega em Andamento", Pendente: "Entrega Pendente" };
 
 export default function MapaFuncionarios() {
   const motorista = useIdentificacao("motorista");
@@ -25,21 +26,24 @@ export default function MapaFuncionarios() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
+  const [entregaConcluida, setEntregaConcluida] = useState(null);
 
   const carregar = useCallback(async (idMotorista, codigoPreferido) => {
     try {
-      const resposta = await chamarApi(`/portal/motorista/${idMotorista}/mapa`);
-      setDados(resposta);
+      const sufixoCodigo = codigoPreferido ? `?codigo=${encodeURIComponent(codigoPreferido)}` : "";
+      const resposta = await chamarApi(`/portal/motorista/${idMotorista}/mapa${sufixoCodigo}`);
+      const entregasAbertas = (resposta.entregas ?? []).filter((entrega) => ["Pendente", "A Caminho"].includes(entrega.status));
+      setDados({ ...resposta, entregas: entregasAbertas });
       setErro("");
       setSelecionadaId((atual) => {
         if (codigoPreferido) {
-          const pedida = resposta.entregas.find((entrega) => entrega.codigo === codigoPreferido);
+          const pedida = entregasAbertas.find((entrega) => entrega.codigo === codigoPreferido);
           if (pedida) return pedida.id;
         }
-        if (resposta.entregas.some((entrega) => entrega.id === atual)) return atual;
-        const primeira = resposta.entregas.find((entrega) => entrega.status === "A Caminho")
-          ?? resposta.entregas.find((entrega) => entrega.status === "Pendente")
-          ?? resposta.entregas[0];
+        if (entregasAbertas.some((entrega) => entrega.id === atual)) return atual;
+        const primeira = entregasAbertas.find((entrega) => entrega.status === "A Caminho")
+          ?? entregasAbertas.find((entrega) => entrega.status === "Pendente")
+          ?? entregasAbertas[0];
         return primeira ? primeira.id : null;
       });
     } catch (falha) {
@@ -57,7 +61,14 @@ export default function MapaFuncionarios() {
     carregar(motorista.id, codigo);
   }, [motorista.id, carregar]);
 
-  const selecionada = dados.entregas.find((entrega) => entrega.id === selecionadaId) ?? null;
+  const entregasAbertas = dados.entregas.filter((entrega) => ["Pendente", "A Caminho"].includes(entrega.status));
+  const selecionada = entregasAbertas.find((entrega) => entrega.id === selecionadaId) ?? null;
+
+  function removerCodigoDaUrl() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("codigo");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }
 
   async function mudarStatus(novoStatus) {
     if (!selecionada) return;
@@ -75,6 +86,47 @@ export default function MapaFuncionarios() {
     }
   }
 
+  async function confirmarEntrega() {
+    if (!selecionada) return;
+    const codigo = selecionada.codigo;
+    setSalvando(true);
+    try {
+      await chamarApi(`/portal/motorista/${motorista.id}/entregas/${encodeURIComponent(codigo)}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "Entregue" }),
+      });
+      setDados((atual) => ({
+        ...atual,
+        entregas: atual.entregas.filter((entrega) => entrega.id !== selecionada.id),
+      }));
+      setSelecionadaId(null);
+      setEntregaConcluida({ codigo });
+    } catch (falha) {
+      setErro(falha.message);
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  async function desfazerEntrega() {
+    if (!entregaConcluida) return;
+    const { codigo } = entregaConcluida;
+    setSalvando(true);
+    try {
+      await chamarApi(`/portal/motorista/${motorista.id}/entregas/${encodeURIComponent(codigo)}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "A Caminho" }),
+      });
+      setEntregaConcluida(null);
+      setCarregando(true);
+      await carregar(motorista.id, codigo);
+    } catch (falha) {
+      setErro(falha.message);
+    } finally {
+      setSalvando(false);
+    }
+  }
+
   const nome = motorista.atual?.nome ?? "Motorista";
 
   return (
@@ -83,7 +135,14 @@ export default function MapaFuncionarios() {
       <main className="delivery-map-page">
       <header className="map-topbar">
         <div className="map-topbar-actions">
-          <SeletorIdentificacao rotulo="Testando como" lista={motorista.lista} id={motorista.id} onChange={(novo) => { motorista.escolher(novo); setSelecionadaId(null); }} />
+          <SeletorIdentificacao rotulo="Testando como" lista={motorista.lista} id={motorista.id} onChange={(novo) => {
+            removerCodigoDaUrl();
+            setEntregaConcluida(null);
+            setDados({ origem: null, entregas: [] });
+            setSelecionadaId(null);
+            setCarregando(true);
+            motorista.escolher(novo);
+          }} />
           <div className="map-user-profile">
             <div className="map-user-avatar">{motorista.atual?.iniciais ?? "--"}</div>
             <div className="map-profile-name"><strong>{nome}</strong></div>
@@ -113,24 +172,35 @@ export default function MapaFuncionarios() {
             <TrackingMap
               layer={camada}
               origem={dados.origem}
-              entregas={dados.entregas}
-              selecionadaId={selecionadaId}
-              onSelecionar={setSelecionadaId}
+              entrega={entregaConcluida ? null : selecionada}
             />
           )}
           <div className="map-legend">
             <span><i className="legend-location"><Navigation size={11} fill="currentColor" /></i>Sua localização</span>
-            <span><i className="legend-progress"><Package size={11} /></i>Entrega em andamento</span>
-            <span><i className="legend-pending"><MapPin size={11} fill="currentColor" /></i>Entrega pendente</span>
-            <span><i className="legend-done"><Check size={11} /></i>Entrega concluída</span>
+            {!entregaConcluida && selecionada && (
+              <span>
+                <i className={selecionada.status === "A Caminho" ? "legend-progress" : "legend-pending"}>
+                  {selecionada.status === "A Caminho" ? <Package size={11} /> : <MapPin size={11} fill="currentColor" />}
+                </i>
+                {selecionada.status === "A Caminho" ? "Entrega em andamento" : "Entrega pendente"}
+              </span>
+            )}
           </div>
         </div>
 
         <aside className="delivery-detail-card" aria-label="Detalhes da entrega">
-          {selecionada ? (
+          {entregaConcluida ? (
+            <div className="delivery-completed-state" role="status">
+              <h2>Entrega {entregaConcluida.codigo} concluída.</h2>
+              <div className="delivery-completion-actions">
+                <button type="button" className="detail-confirm-button" disabled={salvando} onClick={desfazerEntrega}>Desfazer</button>
+                <Link className="detail-route-button" href="/MinhasEntregas">Voltar para Minhas Entregas</Link>
+              </div>
+            </div>
+          ) : selecionada ? (
             <>
               <div className="delivery-card-heading">
-                <div className={`delivery-status-pill ${selecionada.status === "Entregue" ? "is-done" : ""}`}>
+                <div className="delivery-status-pill">
                   <Package size={18} /> {ROTULO_STATUS[selecionada.status]}
                 </div>
                 <h2>{selecionada.codigo}</h2>
@@ -157,15 +227,11 @@ export default function MapaFuncionarios() {
               </div>
 
               <div className="delivery-detail-actions">
-                <button type="button" className="detail-route-button" onClick={() => window.dispatchEvent(new Event("tracking-map-focus"))}>
+                <button type="button" className="detail-route-button" onClick={() => window.dispatchEvent(new CustomEvent("tracking-map-focus", { detail: { entregaId: selecionada.id } }))}>
                   <Navigation size={14} fill="currentColor" /> Ver rota
                 </button>
-                {selecionada.status === "Entregue" ? (
-                  <button type="button" className="detail-cancel-button" disabled={salvando} onClick={() => mudarStatus("A Caminho")}>
-                    <RotateCcw size={15} /> Cancelar entrega
-                  </button>
-                ) : selecionada.status === "A Caminho" ? (
-                  <button type="button" className="detail-confirm-button" disabled={salvando} onClick={() => mudarStatus("Entregue")}>
+                {selecionada.status === "A Caminho" ? (
+                  <button type="button" className="detail-confirm-button" disabled={salvando} onClick={confirmarEntrega}>
                     <Check size={15} /> Confirmar entrega
                   </button>
                 ) : (
@@ -175,27 +241,11 @@ export default function MapaFuncionarios() {
                 )}
               </div>
 
-              {dados.entregas.length > 1 && (
-                <div className="delivery-stops">
-                  <p className="delivery-section-label">Suas paradas de hoje</p>
-                  {dados.entregas.map((entrega) => (
-                    <button
-                      key={entrega.id}
-                      type="button"
-                      className={`delivery-stop ${entrega.id === selecionadaId ? "active" : ""}`}
-                      onClick={() => setSelecionadaId(entrega.id)}
-                    >
-                      <strong>{entrega.codigo}</strong>
-                      <span>{entrega.previsaoHora} · {entrega.status === "A Caminho" ? "Em andamento" : entrega.status === "Entregue" ? "Concluída" : "Pendente"}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
             </>
           ) : (
             <div className="delivery-card-heading">
               <h2>{carregando ? "Carregando..." : "Sem entregas para mostrar"}</h2>
-              {!carregando && <p className="delivery-section-label">Você não tem entregas abertas nem concluídas hoje.</p>}
+              {!carregando && <p className="delivery-section-label">Você não tem entregas abertas no momento.</p>}
             </div>
           )}
         </aside>

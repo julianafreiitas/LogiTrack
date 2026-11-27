@@ -42,6 +42,7 @@ router.post("/login", async (req, res, next) => {
   try {
     const { email, senha } = req.body;
 
+    
     if (!email || !senha) {
       return res.status(400).json({ erro: "Informe e-mail e senha." });
     }

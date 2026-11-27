@@ -280,7 +280,6 @@
 .legend-location { color: #278cff; }
 .legend-progress { color: #ff710f; }
 .legend-pending { color: #ef3340; }
-.legend-done { color: #10b981; }
 
 .tracking-marker-wrap { border: 0; background: transparent; }
 
@@ -309,11 +308,9 @@
 .marker-location { --marker-color: #278cff; }
 .marker-location::after { content: '▲'; font-size: 11px; }
 .marker-package { --marker-color: #ff710f; }
-.marker-package::after { content: '□'; }
+.marker-package::after { content: '▣'; }
 .marker-pin { --marker-color: #e83242; }
 .marker-pin::after { content: '•'; font-size: 18px; }
-.marker-done { --marker-color: #10b981; }
-.marker-done::after { content: '✓'; }
 
 .delivery-detail-card {
   display: flex;
@@ -335,7 +332,6 @@
   font-weight: 700;
 }
 
-.delivery-status-pill.is-done { background: rgba(16, 185, 129, .18); color: #4adea9; }
 
 .delivery-detail-card > h2 {
   margin: 12px 0 11px;
@@ -396,7 +392,24 @@
 .delivery-detail-actions button:disabled { cursor: default; opacity: .72; }
 .detail-route-button { border: 1px solid #258cff; background: rgba(33, 140, 255, .1); color: #64b4ff; }
 .detail-confirm-button { border: 1px solid var(--map-orange); background: var(--map-orange); color: #fff; }
-.detail-cancel-button { border: 1px solid #e35461; background: rgba(227, 84, 97, .12); color: #ff929b; }
+
+.delivery-completed-state { padding: 20px 16px; }
+.delivery-completed-state h2 { margin: 0 0 18px; color: #f4f7fb; font-size: 19px; }
+.delivery-completion-actions { display: grid; gap: 9px; }
+.delivery-completion-actions button,
+.delivery-completion-actions a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.delivery-completion-actions button:disabled { cursor: default; opacity: .72; }
 
 @media (min-width: 1100px) {
   .delivery-map-page { padding: 0 30px 30px; }
@@ -593,36 +606,6 @@
   .map-profile-name strong { font-size: 12px; }
 }
 
-
-/* Lista de paradas no cartão de detalhes (dados vindos do banco) */
-.delivery-stops {
-  display: grid;
-  gap: 6px;
-  margin-top: 16px;
-}
-
-.delivery-stop {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  border: 1px solid #1a3b5a;
-  border-radius: 10px;
-  background: #10243c;
-  color: #f3f6fb;
-  cursor: pointer;
-  padding: 8px 12px;
-  text-align: left;
-}
-
-.delivery-stop span {
-  color: #9bb4d0;
-  font-size: 12px;
-}
-
-.delivery-stop.active {
-  border-color: #ff710f;
-}
 
 .delivery-map-page .seletor-id {
   margin-right: 14px;

@@ -12,7 +12,7 @@ const situacao = (status) => SITUACOES[status] ?? SITUACOES.Pendente;
 const validarId = (valor) => Number.isInteger(Number(valor)) && Number(valor) > 0;
 
 export async function listarClientes(request, response) {
-  const [linhas] = await pool.query("SELECT id, nome FROM cadastro ORDER BY id");
+  const [linhas] = await pool.query("SELECT id_cadastro AS id, nome FROM cadastro ORDER BY id_cadastro");
   response.json(linhas.map((linha) => ({ id: linha.id, nome: linha.nome, iniciais: iniciais(linha.nome) })));
 }
 
@@ -48,17 +48,32 @@ export async function criarPerfil(request, response) {
 
 export async function resumoDoCliente(request, response) {
   const id = Number(request.params.id);
-  if (!validarId(id)) return response.status(400).json({ message: "Id de cliente inválido." });
-  const [[cliente]] = await pool.query("SELECT id, nome FROM cadastro WHERE id = ?", [id]);
-  if (!cliente) return response.status(404).json({ message: "Cliente não encontrado." });
-  const [[contagem]] = await pool.query(`SELECT
-    COALESCE(SUM(status = 'A Caminho'), 0) AS emTransito,
-    COALESCE(SUM(status = 'Entregue'), 0) AS entregues,
-    COALESCE(SUM(status = 'Pendente'), 0) AS pendentes,
-    COALESCE(SUM(status = 'Cancelado'), 0) AS canceladas
-    FROM entregas WHERE id_cliente = ?`, [id]);
-  const [pedidos] = await pool.query(`SELECT codigo_rastreio AS codigo, endereco_destino AS endereco, status
-    FROM entregas WHERE id_cliente = ? ORDER BY checked_at DESC, id_entregas DESC LIMIT 3`, [id]);
+  if (!Number.isInteger(id) || id < 1) {
+    return response.status(400).json({ message: "Id de cliente inválido." });
+  }
+
+  const [[cliente]] = await pool.query("SELECT id_cadastro AS id, nome FROM cadastro WHERE id_cadastro = ?", [id]);
+  if (!cliente) {
+    return response.status(404).json({ message: "Cliente não encontrado." });
+  }
+
+  const [[contagem]] = await pool.query(
+    `SELECT
+       COALESCE(SUM(status = 'A Caminho'), 0) AS emTransito,
+       COALESCE(SUM(status = 'Entregue'), 0) AS entregues,
+       COALESCE(SUM(status = 'Pendente'), 0) AS pendentes
+     FROM entregas WHERE id_cliente = ?`,
+    [id],
+  );
+
+  const [pedidos] = await pool.query(
+    `SELECT codigo AS codigo, endereco_destino AS endereco, status
+     FROM entregas WHERE id_cliente = ?
+     ORDER BY checked_at DESC, id_entregas DESC
+     LIMIT 3`,
+    [id],
+  );
+
   response.json({
     cliente: { id: cliente.id, nome: cliente.nome, iniciais: iniciais(cliente.nome) },
     emTransito: Number(contagem.emTransito), entregues: Number(contagem.entregues),
@@ -109,15 +124,10 @@ export async function cancelarPedido(request, response) {
   response.json({ codigo, status: pedido.status, taxaAplicavel: pedido.status === "Cancelado" && Boolean(pedido.id_motorista) });
 }
 
-export async function obterPerfil(request, response) {
-  const id = Number(request.params.id);
-  if (!validarId(id)) return response.status(400).json({ message: "Id de cliente inválido." });
-  const [[perfil]] = await pool.query(`SELECT id, nome, email, telefone, cpf,
-    DATE_FORMAT(nascimento, '%Y-%m-%d') AS nascimento, cep, rua, numero, bairro, cidade, estado
-    FROM cadastro WHERE id = ?`, [id]);
-  if (!perfil) return response.status(404).json({ message: "Cliente não encontrado." });
-  response.json(perfil);
-}
+  const [[entrega]] = await pool.query(
+    "SELECT codigo AS codigo, endereco_destino AS endereco, status FROM entregas WHERE codigo = ?",
+    [codigo],
+  );
 
 export async function salvarPerfil(request, response) {
   const id = Number(request.params.id);

@@ -1,6 +1,7 @@
 
 "use client";
 
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
@@ -63,6 +64,46 @@ function PixDemoQr({ seed }) {
       />
     </div>
   );
+}
+=======
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, ArrowRight, Box, Calendar, CheckCircle2, CreditCard, Flag, MapPin, MessageSquare, Package, Send, Truck, Wallet } from 'lucide-react';
+import Header from '../components/Header-usuarios';
+import { API_URL } from '../lib/api';
+import '../Main-usuario/pagemain.css';
+import './SolicitarEntrega.css';
+>>>>>>> Matheus
+
+const initialForm = {
+  coleta: "", destino: "", data: "", servico: "", observacoes: "",
+  tamanho: "medio", pesoKg: "1", urgencia: "normal", pagamento: "pix",
+};
+
+const moeda = (valor) => Number(valor || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function PixDemoQr({ seed }) {
+  const modules = useMemo(() => {
+    const size = 29;
+    let hash = [...seed].reduce((value, character) => (value * 31 + character.charCodeAt(0)) >>> 0, 7);
+    const matrix = Array.from({ length: size }, () => Array.from({ length: size }, () => {
+      hash = (hash * 1664525 + 1013904223) >>> 0;
+      return (hash >>> 28) % 2 === 1;
+    }));
+    const addFinder = (left, top) => {
+      for (let y = -1; y <= 7; y += 1) for (let x = -1; x <= 7; x += 1) {
+        const row = top + y;
+        const column = left + x;
+        if (row < 0 || column < 0 || row >= size || column >= size) continue;
+        matrix[row][column] = x >= 0 && x <= 6 && y >= 0 && y <= 6 &&
+          (x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4));
+      }
+    };
+    addFinder(0, 0);
+    addFinder(size - 7, 0);
+    addFinder(0, size - 7);
+    return matrix.flatMap((row, y) => row.map((active, x) => active ? <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" /> : null));
+  }, [seed]);
+  return <svg className="pix-demo-qr" viewBox="-2 -2 33 33" role="img" aria-label="QR code Pix demonstrativo">{modules}</svg>;
 }
 
 export default function SolicitarEntrega() {
@@ -232,7 +273,10 @@ export default function SolicitarEntrega() {
       </section>
 
       <main className="request-main-content">
+<<<<<<< HEAD
 
+=======
+>>>>>>> Matheus
         {solicitacaoEnviada ? (
 
           // TELA DE PAGAMENTO CONCLUÍDO

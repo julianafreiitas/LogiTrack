@@ -1,4 +1,44 @@
+@motoristaJoaoId = 1
+
 POST http://localhost:8080/api/deliveries
 Content-Type: application/json
 
 { "clientName": "Teste", "address": "Avenida Paulista, 1578, São Paulo" }
+
+### Portal do motorista
+GET http://localhost:8080/api/portal/motorista
+
+### Início / resumo
+GET http://localhost:8080/api/portal/motorista/{{motoristaJoaoId}}/resumo
+
+### Minhas Entregas: filtros, busca e paginação
+GET http://localhost:8080/api/portal/motorista/{{motoristaJoaoId}}/entregas?status=A%20Caminho&busca=&pagina=1&limite=5&dias=30
+
+### Mapa (código opcional inclui entrega antiga)
+GET http://localhost:8080/api/portal/motorista/{{motoristaJoaoId}}/mapa?codigo=LT78458
+
+### Perfil
+GET http://localhost:8080/api/portal/motorista/{{motoristaJoaoId}}/perfil
+
+### Atualizar Perfil
+PUT http://localhost:8080/api/portal/motorista/{{motoristaJoaoId}}/perfil
+Content-Type: application/json
+
+{
+  "nome": "João Silva",
+  "email": "joao.silva@logitrack.com",
+  "telefone": "(11) 98765-4321",
+  "cpf": "121.212.121-21",
+  "dataNascimento": "1990-05-18",
+  "endereco": "Rua das Flores, 123 - São Caetano do Sul, SP",
+  "contatoEmergencia": "(11) 90000-0000",
+  "cnh": "12121212121",
+  "categoriaCnh": "AB",
+  "validadeCnh": "2028-11-20"
+}
+
+### Mudar status da entrega (use LT78454 para Pendente -> A Caminho)
+PATCH http://localhost:8080/api/portal/motorista/{{motoristaJoaoId}}/entregas/LT78454/status
+Content-Type: application/json
+
+{ "status": "A Caminho" }

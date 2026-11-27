@@ -79,7 +79,7 @@ export async function createDelivery(req, res, next) {
 
     const query = `
       INSERT INTO entregas
-        (codigo_rastreio, id_cliente, nome_cliente, endereco_destino, coordenadas_destino, previsao, status)
+        (codigo, id_cliente, nome_cliente, endereco_destino, coordenadas_destino, previsao, status)
       VALUES
         (?, 1, ?, ?, ST_GeomFromText(?), DATE_ADD(NOW(), INTERVAL 1 DAY), 'Pendente')
     `;
@@ -113,7 +113,7 @@ export async function getDeliveries(req, res, next) {
     const [rows] = await db.query(`
       SELECT
         e.id_entregas AS id,
-        e.codigo_rastreio AS titulo,
+        e.codigo AS titulo,
         COALESCE(m.nome, 'Sem motorista') AS motorista,
         COALESCE(e.nome_cliente, c.nome) AS cliente,
         e.status,
@@ -125,7 +125,7 @@ export async function getDeliveries(req, res, next) {
         -46.633308 AS origem_lng
       FROM entregas e
       LEFT JOIN motoristas m ON m.id_motoristas = e.id_motorista
-      LEFT JOIN cadastro c ON c.id = e.id_cliente
+      LEFT JOIN cadastro c ON c.id_cadastro = e.id_cliente
       ORDER BY e.id_entregas DESC
     `);
 
