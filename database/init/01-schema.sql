@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS enderecos_entrega (
   bairro VARCHAR(100) NOT NULL,
   cidade VARCHAR(100) NOT NULL,
   coordenadas POINT NOT NULL,
-  FOREIGN KEY (cadastro_id) REFERENCES cadastro(id_cadastro) ON DELETE CASCADE,
+  FOREIGN KEY (cadastro_id) REFERENCES cadastro(id) ON DELETE CASCADE,
   SPATIAL INDEX idx_coordenadas_entrega (coordenadas)
 );
 
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS entregas (
   status ENUM('Pendente', 'A Caminho', 'Entregue', 'Cancelado') NOT NULL DEFAULT 'Pendente',
   checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (id_cliente) REFERENCES cadastro(id_cadastro),
+  FOREIGN KEY (id_cliente) REFERENCES cadastro(id),
   FOREIGN KEY (id_motorista) REFERENCES motoristas(id_motoristas) ON DELETE SET NULL,
   SPATIAL INDEX idx_coordenadas_destino (coordenadas_destino)
 );

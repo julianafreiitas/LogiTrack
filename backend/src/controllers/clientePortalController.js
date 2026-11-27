@@ -12,7 +12,7 @@ const situacao = (status) => SITUACOES[status] ?? SITUACOES.Pendente;
 const validarId = (valor) => Number.isInteger(Number(valor)) && Number(valor) > 0;
 
 export async function listarClientes(request, response) {
-  const [linhas] = await pool.query("SELECT id_cadastro AS id, nome FROM cadastro ORDER BY id_cadastro");
+  const [linhas] = await pool.query("SELECT id, nome FROM cadastro ORDER BY id");
   response.json(linhas.map((linha) => ({ id: linha.id, nome: linha.nome, iniciais: iniciais(linha.nome) })));
 }
 
@@ -52,7 +52,7 @@ export async function resumoDoCliente(request, response) {
     return response.status(400).json({ message: "Id de cliente inválido." });
   }
 
-  const [[cliente]] = await pool.query("SELECT id_cadastro AS id, nome FROM cadastro WHERE id_cadastro = ?", [id]);
+  const [[cliente]] = await pool.query("SELECT id, nome FROM cadastro WHERE id = ?", [id]);
   if (!cliente) {
     return response.status(404).json({ message: "Cliente não encontrado." });
   }
@@ -67,7 +67,7 @@ export async function resumoDoCliente(request, response) {
   );
 
   const [pedidos] = await pool.query(
-    `SELECT codigo AS codigo, endereco_destino AS endereco, status
+    `SELECT codigo_rastreio AS codigo, endereco_destino AS endereco, status
      FROM entregas WHERE id_cliente = ?
      ORDER BY checked_at DESC, id_entregas DESC
      LIMIT 3`,
@@ -125,7 +125,7 @@ export async function cancelarPedido(request, response) {
 }
 
   const [[entrega]] = await pool.query(
-    "SELECT codigo AS codigo, endereco_destino AS endereco, status FROM entregas WHERE codigo = ?",
+    "SELECT codigo_rastreio AS codigo, endereco_destino AS endereco, status FROM entregas WHERE codigo_rastreio = ?",
     [codigo],
   );
 
