@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Check, Clock3, MapPin, Package, PackageX, Search, Send, Truck, X } from "lucide-react";
 import Aside from "../components/aside";
 import DeliveryBanner from "../components/DeliveryBanner";
@@ -13,7 +13,7 @@ import "./cancelamento.css";
 
 // aba da tela -> o que pedir para a API e como mostrar
 const ABAS = [
-  { id: "andamento", label: "Em Andamento", icon: Truck, status: "A Caminho", contagem: "emAndamento" },
+  { id: "andamento", label: "Em Andamento", icon: Truck, status: "Em Andamento", contagem: "emAndamento" },
   { id: "pendente", label: "Pendentes", icon: Clock3, status: "Pendente", contagem: "pendentes" },
   { id: "cancelada", label: "Canceladas", icon: PackageX, status: "Cancelado", contagem: "canceladas" },
   // concluídas: só as de hoje (dias=1), como no card "Entregas Concluídas"
@@ -21,10 +21,13 @@ const ABAS = [
 ];
 
 function nomeStatus(status) {
+  if (status === "Em Rota") return "Em rota";
+  if (status === "Saiu para Entrega" || status === "A Caminho") return "Saiu para entrega";
   return status === "A Caminho" ? "Em andamento" : status === "Entregue" ? "Concluída" : "Pendente";
 }
 
 export default function MinhasEntregas() {
+  const router = useRouter();
   const motorista = useIdentificacao("motorista");
   const [resumo, setResumo] = useState(null);
   const [aba, setAba] = useState("pendente");
@@ -102,7 +105,7 @@ export default function MinhasEntregas() {
     try {
       await chamarApi(`/portal/motorista/${motorista.id}/entregas/${encodeURIComponent(entrega.codigo)}/status`, {
         method: "PATCH",
-        body: JSON.stringify({ status: "A Caminho" }),
+        body: JSON.stringify({ status: "Em Rota" }),
       });
       setAba("andamento");
       setSelecionadaId(entrega.id);
@@ -111,6 +114,22 @@ export default function MinhasEntregas() {
       setErro(falha.message);
     }
   }, [motorista.id]);
+
+  const abrirRota = useCallback(async (entrega) => {
+    if (entrega.status === "Em Rota") {
+      try {
+        await chamarApi(`/portal/motorista/${motorista.id}/entregas/${encodeURIComponent(entrega.codigo)}/status`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: "Saiu para Entrega" }),
+        });
+        setVersao((atual) => atual + 1);
+      } catch (falha) {
+        setErro(falha.message);
+        return;
+      }
+    }
+    router.push(`/MapaFuncionarios?codigo=${encodeURIComponent(entrega.codigo)}`);
+  }, [motorista.id, router]);
 
   const verificarCancelamentos = useCallback(async () => {
     if (!motorista.id) return;
@@ -187,7 +206,7 @@ export default function MinhasEntregas() {
 
             <div className="md-delivery-list">
               {entregas.map((entrega) => {
-                const classe = entrega.status === "A Caminho" ? "andamento" : entrega.status === "Entregue" ? "concluida" : "pendente";
+                const classe = ["Em Rota", "Saiu para Entrega", "A Caminho"].includes(entrega.status) ? "andamento" : entrega.status === "Entregue" ? "concluida" : "pendente";
                 return (
                   <article key={entrega.id} className={`md-delivery-item ${selecionada?.id === entrega.id ? "selected" : ""} ${classe}`}>
                     <button className="md-delivery-summary" type="button" onClick={() => setSelecionadaId(entrega.id)}>
@@ -207,10 +226,10 @@ export default function MinhasEntregas() {
                         <button type="button" className="md-start-button" onClick={() => iniciarEntrega(entrega)}>
                           <Truck size={15} /> Iniciar entrega
                         </button>
-                      ) : entrega.status === "A Caminho" ? (
-                        <Link className="md-route-button" href={`/MapaFuncionarios?codigo=${encodeURIComponent(entrega.codigo)}`}>
+                      ) : ["Em Rota", "Saiu para Entrega", "A Caminho"].includes(entrega.status) ? (
+                        <button type="button" className="md-route-button" onClick={() => abrirRota(entrega)}>
                           <Send size={15} /> Ver rota
-                        </Link>
+                        </button>
                       ) : (
                         <span className="md-complete-label"><Check size={15} /> Concluída</span>
                       )}

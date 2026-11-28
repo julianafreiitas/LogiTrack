@@ -13,13 +13,11 @@ export default function Login() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
-  const [cadastroCriado, setCadastroCriado] = useState(false);
 
   useEffect(() => {
     const parametros = new URLSearchParams(window.location.search);
     const emailCadastrado = parametros.get("email");
     if (emailCadastrado) setEmail(emailCadastrado);
-    setCadastroCriado(parametros.get("cadastro") === "sucesso");
   }, []);
 
   async function entrar(event) {
@@ -28,20 +26,20 @@ export default function Login() {
     setCarregando(true);
     try {
       const opcoes = { method: "POST", body: JSON.stringify({ email, senha }) };
-      let resultadoAdmin = null;
+      let resultadoCliente = null;
       try {
-        resultadoAdmin = await chamarApi("/auth/login", opcoes);
-      } catch (falhaAdmin) {
-        if (falhaAdmin.status !== 401) throw falhaAdmin;
+        resultadoCliente = await chamarApi("/auth/cliente/login", opcoes);
+      } catch (falhaCliente) {
+        if (falhaCliente.status !== 401) throw falhaCliente;
       }
 
-      if (resultadoAdmin?.usuario) {
-        salvarSessaoAdmin(resultadoAdmin.usuario, resultadoAdmin.token);
-        router.replace("/Dash");
-      } else {
-        const resultadoCliente = await chamarApi("/auth/cliente/login", opcoes);
+      if (resultadoCliente?.cliente) {
         salvarSessaoCliente(resultadoCliente.cliente, resultadoCliente.token);
         router.replace("/Main-usuario");
+      } else {
+        const resultadoAdmin = await chamarApi("/auth/login", opcoes);
+        salvarSessaoAdmin(resultadoAdmin.usuario, resultadoAdmin.token);
+        router.replace("/Dash");
       }
     } catch (falha) {
       setErro(falha.message || "Não foi possível entrar. Tente novamente.");
@@ -100,7 +98,6 @@ export default function Login() {
             <a href="/RecuperarSenha">Esqueceu a senha?</a>
           </div>
 
-          {cadastroCriado && <p className="login-success" role="status">Cadastro salvo. Entre com seu e-mail e senha.</p>}
           {erro && <p className="login-error" role="alert">{erro}</p>}
           <button className="login-submit" type="submit" disabled={carregando}>
             {carregando ? "Entrando..." : "Entrar"}

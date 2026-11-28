@@ -11,9 +11,9 @@ const descricoes = {
 const contagens = `
   COUNT(*) AS total,
   COALESCE(SUM(status = 'Entregue'), 0) AS concluidas,
-  COALESCE(SUM(status = 'A Caminho' AND previsao >= NOW()), 0) AS emTransito,
+  COALESCE(SUM(status IN ('Em Rota', 'Saiu para Entrega', 'A Caminho') AND previsao >= NOW()), 0) AS emTransito,
   COALESCE(SUM(status = 'Pendente' AND previsao >= NOW()), 0) AS pendentes,
-  COALESCE(SUM(status IN ('Pendente', 'A Caminho') AND previsao < NOW()), 0) AS atrasadas,
+  COALESCE(SUM(status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho') AND previsao < NOW()), 0) AS atrasadas,
   COALESCE(SUM(status = 'Cancelado'), 0) AS canceladas
 `;
 
@@ -53,8 +53,8 @@ export async function resumoDashboard(request, response) {
        SUBSTRING_INDEX(endereco_destino, ' - ', -1) AS cidade,
        TIMESTAMPDIFF(MINUTE, atualizado_em, NOW()) AS minutos,
        CASE
-         WHEN status IN ('Pendente', 'A Caminho') AND previsao < NOW() THEN 'Atrasada'
-         WHEN status = 'A Caminho' THEN 'Em trânsito'
+         WHEN status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho') AND previsao < NOW() THEN 'Atrasada'
+         WHEN status IN ('Em Rota', 'Saiu para Entrega', 'A Caminho') THEN 'Em trânsito'
          ELSE status
        END AS situacao
      FROM entregas

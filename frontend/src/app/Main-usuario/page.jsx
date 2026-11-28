@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Header from "../components/Header-usuarios";
 import { chamarApi, useIdentificacao } from "../lib/identificacao";
 import "./pagemain.css";
@@ -160,7 +161,7 @@ export default function MainUsuario() {
             <div className="orders-list">
               {resumo && pedidos.length === 0 && <p>Você ainda não tem pedidos.</p>}
               {pedidos.map((pedido) => (
-                <div className="order-item" key={pedido.codigo}>
+                <Link className="order-item" key={pedido.codigo} href={`/acompanharEntrega?codigo=${encodeURIComponent(pedido.codigo)}`}>
                   <div className="order-info">
                     <strong>{pedido.codigo}</strong>
                     <span>{pedido.cidade}</span>
@@ -169,7 +170,7 @@ export default function MainUsuario() {
                   <span className={`status-badge ${pedido.tipo}`}>
                     {pedido.status}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

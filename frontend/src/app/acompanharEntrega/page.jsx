@@ -45,7 +45,7 @@ export default function AcompanharEntrega() {
 
   useEffect(() => {
     if (!codigo) return undefined;
-    const timer = window.setInterval(() => carregarPedido(codigo), 30000);
+    const timer = window.setInterval(() => carregarPedido(codigo), 5000);
     return () => window.clearInterval(timer);
   }, [codigo, carregarPedido]);
 
@@ -67,13 +67,15 @@ export default function AcompanharEntrega() {
 
   const cancelado = pedido?.status === "Cancelado";
   const entregue = pedido?.status === "Entregue";
+  const emRota = pedido?.status === "Em Rota";
+  const saiuParaEntrega = ["Saiu para Entrega", "A Caminho"].includes(pedido?.status);
   const etapas = [
     { titulo: "Pedido\nSolicitado", data: formatarData(pedido?.solicitadoEm), icon: Check },
-    { titulo: "Em Rota", data: pedido?.motoristaAtribuido ? formatarData(pedido?.atualizadoEm) : "Aguardando", icon: Check },
-    { titulo: "Saiu para\nEntrega", data: entregue ? formatarData(pedido?.atualizadoEm) : (pedido?.status === "A Caminho" ? formatarData(pedido?.atualizadoEm) : "Aguardando"), icon: Truck },
+    { titulo: "Em Rota", data: emRota || saiuParaEntrega || entregue ? formatarData(pedido?.atualizadoEm) : "Aguardando", icon: Check },
+    { titulo: "Saiu para\nEntrega", data: saiuParaEntrega || entregue ? formatarData(pedido?.atualizadoEm) : "Aguardando", icon: Truck },
     { titulo: "Entregue", data: entregue ? formatarData(pedido?.atualizadoEm) : "Aguardando", icon: Check },
   ];
-  const indiceAtual = entregue ? 3 : pedido?.status === "A Caminho" ? 2 : 0;
+  const indiceAtual = entregue ? 3 : saiuParaEntrega ? 2 : emRota ? 1 : 0;
 
   return (
     <div className="dash-container tracking-page-shell">
@@ -107,7 +109,7 @@ export default function AcompanharEntrega() {
               </div>
               <div className="tracking-current-order">
                 <div className="tracking-package-icon">{cancelado ? <PackageX size={23} /> : <Box size={23} />}</div>
-                <div><strong>{cancelado ? "Entrega cancelada" : entregue ? "Entrega concluída" : pedido.status === "A Caminho" ? "Entrega em andamento" : "Pedido solicitado"}</strong><span>{pedido.cliente} · {pedido.tamanho || "Pacote"} · {pedido.pesoKg ?? "–"} kg</span></div>
+                <div><strong>{cancelado ? "Entrega cancelada" : entregue ? "Entrega concluída" : saiuParaEntrega ? "Saiu para entrega" : emRota ? "Em rota" : "Pedido solicitado"}</strong><span>{pedido.cliente} · {pedido.tamanho || "Pacote"} · {pedido.pesoKg ?? "–"} kg</span></div>
                 <span className={`tracking-live-dot ${cancelado ? "cancelado" : ""}`} aria-label={pedido.status} />
               </div>
               <div className="tracking-current-address"><MapPin size={17} /><span><b>Coleta:</b> {pedido.coleta || "Não informada"}<br /><b>Destino:</b> {pedido.destino}</span></div>
@@ -130,7 +132,7 @@ export default function AcompanharEntrega() {
                 </div>
                 <div className="tracking-vehicle-status">
                   <div className="tracking-vehicle-icon"><Truck size={34} /></div>
-                  <div><strong>{entregue ? "Entrega concluída" : pedido.status === "A Caminho" ? "Seu veículo está a caminho!" : "Aguardando coleta"}</strong><span>Previsão de chegada: <b>{formatarData(pedido.previsao)}</b></span></div>
+                  <div><strong>{entregue ? "Entrega concluída" : saiuParaEntrega ? "Seu veículo saiu para entrega!" : emRota ? "Entrega em rota" : "Aguardando início pelo motorista"}</strong><span>Previsão de chegada: <b>{formatarData(pedido.previsao)}</b></span></div>
                 </div>
               </>}
             </article>

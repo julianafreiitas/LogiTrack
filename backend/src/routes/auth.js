@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import pool from "../config/database.js";
 import { autenticar } from "../middlewares/authMiddleware.js";
 import { verifyPassword } from "../utils/password.js";
+import { obterSegredoJwt } from "../config/jwtSecret.js";
 
 const router = Router();
 
@@ -66,7 +67,7 @@ router.post("/login", async (req, res, next) => {
 
     const token = jwt.sign(
       { id: usuario.id_usuarios, email: usuario.email, tipo: usuario.tipo },
-      process.env.JWT_SECRET,
+      obterSegredoJwt(),
       { expiresIn: "2h" },
     );
 

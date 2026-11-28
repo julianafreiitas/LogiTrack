@@ -3,6 +3,8 @@ import pool from "../config/database.js";
 import { cidadeDoEndereco, iniciais } from "../utils/endereco.js";
 
 const SITUACOES = {
+  "Em Rota": { texto: "Em rota", tipo: "transito" },
+  "Saiu para Entrega": { texto: "Saiu para entrega", tipo: "transito" },
   "A Caminho": { texto: "Em trânsito", tipo: "transito" },
   Entregue: { texto: "Entregue", tipo: "entregue" },
   Pendente: { texto: "Pendente", tipo: "pendente" },
@@ -52,7 +54,7 @@ export async function resumoDoCliente(request, response) {
   const [[cliente]] = await pool.query("SELECT id, nome FROM cadastro WHERE id = ?", [id]);
   if (!cliente) return response.status(404).json({ message: "Cliente não encontrado." });
   const [[contagem]] = await pool.query(`SELECT
-    COALESCE(SUM(status = 'A Caminho'), 0) AS emTransito,
+    COALESCE(SUM(status IN ('Em Rota', 'Saiu para Entrega', 'A Caminho')), 0) AS emTransito,
     COALESCE(SUM(status = 'Entregue'), 0) AS entregues,
     COALESCE(SUM(status = 'Pendente'), 0) AS pendentes,
     COALESCE(SUM(status = 'Cancelado'), 0) AS canceladas
@@ -98,7 +100,7 @@ export async function listarPedidos(request, response) {
 export async function cancelarPedido(request, response) {
   const codigo = String(request.params.codigo ?? "").trim();
   const [resultado] = await pool.query(`UPDATE entregas SET status_antes_cancelamento = status, status = 'Cancelado'
-    WHERE codigo_rastreio = ? AND status IN ('Pendente', 'A Caminho')`, [codigo]);
+    WHERE codigo_rastreio = ? AND status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho')`, [codigo]);
   if (!resultado.affectedRows) {
     const [[pedido]] = await pool.query("SELECT status FROM entregas WHERE codigo_rastreio = ?", [codigo]);
     if (!pedido) return response.status(404).json({ message: "Pedido não encontrado." });
@@ -108,14 +110,14 @@ export async function cancelarPedido(request, response) {
   const [[pedido]] = await pool.query("SELECT status_antes_cancelamento, id_motorista FROM entregas WHERE codigo_rastreio = ?", [codigo]);
   if (pedido.id_motorista) {
     await pool.query(`UPDATE motoristas SET
-      status = CASE WHEN status = 'IndisponÃ­vel' THEN status
-        WHEN EXISTS (SELECT 1 FROM entregas WHERE id_motorista = ? AND status = 'A Caminho') THEN 'Em rota'
+      status = CASE WHEN status = 'Indisponível' THEN status
+        WHEN EXISTS (SELECT 1 FROM entregas WHERE id_motorista = ? AND status IN ('Em Rota', 'Saiu para Entrega', 'A Caminho')) THEN 'Em rota'
         ELSE 'DisponÃ­vel' END,
       entregas_hoje = (SELECT COUNT(*) FROM entregas WHERE id_motorista = ? AND status <> 'Cancelado'
-        AND (status IN ('Pendente', 'A Caminho') OR (status = 'Entregue' AND DATE(atualizado_em) = CURDATE())))
+        AND (status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho') OR (status = 'Entregue' AND DATE(atualizado_em) = CURDATE())))
       WHERE id_motoristas = ?`, [pedido.id_motorista, pedido.id_motorista, pedido.id_motorista]);
   }
-  response.json({ codigo, status: "Cancelado", precisaDevolucao: pedido.status_antes_cancelamento === "A Caminho" });
+  response.json({ codigo, status: "Cancelado", precisaDevolucao: ["Em Rota", "Saiu para Entrega", "A Caminho"].includes(pedido.status_antes_cancelamento) });
 }
 
 export async function obterPerfil(request, response) {

@@ -33,7 +33,13 @@ export async function getCoordinates(address) {
     throw criarErro('O serviço de geocodificação retornou um erro.', 502);
   }
 
-  const resultados = await response.json();
+  let resultados;
+  try {
+    resultados = await response.json();
+  } catch (error) {
+    console.error('Resposta inválida do Nominatim:', error);
+    throw criarErro('O serviço de geocodificação retornou uma resposta inválida. Tente novamente.', 502);
+  }
 
   if (!Array.isArray(resultados) || resultados.length === 0) {
     throw criarErro('Endereço não encontrado. Informe rua, número e cidade.', 404);

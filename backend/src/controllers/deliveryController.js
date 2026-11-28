@@ -40,7 +40,7 @@ export async function createDelivery(req, res, next) {
         FROM motoristas m
         LEFT JOIN (
           SELECT id_motorista, COUNT(*) AS abertas
-          FROM entregas WHERE status IN ('Pendente', 'A Caminho')
+          FROM entregas WHERE status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho')
           GROUP BY id_motorista
         ) e ON e.id_motorista = m.id_motoristas
         WHERE m.situacao = 'Ativo' AND m.status <> 'Indisponível'
@@ -129,6 +129,7 @@ export async function getDeliveries(req, res, next) {
         e.codigo_rastreio AS titulo,
         COALESCE(m.nome, 'Sem motorista') AS motorista,
         COALESCE(e.nome_cliente, c.nome) AS cliente,
+        e.endereco_coleta,
         e.status,
         e.endereco_destino,
         DATE_FORMAT(e.previsao, '%Y-%m-%dT%H:%i:%s') AS previsao,
@@ -178,7 +179,13 @@ export async function quoteDelivery(req, res, next) {
     routeUrl.searchParams.set('overview', 'false');
     const routeResponse = await fetch(routeUrl, { signal: AbortSignal.timeout(10000) });
     if (!routeResponse.ok) throw criarErro('Não foi possível calcular a distância da rota. Tente novamente.', 502);
-    const routeData = await routeResponse.json();
+    let routeData;
+    try {
+      routeData = await routeResponse.json();
+    } catch (error) {
+      console.error('Resposta inválida do OSRM:', error);
+      throw criarErro('O serviço de rotas retornou uma resposta inválida. Tente novamente.', 502);
+    }
     const distanceMeters = routeData?.routes?.[0]?.distance;
     if (!Number.isFinite(distanceMeters)) throw criarErro('Não foi possível encontrar uma rota entre os endereços.', 422);
 

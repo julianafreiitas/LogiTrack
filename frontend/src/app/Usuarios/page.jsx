@@ -4,14 +4,19 @@ import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, FileText, MapPin, Package, Plus, Search, ShieldCheck, Users, X } from "lucide-react";
 import Aside from "../components/aside";
 import Header from "../components/header";
+import { API_URL } from "../lib/api";
 import "../Dash/pageDash.css";
 import "../sharedDashboard.css";
 import "./pageUsuarios.css";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api";
 const POR_PAGINA = 5;
 const LISTA_VAZIA = { dados: [], total: 0, pagina: 1, totalPaginas: 1 };
 const FORM_ADMIN_VAZIO = { nome: "", email: "", senha: "" };
+
+function cabecalhosAdmin(adicionais = {}) {
+  const token = window.localStorage.getItem("logitrack:adminToken");
+  return { ...adicionais, ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+}
 
 function iniciais(nome) {
   return nome.split(/\s+/).slice(0, 2).map((parte) => parte[0]).join("").toUpperCase();
@@ -49,7 +54,7 @@ export default function Usuarios() {
 
   const carregarResumo = useCallback(async () => {
     try {
-      const resposta = await fetch(`${API_URL}/usuarios/resumo`);
+      const resposta = await fetch(`${API_URL}/usuarios/resumo`, { headers: cabecalhosAdmin(), cache: "no-store" });
       if (!resposta.ok) throw new Error("Falha ao carregar o resumo");
       setResumo(await resposta.json());
     } catch {
@@ -77,10 +82,12 @@ export default function Usuarios() {
     setCarregando(true);
     setErroLista("");
 
-    fetch(`${API_URL}/usuarios/${rota}?${parametros.toString()}`, { signal: controlador.signal })
-      .then((resposta) => {
-        if (!resposta.ok) throw new Error("Falha ao carregar a lista");
-        return resposta.json();
+    fetch(`${API_URL}/usuarios/${rota}?${parametros.toString()}`, { signal: controlador.signal, headers: cabecalhosAdmin(), cache: "no-store" })
+      .then(async (resposta) => {
+        const resultado = await lerJson(resposta);
+        if (!resposta.ok) throw new Error(resultado?.message || resultado?.erro || "Falha ao carregar a lista.");
+        if (!resultado || !Array.isArray(resultado.dados)) throw new Error("A API retornou uma lista de usuários inválida.");
+        return resultado;
       })
       .then((resultado) => {
         setLista(resultado);
@@ -89,7 +96,7 @@ export default function Usuarios() {
       .catch((erro) => {
         if (erro.name === "AbortError") return;
         setLista(LISTA_VAZIA);
-        setErroLista("Não foi possível carregar os dados. Verifique se a API está no ar.");
+        setErroLista(erro.message || "Não foi possível carregar os dados. Verifique se a API está no ar.");
         setCarregando(false);
       });
 
@@ -113,7 +120,7 @@ export default function Usuarios() {
 
   async function abrirDetalhes(cliente) {
     try {
-      const resposta = await fetch(`${API_URL}/usuarios/clientes/${cliente.id}/solicitacao`);
+      const resposta = await fetch(`${API_URL}/usuarios/clientes/${cliente.id}/solicitacao`, { headers: cabecalhosAdmin(), cache: "no-store" });
       if (!resposta.ok) throw new Error("Falha ao carregar a solicitação");
       setSelecionado(await resposta.json());
     } catch {
@@ -129,7 +136,7 @@ export default function Usuarios() {
     try {
       const resposta = await fetch(`${API_URL}/usuarios/administradores`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: cabecalhosAdmin({ "Content-Type": "application/json" }),
         body: JSON.stringify(novoAdmin),
       });
       const corpo = await lerJson(resposta);

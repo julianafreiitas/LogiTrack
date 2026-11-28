@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, Clock3, Map as MapIcon, MapPin, Navigation, Package, RotateCcw, Satellite, UserRound } from "lucide-react";
+import { Check, Clock3, Map as MapIcon, MapPin, Navigation, Package, Satellite, UserRound, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import Aside from "../components/aside";
 import DeliveryBanner from "../components/DeliveryBanner";
@@ -16,10 +16,9 @@ const TrackingMap = dynamic(() => import("./TrackingMap"), {
   loading: () => <div className="tracking-map-loading">Carregando mapa...</div>,
 });
 
-const ROTULO_STATUS = { "A Caminho": "Entrega em Andamento", Pendente: "Entrega Pendente", Entregue: "Entrega Concluída" };
+const ROTULO_STATUS = { "Em Rota": "Em rota", "Saiu para Entrega": "Saiu para entrega", "A Caminho": "Saiu para entrega", Pendente: "Entrega pendente", Entregue: "Entrega concluída", Cancelado: "Entrega cancelada" };
 
 export default function MapaFuncionarios() {
-  const router = useRouter();
   const motorista = useIdentificacao("motorista");
   const [camada, setCamada] = useState("mapa");
   const [dados, setDados] = useState({ origem: null, entregas: [] });
@@ -27,10 +26,13 @@ export default function MapaFuncionarios() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
+  const [codigoRota, setCodigoRota] = useState("");
+  const [avisoCancelamento, setAvisoCancelamento] = useState(null);
 
   const carregar = useCallback(async (idMotorista, codigoPreferido) => {
     try {
-      const resposta = await chamarApi(`/portal/motorista/${idMotorista}/mapa`);
+      const filtroCodigo = codigoPreferido ? `?codigo=${encodeURIComponent(codigoPreferido)}` : "";
+      const resposta = await chamarApi(`/portal/motorista/${idMotorista}/mapa${filtroCodigo}`);
       setDados(resposta);
       setErro("");
       setSelecionadaId((atual) => {
@@ -39,7 +41,8 @@ export default function MapaFuncionarios() {
           if (pedida) return pedida.id;
         }
         if (resposta.entregas.some((entrega) => entrega.id === atual)) return atual;
-        const primeira = resposta.entregas.find((entrega) => entrega.status === "A Caminho")
+        const primeira = resposta.entregas.find((entrega) => entrega.status === "Saiu para Entrega" || entrega.status === "A Caminho")
+          ?? resposta.entregas.find((entrega) => entrega.status === "Em Rota")
           ?? resposta.entregas.find((entrega) => entrega.status === "Pendente")
           ?? resposta.entregas[0];
         return primeira ? primeira.id : null;
@@ -55,9 +58,27 @@ export default function MapaFuncionarios() {
     if (!motorista.id) return;
     // "Ver rota" na tela Minhas Entregas manda ?codigo=... para abrir já nessa entrega
     const codigo = new URLSearchParams(window.location.search).get("codigo");
+    setCodigoRota(codigo || "");
     setCarregando(true);
     carregar(motorista.id, codigo);
   }, [motorista.id, carregar]);
+
+  useEffect(() => {
+    if (!motorista.id || !codigoRota) return undefined;
+    let ativo = true;
+    const atualizar = async () => {
+      try {
+        const dados = await chamarApi(`/portal/motorista/${motorista.id}/entregas?status=Cancelado&limite=50`);
+        const cancelada = dados.itens.find((entrega) => entrega.codigo === codigoRota);
+        if (ativo && cancelada) setAvisoCancelamento(cancelada);
+        if (ativo) await carregar(motorista.id, codigoRota);
+      } catch {
+        // Tenta novamente no prÃ³ximo ciclo sem fechar o mapa.
+      }
+    };
+    const intervalo = window.setInterval(atualizar, 10000);
+    return () => { ativo = false; window.clearInterval(intervalo); };
+  }, [motorista.id, codigoRota, carregar]);
 
   const selecionada = dados.entregas.find((entrega) => entrega.id === selecionadaId) ?? null;
 
@@ -166,17 +187,17 @@ export default function MapaFuncionarios() {
                   <Navigation size={14} fill="currentColor" /> Ver rota
                 </button>
                 {selecionada.status === "Entregue" ? (
-                  <button type="button" className="detail-cancel-button" disabled={salvando} onClick={() => mudarStatus("A Caminho")}>
-                    <RotateCcw size={15} /> Cancelar entrega
-                  </button>
-                ) : selecionada.status === "A Caminho" ? (
+                  <span className="md-complete-label"><Check size={15} /> Entrega concluída</span>
+                ) : selecionada.status === "Saiu para Entrega" || selecionada.status === "A Caminho" ? (
                   <button type="button" className="detail-confirm-button" disabled={salvando} onClick={() => mudarStatus("Entregue")}>
-                    <Check size={15} /> Confirmar entrega
+                    <Check size={15} /> Marcar como entregue
+                  </button>
+                ) : selecionada.status === "Em Rota" ? (
+                  <button type="button" className="detail-confirm-button" disabled={salvando} onClick={() => mudarStatus("Saiu para Entrega")}>
+                    <Navigation size={15} /> Saiu para entrega
                   </button>
                 ) : (
-                  <button type="button" className="detail-confirm-button" disabled={salvando} onClick={() => mudarStatus("A Caminho")}>
-                    <Navigation size={15} /> Iniciar entrega
-                  </button>
+                  <span className="md-empty">Aguardando início em Minhas Entregas</span>
                 )}
               </div>
 
@@ -191,7 +212,7 @@ export default function MapaFuncionarios() {
                       onClick={() => setSelecionadaId(entrega.id)}
                     >
                       <strong>{entrega.codigo}</strong>
-                      <span>{entrega.previsaoHora} · {entrega.status === "A Caminho" ? "Em andamento" : entrega.status === "Entregue" ? "Concluída" : "Pendente"}</span>
+                      <span>{entrega.previsaoHora} · {ROTULO_STATUS[entrega.status] || entrega.status}</span>
                     </button>
                   ))}
                 </div>

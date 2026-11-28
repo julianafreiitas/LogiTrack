@@ -30,13 +30,25 @@ export function limparSessaoCliente() {
 export async function chamarApi(caminho, opcoes) {
   const resposta = await fetch(`${API_URL}${caminho}`, {
     ...opcoes,
+    cache: "no-store",
     headers: { "Content-Type": "application/json", ...(opcoes?.headers ?? {}) },
   });
-  const dados = await resposta.json().catch(() => ({}));
+  const texto = await resposta.text();
+  let dados = {};
+  if (texto) {
+    try {
+      dados = JSON.parse(texto);
+    } catch {
+      // Respostas HTML/texto de proxy também precisam virar erros legíveis.
+    }
+  }
   if (!resposta.ok) {
-    const erro = new Error(dados.message || "Não foi possível completar a operação.");
+    const erro = new Error(dados.message || dados.error || dados.erro || `Não foi possível completar a operação (HTTP ${resposta.status}).`);
     erro.status = resposta.status;
     throw erro;
+  }
+  if (!texto || dados === null || typeof dados !== "object") {
+    throw new Error("O servidor retornou uma resposta inválida. Tente novamente.");
   }
   return dados;
 }

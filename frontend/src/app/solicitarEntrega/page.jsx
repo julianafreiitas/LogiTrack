@@ -53,6 +53,29 @@ function moeda(valor) {
   });
 }
 
+async function lerRespostaApi(response, mensagemFallback) {
+  const texto = await response.text();
+  let data = {};
+
+  if (texto) {
+    try {
+      data = JSON.parse(texto);
+    } catch {
+      // Alguns servidores/proxies retornam HTML ou texto quando falham.
+    }
+  }
+
+  if (!response.ok) {
+    throw new Error(data.error || data.message || `${mensagemFallback} (HTTP ${response.status}).`);
+  }
+
+  if (!texto || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("O servidor retornou uma resposta inválida. Tente novamente.");
+  }
+
+  return data;
+}
+
 // QR Code demonstrativo
 function PixDemoQr({ seed }) {
   return (
@@ -106,8 +129,7 @@ export default function SolicitarEntrega() {
           pagamento: formData.pagamento,
         }),
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || data.message || "Não foi possível registrar o pedido pago.");
+      const data = await lerRespostaApi(response, "Não foi possível registrar o pedido pago");
       setPedidoCriado(data.data);
       setPixEmExibicao(false);
       setSolicitacaoEnviada(true);
@@ -174,13 +196,7 @@ export default function SolicitarEntrega() {
         })
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || "Não foi possível calcular o frete."
-        );
-      }
+      const data = await lerRespostaApi(response, "Não foi possível calcular o frete");
 
       setOrcamento(data);
       setEtapa(2);

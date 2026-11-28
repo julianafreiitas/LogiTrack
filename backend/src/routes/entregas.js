@@ -13,13 +13,13 @@ router.get("/", async (req, res, next) => {
   try {
     const [rows] = await pool.query(`
       SELECT
-        e.codigo AS code,
+        e.codigo_rastreio AS code,
         e.endereco_destino AS destination,
         COALESCE(m.nome, 'Sem motorista') AS driver,
         e.previsao AS eta,
         CASE
-          WHEN e.status IN ('Pendente', 'A Caminho') AND e.previsao < NOW() THEN 'Atrasada'
-          WHEN e.status = 'A Caminho' THEN 'Em trânsito'
+          WHEN e.status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho') AND e.previsao < NOW() THEN 'Atrasada'
+          WHEN e.status IN ('Em Rota', 'Saiu para Entrega', 'A Caminho') THEN 'Em trânsito'
           ELSE e.status
         END AS status
       FROM entregas e

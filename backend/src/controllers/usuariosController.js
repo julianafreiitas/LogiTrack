@@ -242,7 +242,8 @@ export async function criarAdministrador(request, response, next) {
     const nome = String(request.body?.nome ?? "").trim();
     const email = String(request.body?.email ?? "").trim().toLowerCase();
     const senha = String(request.body?.senha ?? "");
-    const telefone = String(request.body?.telefone ?? "").trim() || null;
+    // usuarios.telefone é NOT NULL; o formulário de administrador não pede telefone.
+    const telefone = String(request.body?.telefone ?? "").trim();
 
     if (!nome || nome.length > 100) {
       return response.status(400).json({ message: "Informe o nome do administrador (até 100 caracteres)." });

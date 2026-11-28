@@ -2,13 +2,13 @@ import { createHash } from "node:crypto";
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import pool from "../config/database.js";
+import { obterSegredoJwt } from "../config/jwtSecret.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
 
 const router = Router();
 
 function gerarToken(cliente) {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) throw new Error("JWT_SECRET precisa estar configurado.");
+  const secret = obterSegredoJwt();
   return jwt.sign(
     { id: cliente.id, email: cliente.email, tipo: "cliente" },
     secret,
@@ -28,19 +28,28 @@ router.post("/cadastro", async (request, response, next) => {
     const nome = String(request.body?.nome ?? "").trim();
     const email = String(request.body?.email ?? "").trim().toLowerCase();
     const telefone = String(request.body?.telefone ?? "").trim();
+    const cpf = soDigitos(request.body?.cpf);
     const senha = String(request.body?.senha ?? "");
 
-    if (!nome || nome.length > 100 || !/^\S+@\S+\.\S+$/.test(email) || email.length > 100 || !telefone || telefone.length > 40) {
+    if (!nome || nome.length > 100 || !/^\S+@\S+\.\S+$/.test(email) || email.length > 100 || !telefone || telefone.length > 40 || cpf.length !== 11) {
       return response.status(400).json({ message: "Informe nome, e-mail válido e telefone." });
     }
     if (senha.length < 6) {
       return response.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres." });
     }
 
+    const [[cpfExistente]] = await pool.execute(
+      "SELECT id FROM cadastro WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ? LIMIT 1",
+      [cpf],
+    );
+    if (cpfExistente) {
+      return response.status(409).json({ message: "Este CPF já está vinculado a uma conta." });
+    }
+
     const senhaHash = await hashPassword(senha);
     const [resultado] = await pool.execute(
-      "INSERT INTO cadastro (nome, email, senha, telefone) VALUES (?, ?, ?, ?)",
-      [nome, email, senhaHash, telefone],
+      "INSERT INTO cadastro (nome, email, senha, telefone, cpf) VALUES (?, ?, ?, ?, ?)",
+      [nome, email, senhaHash, telefone, cpf],
     );
     return response.status(201).json({
       message: "Cadastro criado. Entre com seu e-mail e senha.",
@@ -102,8 +111,7 @@ router.post("/recuperar/verificar", async (request, response, next) => {
       return response.status(409).json({ message: "Este CPF está ligado a mais de uma conta. Procure o suporte." });
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET precisa estar configurado.");
+    const secret = obterSegredoJwt();
     const token = jwt.sign(
       { id: contas[0].id, tipo: "reset", v: assinaturaSenha(contas[0].senha) },
       secret,
@@ -126,7 +134,7 @@ router.post("/recuperar/redefinir", async (request, response, next) => {
 
     let dados;
     try {
-      dados = jwt.verify(token, process.env.JWT_SECRET);
+      dados = jwt.verify(token, obterSegredoJwt());
     } catch {
       return response.status(401).json({ message: SESSAO_EXPIRADA });
     }

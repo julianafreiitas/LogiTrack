@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { obterSegredoJwt } from "../config/jwtSecret.js";
 
 // Protege rotas: exige o header "Authorization: Bearer <token>"
 export function autenticar(request, response, next) {
@@ -10,7 +11,7 @@ export function autenticar(request, response, next) {
   }
 
   try {
-    request.usuario = jwt.verify(token, process.env.JWT_SECRET);
+    request.usuario = jwt.verify(token, obterSegredoJwt());
     next();
   } catch {
     response.status(401).json({ erro: "Token inválido ou expirado." });

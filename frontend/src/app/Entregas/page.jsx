@@ -25,14 +25,13 @@ function formatarPrevisao(valor) {
 function traduzirStatus(entrega) {
   const statusBanco = entrega.status;
 
-  if (statusBanco === "Entregue") return "Entregue";
-  if (statusBanco === "Cancelado") return "Cancelado";
+  if (statusBanco === "Entregue" || statusBanco === "Cancelado") return statusBanco;
 
   const previsao = entrega.previsao ? new Date(entrega.previsao) : null;
   const atrasada = previsao && !Number.isNaN(previsao.getTime()) && previsao < new Date();
   if (atrasada) return "Atrasada";
 
-  if (statusBanco === "A Caminho") return "Em trânsito";
+  if (["Em Rota", "Saiu para Entrega", "A Caminho"].includes(statusBanco)) return "Em trânsito";
   return "Pendente";
 }
 
@@ -51,18 +50,27 @@ export default function Entregas() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
 
-  const carregar = useCallback(async () => {
-    setCarregando(true);
+  const carregar = useCallback(async (silencioso = false) => {
+    if (!silencioso) setCarregando(true);
     try {
-      const res = await fetch(`${API_URL}/deliveries`);
-      if (!res.ok) throw new Error(`Erro ${res.status} ao carregar entregas`);
-      const dados = await res.json();
+      const token = window.localStorage.getItem("logitrack:adminToken");
+      const res = await fetch(`${API_URL}/deliveries`, {
+        cache: "no-store",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const texto = await res.text();
+      let dados = [];
+      try { dados = texto ? JSON.parse(texto) : []; } catch { /* erro HTTP será exibido abaixo */ }
+      if (!res.ok) throw new Error(dados.message || dados.error || dados.erro || `Erro ${res.status} ao carregar entregas.`);
+      if (!Array.isArray(dados)) throw new Error("A API retornou uma lista de entregas inválida.");
 
-      const lista = (Array.isArray(dados) ? dados : []).map((item) => ({
+      const lista = dados.map((item) => ({
         code: item.titulo,
         destination: item.endereco_destino,
-        driver: item.motorista,
+        driver: item.motorista || "Sem motorista",
         eta: formatarPrevisao(item.previsao),
+        client: item.cliente || "Cliente",
+        origin: item.endereco_coleta || "",
         status: traduzirStatus(item),
       }));
 
@@ -71,18 +79,20 @@ export default function Entregas() {
     } catch (e) {
       setErro(e.message || "Não foi possível carregar as entregas.");
     } finally {
-      setCarregando(false);
+      if (!silencioso) setCarregando(false);
     }
   }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     carregar();
+    const intervalo = window.setInterval(() => carregar(true), 10000);
+    return () => window.clearInterval(intervalo);
   }, [carregar]);
 
   const filteredDeliveries = useMemo(() => deliveries.filter((delivery) => {
     const matchesStatus = status === "Todos os status" || delivery.status === status;
-    const searchable = `${delivery.code} ${delivery.destination} ${delivery.driver}`.toLocaleLowerCase("pt-BR");
+    const searchable = `${delivery.code} ${delivery.client} ${delivery.origin} ${delivery.destination} ${delivery.driver}`.toLocaleLowerCase("pt-BR");
     return matchesStatus && searchable.includes(query.trim().toLocaleLowerCase("pt-BR"));
   }), [deliveries, query, status]);
 
@@ -121,12 +131,12 @@ export default function Entregas() {
 
           <div className="delivery-table-wrap">
             <table className="delivery-table">
-              <thead><tr><th>Código</th><th>Destino</th><th>Motorista</th><th>Previsão</th><th>Status</th></tr></thead>
+              <thead><tr><th>Código</th><th>Cliente</th><th>Coleta</th><th>Destino</th><th>Motorista</th><th>Previsão</th><th>Status</th></tr></thead>
               <tbody>
                 {filteredDeliveries.map((delivery) => (
                   <tr key={delivery.code}>
                     <td className="delivery-code">{delivery.code}</td>
-                    <td>{delivery.destination}</td>
+                    <td>{delivery.client}</td><td>{delivery.origin || "—"}</td><td>{delivery.destination}</td>
                     <td>{delivery.driver}</td>
                     <td>{delivery.eta}</td>
                     <td>
@@ -139,9 +149,9 @@ export default function Entregas() {
                     </td>
                   </tr>
                 ))}
-                {carregando && <tr><td className="empty-state" colSpan="5">Carregando entregas...</td></tr>}
-                {!carregando && erro && <tr><td className="empty-state" colSpan="5">{erro}</td></tr>}
-                {!carregando && !erro && filteredDeliveries.length === 0 && <tr><td className="empty-state" colSpan="5">Nenhuma entrega encontrada.</td></tr>}
+                {carregando && <tr><td className="empty-state" colSpan="7">Carregando entregas...</td></tr>}
+                {!carregando && erro && <tr><td className="empty-state" colSpan="7">{erro}</td></tr>}
+                {!carregando && !erro && filteredDeliveries.length === 0 && <tr><td className="empty-state" colSpan="7">Nenhuma entrega encontrada.</td></tr>}
               </tbody>
             </table>
           </div>

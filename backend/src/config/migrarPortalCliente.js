@@ -5,6 +5,7 @@ const CAMPOS = {
     ultimo_acesso: "TIMESTAMP NULL DEFAULT NULL",
   },
   cadastro: {
+    cpf: "VARCHAR(20) DEFAULT NULL",
     nascimento: "DATE DEFAULT NULL",
     cep: "VARCHAR(12) DEFAULT NULL",
     rua: "VARCHAR(150) DEFAULT NULL",
@@ -57,6 +58,14 @@ export async function migrarPortalCliente() {
       }
     }
   }
+
+  const [[statusEntrega]] = await pool.query(
+    "SELECT COLUMN_TYPE AS tipo FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'entregas' AND COLUMN_NAME = 'status'",
+  );
+  if (statusEntrega && (!statusEntrega.tipo.includes("Em Rota") || !statusEntrega.tipo.includes("Saiu para Entrega"))) {
+    await pool.query("ALTER TABLE entregas MODIFY status ENUM('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho', 'Entregue', 'Cancelado') NOT NULL DEFAULT 'Pendente'");
+  }
+  await pool.query("UPDATE entregas SET status = 'Saiu para Entrega' WHERE status = 'A Caminho'");
 
   for (const [tabela, coluna] of [["cadastro", "id"], ["entregas", "codigo_rastreio"], ["entregas", "id_cliente"], ["entregas", "coordenadas_destino"], ["entregas", "previsao"]]) {
     if (!(await colunaExiste(tabela, coluna))) {

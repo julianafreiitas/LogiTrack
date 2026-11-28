@@ -4,13 +4,13 @@ import { iniciais, localidade, ruaNumero } from "../utils/endereco.js";
 // Portal do motorista: tudo aqui é filtrado pelo id do motorista da URL.
 // (Enquanto o login real não existe, o front manda o id escolhido no seletor.)
 
-const STATUS_VALIDOS = ["Pendente", "A Caminho", "Entregue", "Cancelado"];
+const STATUS_VALIDOS = ["Pendente", "Em Rota", "Saiu para Entrega", "A Caminho", "Entregue", "Cancelado"];
 
 // Mudanças de status que o motorista pode fazer. "Entregue → A Caminho" desfaz uma confirmação.
 const TRANSICOES = {
-  Pendente: ["A Caminho"],
-  "A Caminho": ["Entregue"],
-  Entregue: ["A Caminho"],
+  Pendente: ["Em Rota"],
+  "Em Rota": ["Saiu para Entrega"],
+  "Saiu para Entrega": ["Entregue"],
 };
 
 const CAMPOS_ENTREGA = `
@@ -18,11 +18,20 @@ const CAMPOS_ENTREGA = `
   e.codigo_rastreio AS codigo,
   COALESCE(e.nome_cliente, c.nome, 'Cliente') AS cliente,
   e.endereco_destino AS endereco,
+  e.endereco_coleta AS coleta,
+  e.tipo_servico AS servico,
+  e.tamanho_pacote AS tamanho,
+  e.peso_kg AS pesoKg,
+  e.valor_frete AS valorFrete,
+  e.forma_pagamento AS pagamento,
+  e.urgencia,
+  e.observacoes,
+  (e.status = 'Cancelado' AND e.status_antes_cancelamento IN ('Em Rota', 'Saiu para Entrega', 'A Caminho')) AS precisaDevolucao,
   e.status,
   DATE_FORMAT(e.previsao, '%H:%i') AS previsaoHora,
   DATE_FORMAT(e.previsao, '%d/%m/%Y') AS previsaoData,
   DATE_FORMAT(e.atualizado_em, '%d/%m/%Y') AS dataEntrega,
-  (e.status IN ('Pendente', 'A Caminho') AND e.previsao < NOW()) AS atrasada
+  (e.status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho') AND e.previsao < NOW()) AS atrasada
 `;
 
 const ORIGEM_ENTREGAS = "FROM entregas e LEFT JOIN cadastro c ON c.id = e.id_cliente";
@@ -33,6 +42,15 @@ function paraTela(linha) {
     codigo: linha.codigo,
     cliente: linha.cliente,
     endereco: linha.endereco,
+    coleta: linha.coleta,
+    servico: linha.servico,
+    tamanho: linha.tamanho,
+    pesoKg: linha.pesoKg,
+    valorFrete: linha.valorFrete,
+    pagamento: linha.pagamento,
+    urgencia: linha.urgencia,
+    observacoes: linha.observacoes,
+    precisaDevolucao: Boolean(linha.precisaDevolucao),
     ruaNumero: ruaNumero(linha.endereco),
     localidade: localidade(linha.endereco),
     status: linha.status,
@@ -86,13 +104,14 @@ export async function resumoDoMotorista(request, response) {
   // "Hoje" = tudo que ainda está aberto + o que foi concluído hoje
   const [[contagem]] = await pool.query(
     `SELECT
-       COUNT(*) AS total,
+       COALESCE(SUM(status <> 'Cancelado'), 0) AS total,
        COALESCE(SUM(status = 'Entregue'), 0) AS entregues,
-       COALESCE(SUM(status = 'A Caminho'), 0) AS emAndamento,
+       COALESCE(SUM(status IN ('Em Rota', 'Saiu para Entrega', 'A Caminho')), 0) AS emAndamento,
        COALESCE(SUM(status = 'Pendente'), 0) AS pendentes,
+       COALESCE(SUM(status = 'Cancelado'), 0) AS canceladas,
        COALESCE(SUM(status = 'Entregue' AND DATE(atualizado_em) = CURDATE()), 0) AS concluidasHoje
      FROM entregas
-     WHERE id_motorista = ? AND status <> 'Cancelado'`,
+     WHERE id_motorista = ?`,
     [motorista.id],
   );
 
@@ -112,6 +131,7 @@ export async function resumoDoMotorista(request, response) {
     entregues: Number(contagem.entregues),
     emAndamento,
     pendentes,
+    canceladas: Number(contagem.canceladas),
     hoje: {
       total: emAndamento + pendentes + concluidasHoje,
       concluidas: concluidasHoje,
@@ -131,7 +151,9 @@ export async function listarEntregasDoMotorista(request, response) {
   const condicoes = ["e.id_motorista = ?"];
   const parametros = [motorista.id];
 
-  if (STATUS_VALIDOS.includes(status)) {
+  if (status === "Em Andamento") {
+    condicoes.push("e.status IN ('Em Rota', 'Saiu para Entrega', 'A Caminho')");
+  } else if (STATUS_VALIDOS.includes(status)) {
     condicoes.push("e.status = ?");
     parametros.push(status);
   }
@@ -171,15 +193,24 @@ export async function listarEntregasDoMotorista(request, response) {
 export async function mapaDoMotorista(request, response) {
   const { motorista } = request;
 
+  const codigo = String(request.query.codigo ?? "").trim();
+  const condicoes = [
+    "e.id_motorista = ?",
+    "(e.status IN ('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho') OR (e.status = 'Entregue' AND DATE(e.atualizado_em) = CURDATE()))",
+  ];
+  const parametros = [motorista.id];
+  if (codigo) {
+    condicoes.push("e.codigo_rastreio = ?");
+    parametros.push(codigo);
+  }
+
   const [linhas] = await pool.query(
     `SELECT ${CAMPOS_ENTREGA},
             ST_Y(e.coordenadas_destino) AS lat, ST_X(e.coordenadas_destino) AS lng
      ${ORIGEM_ENTREGAS}
-     WHERE e.id_motorista = ?
-       AND (e.status IN ('Pendente', 'A Caminho')
-            OR (e.status = 'Entregue' AND DATE(e.atualizado_em) = CURDATE()))
+     WHERE ${condicoes.join(" AND ")}
      ORDER BY e.previsao ASC, e.id_entregas`,
-    [motorista.id],
+    parametros,
   );
 
   response.json({
@@ -216,5 +247,13 @@ export async function atualizarStatusDaEntrega(request, response) {
   }
 
   await pool.query("UPDATE entregas SET status = ? WHERE id_entregas = ?", [novoStatus, entrega.id]);
+  if (["Em Rota", "Saiu para Entrega"].includes(novoStatus)) {
+    await pool.query("UPDATE motoristas SET status = 'Em rota' WHERE id_motoristas = ? AND situacao = 'Ativo' AND status <> 'Indisponível'", [motorista.id]);
+  } else if (novoStatus === "Entregue") {
+    await pool.query(`UPDATE motoristas SET status = CASE
+      WHEN status = 'Indisponível' THEN status
+      WHEN EXISTS (SELECT 1 FROM entregas WHERE id_motorista = ? AND status IN ('Pendente', 'Em Rota', 'Saiu para Entrega')) THEN 'Em rota'
+      ELSE 'Disponível' END WHERE id_motoristas = ?`, [motorista.id, motorista.id]);
+  }
   response.json({ codigo, status: novoStatus });
 }

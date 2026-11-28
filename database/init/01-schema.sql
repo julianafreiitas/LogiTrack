@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS entregas (
     pago_em DATETIME DEFAULT NULL,
     coordenadas_destino POINT NOT NULL,
     previsao DATETIME NOT NULL,
-    status ENUM('Pendente', 'A Caminho', 'Entregue', 'Cancelado') NOT NULL DEFAULT 'Pendente',
+    status ENUM('Pendente', 'Em Rota', 'Saiu para Entrega', 'A Caminho', 'Entregue', 'Cancelado') NOT NULL DEFAULT 'Pendente',
     checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_cliente) REFERENCES cadastro(id),
